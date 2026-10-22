@@ -67,7 +67,13 @@ class MainActivity : ComponentActivity() {
             val isOnboardingCompleted by preferencesManager.isOnboardingCompleted.collectAsState(initial = false)
             val currentLanguage by preferencesManager.appLanguage.collectAsState(initial = preferencesManager.getInitialLanguage())
             val rawLanguage by preferencesManager.rawAppLanguage.collectAsState(initial = preferencesManager.getInitialRawLanguage())
-            val currentTheme by preferencesManager.appTheme.collectAsState(initial = "system")
+            var currentTheme by remember { mutableStateOf(preferencesManager.getInitialTheme()) }
+            val storedTheme by preferencesManager.appTheme.collectAsState(initial = preferencesManager.getInitialTheme())
+
+            LaunchedEffect(storedTheme) {
+                currentTheme = storedTheme
+            }
+
             val devotionalName by preferencesManager.devotionalName.collectAsState(initial = "")
 
             val darkTheme = when (currentTheme) {
@@ -101,6 +107,7 @@ class MainActivity : ComponentActivity() {
                             }
                         },
                         onThemeChange = { theme ->
+                            currentTheme = theme
                             lifecycleScope.launch {
                                 preferencesManager.setTheme(theme)
                             }

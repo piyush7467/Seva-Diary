@@ -77,7 +77,7 @@ fun ChantingScreen(
     }
 
     Scaffold(
-        containerColor = Color(0xFF0F1115),
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Surface(
                 modifier = Modifier.fillMaxWidth(),

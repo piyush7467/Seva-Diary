@@ -148,8 +148,20 @@ fun OnboardingScreen(
 
     val pagerState = rememberPagerState(pageCount = { pages.size })
     val currentPageTheme = pages[pagerState.currentPage]
+
+    val isSystemDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val isDarkSelected = when (currentTheme) {
+        "dark" -> true
+        "light" -> false
+        else -> isSystemDark
+    }
+
+    val page4Bg = if (isDarkSelected) Color(0xFF141312) else Color(0xFFFBF8F3)
+    val page4Accent = if (isDarkSelected) Color(0xFF4DB670) else Color(0xFF1E4D2B)
+    val page4OnAccent = if (isDarkSelected) Color(0xFF0C2B16) else Color.White
+
     val animatedBgColor by animateColorAsState(
-        targetValue = currentPageTheme.backgroundColor,
+        targetValue = if (pagerState.currentPage == 4) page4Bg else currentPageTheme.backgroundColor,
         label = "onboardingBgColor"
     )
 
@@ -264,9 +276,9 @@ fun OnboardingScreen(
                                     label = "dotWidth"
                                 )
                                 val dotColor = if (isSelected) {
-                                    currentPageTheme.accentColor
+                                    page4Accent
                                 } else {
-                                    currentPageTheme.accentColor.copy(alpha = 0.25f)
+                                    page4Accent.copy(alpha = 0.25f)
                                 }
                                 Box(
                                     modifier = Modifier
@@ -285,8 +297,8 @@ fun OnboardingScreen(
                                 .height(52.dp),
                             shape = RoundedCornerShape(26.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = currentPageTheme.accentColor,
-                                contentColor = Color.White
+                                containerColor = page4Accent,
+                                contentColor = page4OnAccent
                             ),
                             elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
                         ) {
@@ -493,6 +505,20 @@ private fun ChoosePreferencesOnboardingPage(
     onThemeChange: (String) -> Unit
 ) {
     val isHindi = currentLanguage == "hi"
+    val isSystemDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val isDarkSelected = when (currentTheme) {
+        "dark" -> true
+        "light" -> false
+        else -> isSystemDark
+    }
+
+    val cardBg = if (isDarkSelected) Color(0xFF1E1C1A) else Color.White
+    val cardBorder = if (isDarkSelected) Color(0xFF38332C) else pageTheme.iconColor.copy(alpha = 0.25f)
+    val titleText = if (isDarkSelected) Color(0xFFF2EFE9) else pageTheme.titleColor
+    val descText = if (isDarkSelected) Color(0xFFA8A39B) else pageTheme.descColor
+    val segmentedBg = if (isDarkSelected) Color(0xFF262320) else pageTheme.backgroundColor
+    val unselectedText = if (isDarkSelected) Color(0xFFCCCCCC) else Color(0xFF333333)
+    val accent = if (isDarkSelected) Color(0xFF4DB670) else pageTheme.accentColor
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val totalHeight = maxHeight
@@ -546,7 +572,7 @@ private fun ChoosePreferencesOnboardingPage(
                     fontFamily = FontFamily.Serif,
                     fontWeight = FontWeight.Bold,
                     fontSize = if (isCompactScreen) 22.sp else 24.sp,
-                    color = pageTheme.titleColor,
+                    color = titleText,
                     letterSpacing = (-0.2).sp
                 ),
                 textAlign = TextAlign.Center
@@ -583,7 +609,7 @@ private fun ChoosePreferencesOnboardingPage(
             Text(
                 text = stringResource(pageTheme.descRes),
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = pageTheme.descColor,
+                    color = descText,
                     fontSize = 13.sp,
                     lineHeight = 18.sp
                 ),
@@ -597,9 +623,9 @@ private fun ChoosePreferencesOnboardingPage(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = cardBg),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                border = BorderStroke(1.dp, pageTheme.iconColor.copy(alpha = 0.25f))
+                border = BorderStroke(1.dp, cardBorder)
             ) {
                 Column(
                     modifier = Modifier
@@ -611,14 +637,14 @@ private fun ChoosePreferencesOnboardingPage(
                             imageVector = Icons.Default.Language,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
-                            tint = pageTheme.accentColor
+                            tint = accent
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = stringResource(R.string.pref_language),
                             style = MaterialTheme.typography.titleSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = pageTheme.titleColor
+                                color = titleText
                             )
                         )
                     }
@@ -629,21 +655,23 @@ private fun ChoosePreferencesOnboardingPage(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(10.dp))
-                            .background(pageTheme.backgroundColor)
+                            .background(segmentedBg)
                             .padding(3.dp),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         SegmentedLanguageItem(
                             label = "English",
                             isSelected = currentLanguage == "en",
-                            accentColor = pageTheme.accentColor,
+                            accentColor = accent,
+                            unselectedTextColor = unselectedText,
                             onClick = { onLanguageChange("en") },
                             modifier = Modifier.weight(1f)
                         )
                         SegmentedLanguageItem(
                             label = "हिंदी",
                             isSelected = currentLanguage == "hi",
-                            accentColor = pageTheme.accentColor,
+                            accentColor = accent,
+                            unselectedTextColor = unselectedText,
                             onClick = { onLanguageChange("hi") },
                             modifier = Modifier.weight(1f)
                         )
@@ -657,9 +685,9 @@ private fun ChoosePreferencesOnboardingPage(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = cardBg),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                border = BorderStroke(1.dp, pageTheme.iconColor.copy(alpha = 0.25f))
+                border = BorderStroke(1.dp, cardBorder)
             ) {
                 Column(
                     modifier = Modifier
@@ -671,14 +699,14 @@ private fun ChoosePreferencesOnboardingPage(
                             imageVector = Icons.Default.Palette,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
-                            tint = pageTheme.accentColor
+                            tint = accent
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = stringResource(R.string.pref_theme),
                             style = MaterialTheme.typography.titleSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = pageTheme.titleColor
+                                color = titleText
                             )
                         )
                     }
@@ -693,7 +721,7 @@ private fun ChoosePreferencesOnboardingPage(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(10.dp))
-                            .background(pageTheme.backgroundColor)
+                            .background(segmentedBg)
                             .padding(3.dp),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
@@ -701,7 +729,8 @@ private fun ChoosePreferencesOnboardingPage(
                             icon = Icons.Default.LightMode,
                             label = lightLabel,
                             isSelected = currentTheme == "light",
-                            accentColor = pageTheme.accentColor,
+                            accentColor = accent,
+                            unselectedTextColor = unselectedText,
                             onClick = { onThemeChange("light") },
                             modifier = Modifier.weight(1f)
                         )
@@ -709,7 +738,8 @@ private fun ChoosePreferencesOnboardingPage(
                             icon = Icons.Default.DarkMode,
                             label = darkLabel,
                             isSelected = currentTheme == "dark",
-                            accentColor = pageTheme.accentColor,
+                            accentColor = accent,
+                            unselectedTextColor = unselectedText,
                             onClick = { onThemeChange("dark") },
                             modifier = Modifier.weight(1f)
                         )
@@ -717,7 +747,8 @@ private fun ChoosePreferencesOnboardingPage(
                             icon = Icons.Default.BrightnessAuto,
                             label = systemLabel,
                             isSelected = currentTheme == "system",
-                            accentColor = pageTheme.accentColor,
+                            accentColor = accent,
+                            unselectedTextColor = unselectedText,
                             onClick = { onThemeChange("system") },
                             modifier = Modifier.weight(1f)
                         )
@@ -735,6 +766,7 @@ private fun SegmentedLanguageItem(
     label: String,
     isSelected: Boolean,
     accentColor: Color,
+    unselectedTextColor: Color = Color(0xFF333333),
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -756,7 +788,7 @@ private fun SegmentedLanguageItem(
     ) {
         Text(
             text = label,
-            color = if (isSelected) Color.White else Color(0xFF333333),
+            color = if (isSelected) Color.White else unselectedTextColor,
             style = MaterialTheme.typography.labelLarge.copy(
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
             ),
@@ -772,6 +804,7 @@ private fun SegmentedThemeItem(
     label: String,
     isSelected: Boolean,
     accentColor: Color,
+    unselectedTextColor: Color = Color(0xFF333333),
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -799,12 +832,12 @@ private fun SegmentedThemeItem(
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier.size(18.dp),
-                tint = if (isSelected) Color.White else Color(0xFF555555)
+                tint = if (isSelected) Color.White else unselectedTextColor
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = label,
-                color = if (isSelected) Color.White else Color(0xFF333333),
+                color = if (isSelected) Color.White else unselectedTextColor,
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                 ),
