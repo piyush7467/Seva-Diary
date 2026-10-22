@@ -80,7 +80,7 @@ fun ReportsScreen(
             ReportOptionCard(
                 title = stringResource(R.string.report_type_jaap),
                 subtitle = "Daily Naam Jaap counts, targets, period summaries, and totals",
-                drawableRes = R.drawable.ic_devotional_jaap_mala,
+                drawableRes = R.drawable.counter_logo,
                 isSelected = uiState.selectedReportType == "JAAP",
                 onClick = { viewModel.selectReportType("JAAP") }
             )

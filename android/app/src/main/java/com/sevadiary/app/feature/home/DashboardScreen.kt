@@ -1,7 +1,9 @@
 package com.sevadiary.app.feature.home
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -131,14 +133,14 @@ fun DashboardScreen(
                         modifier = Modifier
                             .size(54.dp)
                             .clip(CircleShape)
-                            .background(ForestGreen),
+                            .background(Color(0xFF1E232B))
+                            .border(BorderStroke(1.dp, SaffronGold.copy(alpha = 0.4f)), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_devotional_jaap_mala),
-                            contentDescription = "Naam Jaap",
-                            tint = Color.White,
-                            modifier = Modifier.size(32.dp)
+                        Image(
+                            painter = painterResource(id = R.drawable.counter_logo),
+                            contentDescription = "Naam Jaap Counter",
+                            modifier = Modifier.size(38.dp)
                         )
                     }
                 }
