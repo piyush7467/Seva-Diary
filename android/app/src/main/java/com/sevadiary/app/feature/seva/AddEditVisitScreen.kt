@@ -100,7 +100,7 @@ fun AddEditVisitScreen(
             DevotionalCard {
                 Text(
                     text = stringResource(R.string.ashram_select),
-                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = ForestGreen)
+                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -154,7 +154,7 @@ fun AddEditVisitScreen(
             DevotionalCard {
                 Text(
                     text = "Visit Dates & Duration",
-                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = ForestGreen)
+                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -183,7 +183,7 @@ fun AddEditVisitScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(8.dp))
-                        .background(ForestGreen.copy(alpha = 0.08f))
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
                         .padding(horizontal = 14.dp, vertical = 10.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -194,7 +194,7 @@ fun AddEditVisitScreen(
                     )
                     Text(
                         text = stringResource(R.string.days_count, calculatedDuration),
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, color = ForestGreen)
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                     )
                 }
             }
@@ -203,7 +203,7 @@ fun AddEditVisitScreen(
             DevotionalCard {
                 Text(
                     text = "Purpose & Seva Details",
-                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = ForestGreen)
+                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -296,7 +296,7 @@ fun AddEditVisitScreen(
             DevotionalCard {
                 Text(
                     text = "Additional Memories (Optional)",
-                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = ForestGreen)
+                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
 

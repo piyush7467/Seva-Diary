@@ -60,7 +60,7 @@ fun ForgotPasswordScreen(
                     Text(
                         text = stringResource(R.string.reset_link_sent_msg),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = ForestGreen
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))

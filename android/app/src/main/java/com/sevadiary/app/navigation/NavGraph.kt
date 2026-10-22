@@ -34,6 +34,7 @@ fun NavGraph(
     isOnboardingCompleted: Boolean,
     isLoggedIn: Boolean,
     currentLanguage: String,
+    rawLanguage: String,
     currentTheme: String,
     devotionalName: String,
     onLanguageChange: (String) -> Unit,
@@ -61,6 +62,7 @@ fun NavGraph(
         composable(Screen.Onboarding.route) {
             OnboardingScreen(
                 currentLanguage = currentLanguage,
+                rawLanguage = rawLanguage,
                 currentTheme = currentTheme,
                 onLanguageChange = onLanguageChange,
                 onThemeChange = onThemeChange,
@@ -172,6 +174,7 @@ fun NavGraph(
                 viewModel = settingsViewModel,
                 devotionalName = devotionalName,
                 currentLanguage = currentLanguage,
+                rawLanguage = rawLanguage,
                 currentTheme = currentTheme,
                 onLanguageChange = onLanguageChange,
                 onThemeChange = onThemeChange,

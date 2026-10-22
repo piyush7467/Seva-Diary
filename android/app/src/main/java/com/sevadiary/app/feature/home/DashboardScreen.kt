@@ -76,7 +76,7 @@ fun DashboardScreen(
                             text = if (devotionalName.isNotBlank()) "Sat Sahib, $devotionalName" else "Sat Sahib",
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = ForestGreen
+                                color = MaterialTheme.colorScheme.primary
                             )
                         )
                         Text(
@@ -92,9 +92,9 @@ fun DashboardScreen(
                     modifier = Modifier
                         .size(42.dp)
                         .clip(CircleShape)
-                        .background(ForestGreen.copy(alpha = 0.1f))
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
                 ) {
-                    Icon(Icons.Default.Settings, contentDescription = "Settings", tint = ForestGreen)
+                    Icon(Icons.Default.Settings, contentDescription = "Settings", tint = MaterialTheme.colorScheme.primary)
                 }
             }
         }
@@ -211,7 +211,7 @@ fun DashboardScreen(
                         modifier = Modifier
                             .size(54.dp)
                             .clip(CircleShape)
-                            .background(ForestGreen.copy(alpha = 0.85f)),
+                            .background(MaterialTheme.colorScheme.primary),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(

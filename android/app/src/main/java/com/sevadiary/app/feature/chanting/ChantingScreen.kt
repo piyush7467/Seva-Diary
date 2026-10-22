@@ -545,7 +545,7 @@ fun ChantingScreen(
                     }
                     Text(
                         text = "${uiState.todayCount} / ${uiState.target}",
-                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold, color = ForestGreen)
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -556,8 +556,8 @@ fun ChantingScreen(
                         .fillMaxWidth()
                         .height(8.dp)
                         .clip(RoundedCornerShape(4.dp)),
-                    color = ForestGreen,
-                    trackColor = ForestGreen.copy(alpha = 0.15f)
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
                 )
             }
 
@@ -577,7 +577,7 @@ fun ChantingScreen(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "${uiState.summary.thisWeek}",
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = ForestGreen)
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                     )
                 }
 
@@ -590,7 +590,7 @@ fun ChantingScreen(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "${uiState.summary.thisMonth}",
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = ForestGreen)
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                     )
                 }
 
@@ -657,7 +657,7 @@ fun ChantingScreen(
                     viewModel.setTarget(parsed)
                     showTargetDialog = false
                 }) {
-                    Text(text = stringResource(R.string.btn_save), color = ForestGreen)
+                    Text(text = stringResource(R.string.btn_save), color = MaterialTheme.colorScheme.primary)
                 }
             },
             dismissButton = {
@@ -681,7 +681,7 @@ fun ChantingScreen(
             ) {
                 Text(
                     text = "Naam Jaap Calendar History",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, color = ForestGreen)
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -718,7 +718,7 @@ fun ChantingScreen(
                                         text = "${item.count}",
                                         style = MaterialTheme.typography.titleMedium.copy(
                                             fontWeight = FontWeight.Bold,
-                                            color = if (item.count >= item.target && item.target > 0) ForestGreen else SaffronGold
+                                            color = if (item.count >= item.target && item.target > 0) MaterialTheme.colorScheme.primary else SaffronGold
                                         )
                                     )
                                 }

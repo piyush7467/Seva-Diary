@@ -50,7 +50,7 @@ fun AshramDiaryScreen(
                 onBackClick = onBackClick,
                 actions = {
                     IconButton(onClick = { viewModel.loadRecords() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refresh", tint = ForestGreen)
+                        Icon(Icons.Default.Refresh, contentDescription = "Refresh", tint = MaterialTheme.colorScheme.primary)
                     }
                 }
             )
@@ -58,8 +58,8 @@ fun AshramDiaryScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddNewVisit,
-                containerColor = ForestGreen,
-                contentColor = Color.White,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Visit")
@@ -127,7 +127,7 @@ fun AshramDiaryScreen(
             // Visit Records List or Empty State
             if (uiState.isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = ForestGreen)
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
             } else if (uiState.records.isEmpty()) {
                 DevotionalEmptyState(
@@ -164,7 +164,7 @@ fun AshramDiaryScreen(
                                         text = ashramName,
                                         style = MaterialTheme.typography.titleMedium.copy(
                                             fontWeight = FontWeight.Bold,
-                                            color = ForestGreen
+                                            color = MaterialTheme.colorScheme.primary
                                         )
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
@@ -180,7 +180,7 @@ fun AshramDiaryScreen(
                                         onClick = { onEditVisit(record.id) },
                                         modifier = Modifier.size(36.dp)
                                     ) {
-                                        Icon(Icons.Default.Edit, contentDescription = "Edit", tint = ForestGreen, modifier = Modifier.size(18.dp))
+                                        Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
                                     }
                                     IconButton(
                                         onClick = { recordToDelete = record },
@@ -198,12 +198,12 @@ fun AshramDiaryScreen(
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(6.dp))
-                                        .background(ForestGreen.copy(alpha = 0.1f))
+                                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
                                         .padding(horizontal = 8.dp, vertical = 4.dp)
                                 ) {
                                     Text(
                                         text = record.purpose,
-                                        style = MaterialTheme.typography.labelSmall.copy(color = ForestGreen, fontWeight = FontWeight.Bold)
+                                        style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                                     )
                                 }
 

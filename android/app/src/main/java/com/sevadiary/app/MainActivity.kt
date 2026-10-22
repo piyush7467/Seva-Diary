@@ -17,6 +17,7 @@ import com.sevadiary.app.core.designsystem.theme.SevaDiaryTheme
 import com.sevadiary.app.core.network.ApiClient
 import com.sevadiary.app.core.preferences.PreferencesManager
 import com.sevadiary.app.core.security.SecureTokenManager
+import com.sevadiary.app.core.util.LocaleHelper
 import com.sevadiary.app.feature.auth.data.AuthRepository
 import com.sevadiary.app.feature.auth.presentation.AuthViewModel
 import com.sevadiary.app.feature.chanting.data.ChantingRepository
@@ -34,11 +35,15 @@ class MainActivity : ComponentActivity() {
     private lateinit var preferencesManager: PreferencesManager
 
     override fun attachBaseContext(newBase: Context) {
-        preferencesManager = PreferencesManager(newBase)
-        super.attachBaseContext(newBase)
+        val initialLanguage = LocaleHelper.getSavedLanguagePreference(newBase)
+        val wrappedContext = LocaleHelper.wrapContext(newBase, initialLanguage)
+        preferencesManager = PreferencesManager(wrappedContext)
+        super.attachBaseContext(wrappedContext)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val initialLanguage = LocaleHelper.getSavedLanguagePreference(this)
+        LocaleHelper.updateResources(this, initialLanguage)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
@@ -60,7 +65,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val isOnboardingCompleted by preferencesManager.isOnboardingCompleted.collectAsState(initial = false)
-            val currentLanguage by preferencesManager.appLanguage.collectAsState(initial = "en")
+            val currentLanguage by preferencesManager.appLanguage.collectAsState(initial = preferencesManager.getInitialLanguage())
+            val rawLanguage by preferencesManager.rawAppLanguage.collectAsState(initial = preferencesManager.getInitialRawLanguage())
             val currentTheme by preferencesManager.appTheme.collectAsState(initial = "system")
             val devotionalName by preferencesManager.devotionalName.collectAsState(initial = "")
 
@@ -84,12 +90,14 @@ class MainActivity : ComponentActivity() {
                         isOnboardingCompleted = isOnboardingCompleted,
                         isLoggedIn = !tokenManager.getAccessToken().isNullOrBlank() || devotionalName.isNotBlank(),
                         currentLanguage = currentLanguage,
+                        rawLanguage = rawLanguage,
                         currentTheme = currentTheme,
                         devotionalName = devotionalName,
                         onLanguageChange = { lang ->
                             lifecycleScope.launch {
                                 preferencesManager.setLanguage(lang)
-                                updateLocale(lang)
+                                LocaleHelper.updateResources(this@MainActivity, lang)
+                                recreate()
                             }
                         },
                         onThemeChange = { theme ->
@@ -119,14 +127,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    private fun updateLocale(languageCode: String) {
-        val locale = Locale.forLanguageTag(languageCode)
-        Locale.setDefault(locale)
-        val config = Configuration(resources.configuration)
-        config.setLocale(locale)
-        resources.updateConfiguration(config, resources.displayMetrics)
-        recreate()
     }
 }

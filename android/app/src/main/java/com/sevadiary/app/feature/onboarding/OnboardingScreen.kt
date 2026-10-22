@@ -43,6 +43,7 @@ data class OnboardingPageData(
 @Composable
 fun OnboardingScreen(
     currentLanguage: String,
+    rawLanguage: String = currentLanguage,
     currentTheme: String,
     onLanguageChange: (String) -> Unit,
     onThemeChange: (String) -> Unit,
@@ -50,10 +51,10 @@ fun OnboardingScreen(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val pages = listOf(
-        OnboardingPageData(R.string.onboarding_1_title, R.string.onboarding_1_desc, imageRes = R.drawable.logo),
-        OnboardingPageData(R.string.onboarding_2_title, R.string.onboarding_2_desc, imageRes = R.drawable.img1, vectorIcon = Icons.Default.FilterVintage),
-        OnboardingPageData(R.string.onboarding_3_title, R.string.onboarding_3_desc, imageRes = R.drawable.img2, vectorIcon = Icons.Default.AccountBalance),
-        OnboardingPageData(R.string.onboarding_4_title, R.string.onboarding_4_desc, imageRes = R.drawable.img4, vectorIcon = Icons.Default.Assessment),
+        OnboardingPageData(R.string.onboarding_1_title, R.string.onboarding_1_desc, imageRes = R.drawable.onboarding1),
+        OnboardingPageData(R.string.onboarding_2_title, R.string.onboarding_2_desc, imageRes = R.drawable.onboarding2, vectorIcon = Icons.Default.FilterVintage),
+        OnboardingPageData(R.string.onboarding_3_title, R.string.onboarding_3_desc, imageRes = R.drawable.onboarding3, vectorIcon = Icons.Default.AccountBalance),
+        OnboardingPageData(R.string.onboarding_4_title, R.string.onboarding_4_desc, imageRes = R.drawable.onboarding4, vectorIcon = Icons.Default.Assessment),
         OnboardingPageData(R.string.onboarding_5_title, R.string.onboarding_5_desc, imageRes = R.drawable.logo, vectorIcon = Icons.Default.Tune)
     )
 
@@ -217,6 +218,7 @@ fun OnboardingScreen(
                     Spacer(modifier = Modifier.height(24.dp))
                     PreferencesSelector(
                         currentLanguage = currentLanguage,
+                        rawLanguage = rawLanguage,
                         currentTheme = currentTheme,
                         onLanguageChange = onLanguageChange,
                         onThemeChange = onThemeChange
@@ -230,6 +232,7 @@ fun OnboardingScreen(
 @Composable
 fun PreferencesSelector(
     currentLanguage: String,
+    rawLanguage: String,
     currentTheme: String,
     onLanguageChange: (String) -> Unit,
     onThemeChange: (String) -> Unit
@@ -247,19 +250,25 @@ fun PreferencesSelector(
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 LanguageChip(
                     text = "English",
-                    isSelected = currentLanguage == "en",
+                    isSelected = rawLanguage == "en",
                     onClick = { onLanguageChange("en") },
                     modifier = Modifier.weight(1f)
                 )
                 LanguageChip(
                     text = "हिंदी",
-                    isSelected = currentLanguage == "hi",
+                    isSelected = rawLanguage == "hi",
                     onClick = { onLanguageChange("hi") },
                     modifier = Modifier.weight(1f)
+                )
+                LanguageChip(
+                    text = stringResource(R.string.lang_system),
+                    isSelected = rawLanguage == "system",
+                    onClick = { onLanguageChange("system") },
+                    modifier = Modifier.weight(1.2f)
                 )
             }
         }
@@ -273,7 +282,7 @@ fun PreferencesSelector(
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 LanguageChip(
                     text = stringResource(R.string.theme_light),
@@ -291,7 +300,7 @@ fun PreferencesSelector(
                     text = stringResource(R.string.theme_system),
                     isSelected = currentTheme == "system",
                     onClick = { onThemeChange("system") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1.2f)
                 )
             }
         }
@@ -308,15 +317,15 @@ fun LanguageChip(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
-            .background(if (isSelected) ForestGreen else ForestGreen.copy(alpha = 0.08f))
+            .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
             .clickable(onClick = onClick)
-            .padding(vertical = 10.dp),
+            .padding(vertical = 10.dp, horizontal = 4.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
-            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.bodyMedium.copy(
+            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.labelMedium.copy(
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
             ),
             textAlign = TextAlign.Center

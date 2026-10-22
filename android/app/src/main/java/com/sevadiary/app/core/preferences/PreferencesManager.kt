@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.sevadiary.app.core.util.LocaleHelper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -25,16 +26,40 @@ class PreferencesManager(private val context: Context) {
         preferences[KEY_ONBOARDING_COMPLETED] ?: false
     }
 
-    val appLanguage: Flow<String> = context.dataStore.data.map { preferences ->
-        preferences[KEY_LANGUAGE] ?: "en"
+    /**
+     * Emits the raw language choice ("system", "en", or "hi").
+     * Defaults to "system" so the app aligns with device settings by default.
+     */
+    val rawAppLanguage: Flow<String> = context.dataStore.data.map { preferences ->
+        preferences[KEY_LANGUAGE] ?: LocaleHelper.getSavedRawLanguagePreference(context)
     }
 
+    /**
+     * Emits the resolved effective language code ("hi" or "en") for string loading.
+     * If user chose "system" or hasn't selected yet, dynamically resolves to system language.
+     */
+    val appLanguage: Flow<String> = context.dataStore.data.map { preferences ->
+        val saved = preferences[KEY_LANGUAGE] ?: LocaleHelper.getSavedRawLanguagePreference(context)
+        LocaleHelper.getEffectiveLanguage(saved)
+    }
+
+    /**
+     * Emits the theme mode: "system" (default), "light", or "dark".
+     */
     val appTheme: Flow<String> = context.dataStore.data.map { preferences ->
         preferences[KEY_THEME] ?: "system"
     }
 
     val devotionalName: Flow<String> = context.dataStore.data.map { preferences ->
         preferences[KEY_DEVOTIONAL_NAME] ?: ""
+    }
+
+    fun getInitialLanguage(): String {
+        return LocaleHelper.getSavedLanguagePreference(context)
+    }
+
+    fun getInitialRawLanguage(): String {
+        return LocaleHelper.getSavedRawLanguagePreference(context)
     }
 
     suspend fun setOnboardingCompleted(completed: Boolean) {
@@ -44,6 +69,7 @@ class PreferencesManager(private val context: Context) {
     }
 
     suspend fun setLanguage(language: String) {
+        LocaleHelper.saveLanguagePreference(context, language)
         context.dataStore.edit { preferences ->
             preferences[KEY_LANGUAGE] = language
         }
@@ -64,7 +90,6 @@ class PreferencesManager(private val context: Context) {
     suspend fun clearSessionPreferences() {
         context.dataStore.edit { preferences ->
             preferences.remove(KEY_DEVOTIONAL_NAME)
-            // Onboarding and language/theme preferences are preserved as per spec
         }
     }
 }

@@ -7,19 +7,20 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val LightColorScheme = lightColorScheme(
     primary = ForestGreen,
-    onPrimary = SurfaceLight,
+    onPrimary = Color.White,
     primaryContainer = ForestGreenLight,
     onPrimaryContainer = ForestGreenDark,
     secondary = SaffronGold,
-    onSecondary = SurfaceLight,
+    onSecondary = Color.White,
     secondaryContainer = SaffronGoldLight,
-    onSecondaryContainer = ForestGreenDark,
+    onSecondaryContainer = SaffronGoldDark,
     background = WarmIvory,
     onBackground = TextPrimaryLight,
     surface = SurfaceLight,
@@ -27,19 +28,20 @@ private val LightColorScheme = lightColorScheme(
     surfaceVariant = DevotionalCream,
     onSurfaceVariant = TextSecondaryLight,
     outline = BorderLight,
+    outlineVariant = BorderLight.copy(alpha = 0.5f),
     error = ErrorColor,
-    onError = SurfaceLight
+    onError = Color.White
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = ForestGreenLight,
-    onPrimary = ForestGreenDark,
-    primaryContainer = ForestGreen,
-    onPrimaryContainer = WarmIvory,
-    secondary = SaffronGoldLight,
-    onSecondary = BackgroundDark,
-    secondaryContainer = SaffronGold,
-    onSecondaryContainer = WarmIvory,
+    primary = DevotionalEmerald,
+    onPrimary = DevotionalEmeraldDark,
+    primaryContainer = DevotionalEmeraldContainer,
+    onPrimaryContainer = Color(0xFFD4F5DE),
+    secondary = RadiantGold,
+    onSecondary = Color(0xFF3B2404),
+    secondaryContainer = RadiantGoldContainer,
+    onSecondaryContainer = Color(0xFFFFE3B8),
     background = BackgroundDark,
     onBackground = TextPrimaryDark,
     surface = SurfaceDark,
@@ -47,8 +49,9 @@ private val DarkColorScheme = darkColorScheme(
     surfaceVariant = CardBackgroundDark,
     onSurfaceVariant = TextSecondaryDark,
     outline = BorderDark,
-    error = ErrorColor,
-    onError = SurfaceLight
+    outlineVariant = BorderDark.copy(alpha = 0.6f),
+    error = ErrorColorDark,
+    onError = Color(0xFF690005)
 )
 
 @Composable
@@ -64,7 +67,10 @@ fun SevaDiaryTheme(
             val window = (view.context as? Activity)?.window
             if (window != null) {
                 window.statusBarColor = colorScheme.background.toArgb()
-                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+                window.navigationBarColor = colorScheme.background.toArgb()
+                val controller = WindowCompat.getInsetsController(window, view)
+                controller.isAppearanceLightStatusBars = !darkTheme
+                controller.isAppearanceLightNavigationBars = !darkTheme
             }
         }
     }

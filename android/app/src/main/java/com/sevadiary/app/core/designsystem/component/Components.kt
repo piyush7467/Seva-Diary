@@ -49,16 +49,16 @@ fun SevaPrimaryButton(
         enabled = enabled && !isLoading,
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = ForestGreen,
-            contentColor = Color.White,
-            disabledContainerColor = ForestGreen.copy(alpha = 0.5f),
-            disabledContentColor = Color.White.copy(alpha = 0.7f)
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+            disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
         )
     ) {
         if (isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.size(22.dp),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onPrimary,
                 strokeWidth = 2.dp
             )
         } else {
@@ -97,9 +97,9 @@ fun SevaOutlinedButton(
             .height(52.dp),
         enabled = enabled,
         shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.5.dp, ForestGreen),
+        border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary),
         colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = ForestGreen
+            contentColor = MaterialTheme.colorScheme.primary
         )
     ) {
         Row(
@@ -176,9 +176,9 @@ fun SevaTextField(
                     }
                 },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = ForestGreen,
-                focusedLabelColor = ForestGreen,
-                cursorColor = ForestGreen
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                cursorColor = MaterialTheme.colorScheme.primary
             )
         )
         AnimatedVisibility(visible = isError && !errorMessage.isNullOrBlank()) {
@@ -246,9 +246,9 @@ fun SevaPasswordField(
                     }
                 },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = ForestGreen,
-                focusedLabelColor = ForestGreen,
-                cursorColor = ForestGreen
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                cursorColor = MaterialTheme.colorScheme.primary
             )
         )
         AnimatedVisibility(visible = isError && !errorMessage.isNullOrBlank()) {

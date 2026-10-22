@@ -99,7 +99,7 @@ fun SplashScreen(
                 text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.displayMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    color = ForestGreen,
+                    color = MaterialTheme.colorScheme.primary,
                     letterSpacing = 1.sp
                 )
             )
@@ -109,7 +109,7 @@ fun SplashScreen(
             Text(
                 text = stringResource(R.string.app_tagline),
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = Color(0xFF5C645E),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Medium
                 )
             )

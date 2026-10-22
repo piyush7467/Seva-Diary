@@ -37,6 +37,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     devotionalName: String,
     currentLanguage: String,
+    rawLanguage: String = currentLanguage,
     currentTheme: String,
     onLanguageChange: (String) -> Unit,
     onThemeChange: (String) -> Unit,
@@ -71,16 +72,16 @@ fun SettingsScreen(
                         modifier = Modifier
                             .size(50.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(ForestGreen.copy(alpha = 0.12f)),
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.Person, contentDescription = null, tint = ForestGreen, modifier = Modifier.size(28.dp))
+                        Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
                     }
                     Spacer(modifier = Modifier.width(14.dp))
                     Column {
                         Text(
                             text = uiState.userProfile?.displayName?.ifBlank { devotionalName } ?: devotionalName.ifBlank { "Devotee" },
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = ForestGreen)
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                         )
                         Text(
                             text = if (uiState.userProfile?.email != null) uiState.userProfile!!.email else "Signed in to Seva Diary",
@@ -94,7 +95,7 @@ fun SettingsScreen(
             // Language Selection Card
             DevotionalCard {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Language, contentDescription = null, tint = ForestGreen)
+                    Icon(Icons.Default.Language, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
                         text = stringResource(R.string.pref_language),
@@ -104,19 +105,25 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     FilterChip(
-                        selected = currentLanguage == "en",
+                        selected = rawLanguage == "en",
                         onClick = { onLanguageChange("en") },
-                        label = { Text("English") },
+                        label = { Text("English", style = MaterialTheme.typography.labelSmall) },
                         modifier = Modifier.weight(1f)
                     )
                     FilterChip(
-                        selected = currentLanguage == "hi",
+                        selected = rawLanguage == "hi",
                         onClick = { onLanguageChange("hi") },
-                        label = { Text("हिंदी") },
+                        label = { Text("हिंदी", style = MaterialTheme.typography.labelSmall) },
                         modifier = Modifier.weight(1f)
+                    )
+                    FilterChip(
+                        selected = rawLanguage == "system",
+                        onClick = { onLanguageChange("system") },
+                        label = { Text(stringResource(R.string.lang_system), style = MaterialTheme.typography.labelSmall) },
+                        modifier = Modifier.weight(1.2f)
                     )
                 }
             }
@@ -124,7 +131,7 @@ fun SettingsScreen(
             // Theme Selection Card
             DevotionalCard {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Palette, contentDescription = null, tint = ForestGreen)
+                    Icon(Icons.Default.Palette, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
                         text = stringResource(R.string.pref_theme),
@@ -139,20 +146,20 @@ fun SettingsScreen(
                     FilterChip(
                         selected = currentTheme == "light",
                         onClick = { onThemeChange("light") },
-                        label = { Text(stringResource(R.string.theme_light)) },
+                        label = { Text(stringResource(R.string.theme_light), style = MaterialTheme.typography.labelSmall) },
                         modifier = Modifier.weight(1f)
                     )
                     FilterChip(
                         selected = currentTheme == "dark",
                         onClick = { onThemeChange("dark") },
-                        label = { Text(stringResource(R.string.theme_dark)) },
+                        label = { Text(stringResource(R.string.theme_dark), style = MaterialTheme.typography.labelSmall) },
                         modifier = Modifier.weight(1f)
                     )
                     FilterChip(
                         selected = currentTheme == "system",
                         onClick = { onThemeChange("system") },
-                        label = { Text(stringResource(R.string.theme_system)) },
-                        modifier = Modifier.weight(1f)
+                        label = { Text(stringResource(R.string.theme_system), style = MaterialTheme.typography.labelSmall) },
+                        modifier = Modifier.weight(1.2f)
                     )
                 }
             }
@@ -160,7 +167,7 @@ fun SettingsScreen(
             // App Guide & Tour
             DevotionalCard(onClick = onOpenGuide) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Tour, contentDescription = null, tint = ForestGreen)
+                    Icon(Icons.Default.Tour, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
@@ -210,7 +217,7 @@ fun SettingsScreen(
                     text = "Seva Diary",
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        color = ForestGreen
+                        color = MaterialTheme.colorScheme.primary
                     )
                 )
                 Spacer(modifier = Modifier.height(2.dp))

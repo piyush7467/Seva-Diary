@@ -149,7 +149,7 @@ fun RegisterScreen(
                     else -> stringResource(R.string.reg_step_4)
                 },
                 style = MaterialTheme.typography.titleSmall.copy(
-                    color = ForestGreen,
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )
             )
@@ -160,8 +160,8 @@ fun RegisterScreen(
                     .fillMaxWidth()
                     .height(6.dp)
                     .clip(RoundedCornerShape(3.dp)),
-                color = ForestGreen,
-                trackColor = ForestGreen.copy(alpha = 0.15f)
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -192,14 +192,14 @@ fun RegisterScreen(
                             modifier = Modifier
                                 .weight(1f)
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(if (gender == "MALE") ForestGreen else ForestGreen.copy(alpha = 0.08f))
+                                .background(if (gender == "MALE") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
                                 .clickable { gender = "MALE" }
                                 .padding(vertical = 12.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = stringResource(R.string.gender_male),
-                                color = if (gender == "MALE") Color.White else MaterialTheme.colorScheme.onSurface,
+                                color = if (gender == "MALE") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
@@ -207,14 +207,14 @@ fun RegisterScreen(
                             modifier = Modifier
                                 .weight(1f)
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(if (gender == "FEMALE") ForestGreen else ForestGreen.copy(alpha = 0.08f))
+                                .background(if (gender == "FEMALE") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
                                 .clickable { gender = "FEMALE" }
                                 .padding(vertical = 12.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = stringResource(R.string.gender_female),
-                                color = if (gender == "FEMALE") Color.White else MaterialTheme.colorScheme.onSurface,
+                                color = if (gender == "FEMALE") MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
@@ -509,10 +509,10 @@ fun RegisterScreen(
                     DevotionalCard {
                         Text(
                             text = "Review Registration Details",
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = ForestGreen)
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                         )
                         Spacer(modifier = Modifier.height(12.dp))
-                        Text(text = "Devotional Name: $displayName", style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold, color = ForestGreen))
+                        Text(text = "Devotional Name: $displayName", style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary))
                         Text(text = "Mantra Initiation: $mantraStage", style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold, color = SaffronGold))
                         Text(text = "Full Name: $firstName $lastName", style = MaterialTheme.typography.bodyMedium)
                         Text(text = "Email: $email", style = MaterialTheme.typography.bodyMedium)
@@ -663,7 +663,7 @@ fun SearchableListDialog(
         title = {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = ForestGreen)
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
             )
         },
         text = {
@@ -676,7 +676,7 @@ fun SearchableListDialog(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
                     placeholder = { Text(searchPlaceholder, style = MaterialTheme.typography.bodySmall) },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = ForestGreen) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                     trailingIcon = {
                         if (searchQuery.isNotEmpty()) {
                             IconButton(onClick = { searchQuery = "" }) {
@@ -710,7 +710,7 @@ fun SearchableListDialog(
                                     onItemSelected(searchQuery.trim())
                                     onDismissRequest()
                                 }) {
-                                    Text("Use \"${searchQuery.trim()}\"", color = ForestGreen, fontWeight = FontWeight.Bold)
+                                    Text("Use \"${searchQuery.trim()}\"", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }
@@ -728,7 +728,7 @@ fun SearchableListDialog(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(if (isSelected) ForestGreen.copy(alpha = 0.12f) else Color.Transparent)
+                                    .background(if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else Color.Transparent)
                                     .clickable {
                                         onItemSelected(item)
                                         onDismissRequest()
@@ -741,14 +741,14 @@ fun SearchableListDialog(
                                     text = item,
                                     style = MaterialTheme.typography.bodyMedium.copy(
                                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                        color = if (isSelected) ForestGreen else MaterialTheme.colorScheme.onSurface
+                                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                                     )
                                 )
                                 if (isSelected) {
                                     Icon(
                                         Icons.Default.Check,
                                         contentDescription = null,
-                                        tint = ForestGreen,
+                                        tint = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.size(18.dp)
                                     )
                                 }

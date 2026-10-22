@@ -40,6 +40,7 @@
     <string name="pref_language">भाषा / Language</string>
     <string name="lang_english">English</string>
     <string name="lang_hindi">हिंदी (Hindi)</string>
+    <string name="lang_system">सिस्टम अनुसार</string>
     <string name="pref_theme">थीम</string>
     <string name="theme_system">सिस्टम अनुसार</string>
     <string name="theme_light">हल्की (Light)</string>

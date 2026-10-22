@@ -118,7 +118,7 @@ fun LoginScreen(
                     Icons.Default.Wifi,
                     contentDescription = null,
                     modifier = Modifier.size(14.dp),
-                    tint = ForestGreen
+                    tint = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
@@ -152,7 +152,7 @@ fun LoginScreen(
                 TextButton(onClick = onNavigateToForgotPassword) {
                     Text(
                         text = stringResource(R.string.forgot_password),
-                        color = ForestGreen,
+                        color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold)
                     )
                 }
@@ -188,7 +188,7 @@ fun LoginScreen(
 
             Text(
                 text = stringResource(R.string.no_account),
-                color = ForestGreen,
+                color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
                 modifier = Modifier.clickable(onClick = onNavigateToRegister)
             )
@@ -249,7 +249,7 @@ fun LoginScreen(
                     ApiClient.updateHost(serverUrlInput)
                     showServerDialog = false
                 }) {
-                    Text("Apply", color = ForestGreen, fontWeight = FontWeight.Bold)
+                    Text("Apply", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
