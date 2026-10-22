@@ -1,9 +1,10 @@
 package com.sevadiary.app.feature.onboarding
 
-import androidx.compose.animation.*
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -13,7 +14,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.BrightnessAuto
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,8 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sevadiary.app.R
-import com.sevadiary.app.core.designsystem.component.DevotionalCard
-import com.sevadiary.app.core.designsystem.component.SevaPrimaryButton
+import com.sevadiary.app.core.designsystem.theme.SaffronGold
 import kotlinx.coroutines.launch
 
 data class OnboardingPageData(
@@ -54,10 +61,10 @@ fun OnboardingScreen(
     val pages = remember {
         listOf(
             OnboardingPageData(R.string.onboarding_1_title, R.string.onboarding_1_desc, imageRes = R.drawable.onboarding1),
-            OnboardingPageData(R.string.onboarding_2_title, R.string.onboarding_2_desc, imageRes = R.drawable.onboarding2, vectorIcon = Icons.Default.FilterVintage),
-            OnboardingPageData(R.string.onboarding_3_title, R.string.onboarding_3_desc, imageRes = R.drawable.onboarding3, vectorIcon = Icons.Default.AccountBalance),
-            OnboardingPageData(R.string.onboarding_4_title, R.string.onboarding_4_desc, imageRes = R.drawable.onboarding4, vectorIcon = Icons.Default.Assessment),
-            OnboardingPageData(R.string.onboarding_5_title, R.string.onboarding_5_desc, imageRes = R.drawable.logo, vectorIcon = Icons.Default.Tune)
+            OnboardingPageData(R.string.onboarding_2_title, R.string.onboarding_2_desc, imageRes = R.drawable.onboarding2),
+            OnboardingPageData(R.string.onboarding_3_title, R.string.onboarding_3_desc, imageRes = R.drawable.onboarding3),
+            OnboardingPageData(R.string.onboarding_4_title, R.string.onboarding_4_desc, imageRes = R.drawable.onboarding4),
+            OnboardingPageData(R.string.onboarding_5_title, R.string.onboarding_5_desc, imageRes = R.drawable.logo)
         )
     }
 
@@ -70,35 +77,52 @@ fun OnboardingScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .statusBarsPadding()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (pagerState.currentPage > 0) {
-                    TextButton(onClick = {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                    IconButton(
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                            }
                         }
-                    }) {
-                        Text(
-                            text = stringResource(R.string.btn_back),
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Medium
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.btn_back),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 } else {
-                    Spacer(modifier = Modifier.width(64.dp))
+                    Spacer(modifier = Modifier.size(48.dp))
                 }
 
                 if (pagerState.currentPage < pages.size - 1) {
-                    TextButton(onClick = onFinishOnboarding) {
-                        Text(
-                            text = stringResource(R.string.btn_skip),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                    TextButton(
+                        onClick = onFinishOnboarding,
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = stringResource(R.string.btn_skip),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            )
+                            Spacer(modifier = Modifier.width(2.dp))
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 } else {
-                    Spacer(modifier = Modifier.width(64.dp))
+                    Spacer(modifier = Modifier.size(48.dp))
                 }
             }
         },
@@ -107,44 +131,84 @@ fun OnboardingScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
-                    .padding(horizontal = 24.dp, vertical = 12.dp),
+                    .padding(horizontal = 24.dp, vertical = 14.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Symmetrical Page Indicator Dots
                 Row(
-                    modifier = Modifier.padding(bottom = 12.dp),
+                    modifier = Modifier.padding(bottom = 14.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     repeat(pages.size) { iteration ->
                         val isSelected = (pagerState.currentPage == iteration)
-                        val color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.22f)
-                        val width = if (isSelected) 22.dp else 7.dp
+                        val animatedWidth by animateDpAsState(
+                            targetValue = if (isSelected) 24.dp else 6.dp,
+                            label = "dotWidth"
+                        )
+                        val dotColor = if (isSelected) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
+                        }
                         Box(
                             modifier = Modifier
-                                .padding(horizontal = 3.dp)
+                                .padding(horizontal = 3.5.dp)
                                 .height(6.dp)
-                                .width(width)
+                                .width(animatedWidth)
                                 .clip(CircleShape)
-                                .background(color)
+                                .background(dotColor)
                         )
                     }
                 }
 
-                if (pagerState.currentPage == pages.size - 1) {
-                    SevaPrimaryButton(
-                        text = stringResource(R.string.btn_get_started),
-                        onClick = onFinishOnboarding
-                    )
-                } else {
-                    SevaPrimaryButton(
-                        text = stringResource(R.string.btn_next),
-                        onClick = {
+                // Full-width rounded Forest Green Next / Get Started button
+                Button(
+                    onClick = {
+                        if (pagerState.currentPage == pages.size - 1) {
+                            onFinishOnboarding()
+                        } else {
                             coroutineScope.launch {
                                 pagerState.animateScrollToPage(pagerState.currentPage + 1)
                             }
                         }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(54.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 2.dp,
+                        pressedElevation = 4.dp
                     )
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = if (pagerState.currentPage == pages.size - 1) {
+                                stringResource(R.string.btn_get_started)
+                            } else {
+                                stringResource(R.string.btn_next)
+                            },
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 16.sp,
+                                letterSpacing = 0.3.sp
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             }
         }
@@ -156,7 +220,6 @@ fun OnboardingScreen(
                 .padding(innerPadding)
         ) { page ->
             if (page == 4) {
-                // Dedicated, compact, beautifully balanced preferences onboarding screen
                 ChoosePreferencesOnboardingPage(
                     currentLanguage = currentLanguage,
                     currentTheme = currentTheme,
@@ -165,70 +228,100 @@ fun OnboardingScreen(
                 )
             } else {
                 val pageData = pages[page]
-                Column(
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 24.dp)
-                        .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 24.dp, vertical = 8.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    if (pageData.imageRes != null) {
-                        Box(
-                            modifier = Modifier
-                                .size(130.dp)
-                                .shadow(elevation = 6.dp, shape = CircleShape)
-                                .clip(CircleShape)
-                                .background(Color.White),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = pageData.imageRes),
-                                contentDescription = null,
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .widthIn(max = 420.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        if (pageData.imageRes != null) {
+                            Box(
                                 modifier = Modifier
-                                    .size(120.dp)
-                                    .clip(CircleShape),
-                                contentScale = ContentScale.Crop
-                            )
+                                    .size(215.dp)
+                                    .shadow(
+                                        elevation = 10.dp,
+                                        shape = CircleShape,
+                                        spotColor = SaffronGold.copy(alpha = 0.35f),
+                                        ambientColor = SaffronGold.copy(alpha = 0.2f)
+                                    )
+                                    .border(
+                                        width = 3.dp,
+                                        color = SaffronGold.copy(alpha = 0.85f),
+                                        shape = CircleShape
+                                    )
+                                    .padding(5.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.surface),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(id = pageData.imageRes),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clip(CircleShape),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                        } else if (pageData.vectorIcon != null) {
+                            Box(
+                                modifier = Modifier
+                                    .size(140.dp)
+                                    .border(
+                                        width = 2.5.dp,
+                                        color = SaffronGold.copy(alpha = 0.85f),
+                                        shape = CircleShape
+                                    )
+                                    .padding(4.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = pageData.vectorIcon,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(64.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
                         }
-                    } else if (pageData.vectorIcon != null) {
-                        Box(
+
+                        Spacer(modifier = Modifier.height(26.dp))
+
+                        Text(
+                            text = stringResource(pageData.titleRes),
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                letterSpacing = (-0.3).sp
+                            ),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
+
+                        DevotionalOrnamentalDivider()
+
+                        Text(
+                            text = stringResource(pageData.descRes),
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 15.sp,
+                                lineHeight = 23.sp
+                            ),
+                            textAlign = TextAlign.Center,
                             modifier = Modifier
-                                .size(110.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = pageData.vectorIcon,
-                                contentDescription = null,
-                                modifier = Modifier.size(56.dp),
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
+                                .widthIn(max = 340.dp)
+                                .padding(horizontal = 4.dp)
+                        )
                     }
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    Text(
-                        text = stringResource(pageData.titleRes),
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground
-                        ),
-                        textAlign = TextAlign.Center
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text(
-                        text = stringResource(pageData.descRes),
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            lineHeight = 24.sp
-                        ),
-                        textAlign = TextAlign.Center
-                    )
                 }
             }
         }
@@ -236,9 +329,47 @@ fun OnboardingScreen(
 }
 
 /**
- * Improved, compact, and balanced "Choose Your Preferences" screen.
- * - Consistent 88dp centered logo with balanced 14dp spacing
- * - Compact typography and spacing that fits common screens with vertical scroll fallback
+ * Devotional Lotus & Gold Divider that gracefully joins Title and Description.
+ */
+@Composable
+private fun DevotionalOrnamentalDivider(
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .width(130.dp)
+            .padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            thickness = 1.dp,
+            color = SaffronGold.copy(alpha = 0.5f)
+        )
+        Box(
+            modifier = Modifier.padding(horizontal = 6.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Spa,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = SaffronGold
+            )
+        }
+        HorizontalDivider(
+            modifier = Modifier.weight(1f),
+            thickness = 1.dp,
+            color = SaffronGold.copy(alpha = 0.5f)
+        )
+    }
+}
+
+/**
+ * Consistent, compact, and balanced "Choose Your Preferences" screen.
+ * - Circular logo with matching sacred gold rim
+ * - Unified headline, ornamental lotus divider, and description
  * - Segmented Language card with two equal-width options: English and हिंदी
  * - Segmented Theme card with three equal-width options: Light, Dark, System
  */
@@ -251,185 +382,204 @@ private fun ChoosePreferencesOnboardingPage(
 ) {
     val isHindi = currentLanguage == "hi"
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp, vertical = 8.dp),
+        contentAlignment = Alignment.Center
     ) {
-        Spacer(modifier = Modifier.height(4.dp))
-
-        // 1. Logo - Sized consistently (88dp) with balanced spacing below
-        Box(
+        Column(
             modifier = Modifier
-                .size(88.dp)
-                .shadow(elevation = 4.dp, shape = CircleShape)
-                .clip(CircleShape)
-                .background(Color.White),
-            contentAlignment = Alignment.Center
+                .fillMaxWidth()
+                .widthIn(max = 420.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Seva Diary Logo",
+            // 1. Logo - Circular container with matching gold rim
+            Box(
                 modifier = Modifier
-                    .size(78.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Fit
+                    .size(92.dp)
+                    .shadow(
+                        elevation = 6.dp,
+                        shape = CircleShape,
+                        spotColor = SaffronGold.copy(alpha = 0.35f)
+                    )
+                    .border(
+                        width = 2.5.dp,
+                        color = SaffronGold.copy(alpha = 0.85f),
+                        shape = CircleShape
+                    )
+                    .padding(4.dp)
+                    .clip(CircleShape)
+                    .background(Color.White),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "Seva Diary Logo",
+                    modifier = Modifier
+                        .size(76.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Fit
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 2. Heading Typography
+            Text(
+                text = stringResource(R.string.onboarding_5_title),
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    letterSpacing = (-0.2).sp
+                ),
+                textAlign = TextAlign.Center
             )
-        }
 
-        Spacer(modifier = Modifier.height(14.dp))
+            // Ornamental Divider matching pages 0-3
+            DevotionalOrnamentalDivider()
 
-        // 2. Heading Typography
-        Text(
-            text = stringResource(R.string.onboarding_5_title),
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
-                letterSpacing = (-0.2).sp
-            ),
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        // 3. Description Typography
-        Text(
-            text = stringResource(R.string.onboarding_5_desc),
-            style = MaterialTheme.typography.bodyMedium.copy(
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = 20.sp
-            ),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 12.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 4. Language Card with two equal-width segmented options: English and हिंदी
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(14.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 1.5.dp),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f))
-        ) {
-            Column(
+            // 3. Description Typography
+            Text(
+                text = stringResource(R.string.onboarding_5_desc),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp
+                ),
+                textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 14.dp, vertical = 12.dp)
+                    .widthIn(max = 340.dp)
+                    .padding(horizontal = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 4. Language Card with two equal-width segmented options: English and हिंदी
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.5.dp),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Language,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.pref_language),
-                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-                        .padding(3.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        .padding(horizontal = 14.dp, vertical = 12.dp)
                 ) {
-                    SegmentedLanguageItem(
-                        label = "English",
-                        isSelected = currentLanguage == "en",
-                        onClick = { onLanguageChange("en") },
-                        modifier = Modifier.weight(1f)
-                    )
-                    SegmentedLanguageItem(
-                        label = "हिंदी",
-                        isSelected = currentLanguage == "hi",
-                        onClick = { onLanguageChange("hi") },
-                        modifier = Modifier.weight(1f)
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Language,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.pref_language),
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                            .padding(3.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        SegmentedLanguageItem(
+                            label = "English",
+                            isSelected = currentLanguage == "en",
+                            onClick = { onLanguageChange("en") },
+                            modifier = Modifier.weight(1f)
+                        )
+                        SegmentedLanguageItem(
+                            label = "हिंदी",
+                            isSelected = currentLanguage == "hi",
+                            onClick = { onLanguageChange("hi") },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-        // 5. Theme Card with three equal-width options: Warm Light, Devotional Dark, and System Default
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(14.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 1.5.dp),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f))
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 14.dp, vertical = 12.dp)
+            // 5. Theme Card with three equal-width options: Warm Light, Devotional Dark, and System Default
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.5.dp),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Palette,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.pref_theme),
-                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                val lightLabel = if (isHindi) "हल्की" else "Light"
-                val darkLabel = if (isHindi) "डार्क" else "Dark"
-                val systemLabel = if (isHindi) "सिस्टम" else "System"
-
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-                        .padding(3.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        .padding(horizontal = 14.dp, vertical = 12.dp)
                 ) {
-                    SegmentedThemeItem(
-                        icon = Icons.Default.LightMode,
-                        label = lightLabel,
-                        isSelected = currentTheme == "light",
-                        onClick = { onThemeChange("light") },
-                        modifier = Modifier.weight(1f)
-                    )
-                    SegmentedThemeItem(
-                        icon = Icons.Default.DarkMode,
-                        label = darkLabel,
-                        isSelected = currentTheme == "dark",
-                        onClick = { onThemeChange("dark") },
-                        modifier = Modifier.weight(1f)
-                    )
-                    SegmentedThemeItem(
-                        icon = Icons.Default.BrightnessAuto,
-                        label = systemLabel,
-                        isSelected = currentTheme == "system",
-                        onClick = { onThemeChange("system") },
-                        modifier = Modifier.weight(1f)
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Palette,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.pref_theme),
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    val lightLabel = if (isHindi) "हल्की" else "Light"
+                    val darkLabel = if (isHindi) "डार्क" else "Dark"
+                    val systemLabel = if (isHindi) "सिस्टम" else "System"
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                            .padding(3.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        SegmentedThemeItem(
+                            icon = Icons.Default.LightMode,
+                            label = lightLabel,
+                            isSelected = currentTheme == "light",
+                            onClick = { onThemeChange("light") },
+                            modifier = Modifier.weight(1f)
+                        )
+                        SegmentedThemeItem(
+                            icon = Icons.Default.DarkMode,
+                            label = darkLabel,
+                            isSelected = currentTheme == "dark",
+                            onClick = { onThemeChange("dark") },
+                            modifier = Modifier.weight(1f)
+                        )
+                        SegmentedThemeItem(
+                            icon = Icons.Default.BrightnessAuto,
+                            label = systemLabel,
+                            isSelected = currentTheme == "system",
+                            onClick = { onThemeChange("system") },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+        }
     }
 }
 
