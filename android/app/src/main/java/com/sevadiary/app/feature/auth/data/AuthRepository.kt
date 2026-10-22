@@ -9,6 +9,25 @@ class AuthRepository(
     private val tokenManager: SecureTokenManager
 ) {
 
+    private fun parseErrorMessage(response: retrofit2.Response<*>): String {
+        return try {
+            val raw = response.errorBody()?.string()
+            if (!raw.isNullOrBlank()) {
+                val json = org.json.JSONObject(raw)
+                if (json.has("error")) {
+                    val err = json.getJSONObject("error")
+                    err.optString("message", "Request failed (HTTP ${response.code()})")
+                } else {
+                    raw
+                }
+            } else {
+                "Request failed (HTTP ${response.code()})"
+            }
+        } catch (_: Exception) {
+            "Request failed (HTTP ${response.code()})"
+        }
+    }
+
     suspend fun register(request: RegisterRequest): Result<UserProfileDto> {
         return try {
             val response = apiService.register(request)
@@ -20,13 +39,10 @@ class AuthRepository(
                     Result.failure(Exception("Registration succeeded but user profile was empty."))
                 }
             } else {
-                val errorMsg = response.body()?.error?.message 
-                    ?: response.errorBody()?.string() 
-                    ?: "Registration failed (HTTP ${response.code()})"
-                Result.failure(Exception(errorMsg))
+                Result.failure(Exception(parseErrorMessage(response)))
             }
         } catch (e: java.net.SocketTimeoutException) {
-            Result.failure(Exception("Connection timed out. Please verify the backend is running."))
+            Result.failure(Exception("Connection timed out. Please verify your internet connection."))
         } catch (e: java.net.ConnectException) {
             Result.failure(Exception("Cannot reach server at ${com.sevadiary.app.core.network.ApiClient.baseUrl}. Please check your connection."))
         } catch (e: Exception) {
@@ -46,12 +62,10 @@ class AuthRepository(
                     Result.failure(Exception("Login succeeded but token response was empty."))
                 }
             } else {
-                val errorMsg = response.body()?.error?.message 
-                    ?: "Invalid credentials (HTTP ${response.code()})"
-                Result.failure(Exception(errorMsg))
+                Result.failure(Exception(parseErrorMessage(response)))
             }
         } catch (e: java.net.SocketTimeoutException) {
-            Result.failure(Exception("Connection timed out. Please verify the backend is running."))
+            Result.failure(Exception("Connection timed out. Please verify your internet connection."))
         } catch (e: java.net.ConnectException) {
             Result.failure(Exception("Cannot reach server at ${com.sevadiary.app.core.network.ApiClient.baseUrl}. Please check your connection."))
         } catch (e: Exception) {

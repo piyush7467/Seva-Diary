@@ -48,13 +48,15 @@ class AuthViewModel(
     ) {
         _uiState.value = AuthUiState.Loading
         viewModelScope.launch {
+            val normalizedUsername = username.trim().lowercase()
+            val resolvedEmail = if (email.isBlank()) "${normalizedUsername}@sevadiary.org" else email.trim().lowercase()
             val request = RegisterRequest(
                 firstName = firstName.trim(),
                 lastName = lastName.trim(),
                 gender = gender,
                 displayName = displayName.trim(),
-                username = username.trim().lowercase(),
-                email = email.trim().lowercase(),
+                username = normalizedUsername,
+                email = resolvedEmail,
                 phone = phone.trim(),
                 address = AddressDto(
                     addressLine = addressLine.trim(),

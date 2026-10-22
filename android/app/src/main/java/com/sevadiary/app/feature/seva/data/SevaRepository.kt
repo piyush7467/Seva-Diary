@@ -7,6 +7,25 @@ class SevaRepository(
     private val apiService: SevaDiaryApiService
 ) {
 
+    private fun parseErrorMessage(response: retrofit2.Response<*>): String {
+        return try {
+            val raw = response.errorBody()?.string()
+            if (!raw.isNullOrBlank()) {
+                val json = org.json.JSONObject(raw)
+                if (json.has("error")) {
+                    val err = json.getJSONObject("error")
+                    err.optString("message", "Request failed (HTTP ${response.code()})")
+                } else {
+                    raw
+                }
+            } else {
+                "Request failed (HTTP ${response.code()})"
+            }
+        } catch (_: Exception) {
+            "Request failed (HTTP ${response.code()})"
+        }
+    }
+
     suspend fun getRecords(
         ashramCode: String? = null,
         purpose: String? = null,
@@ -29,7 +48,7 @@ class SevaRepository(
             if (response.isSuccessful && response.body()?.success == true && response.body()?.data != null) {
                 Result.success(response.body()!!.data!!)
             } else {
-                Result.failure(Exception(response.body()?.error?.message ?: "Failed to fetch seva records."))
+                Result.failure(Exception(parseErrorMessage(response)))
             }
         } catch (e: Exception) {
             Result.failure(Exception(e.localizedMessage ?: "Network error fetching seva records."))
@@ -42,7 +61,7 @@ class SevaRepository(
             if (response.isSuccessful && response.body()?.success == true && response.body()?.data != null) {
                 Result.success(response.body()!!.data!!)
             } else {
-                Result.failure(Exception(response.body()?.error?.message ?: "Failed to save visit record."))
+                Result.failure(Exception(parseErrorMessage(response)))
             }
         } catch (e: Exception) {
             Result.failure(Exception(e.localizedMessage ?: "Network error saving visit record."))
@@ -55,7 +74,7 @@ class SevaRepository(
             if (response.isSuccessful && response.body()?.success == true && response.body()?.data != null) {
                 Result.success(response.body()!!.data!!)
             } else {
-                Result.failure(Exception(response.body()?.error?.message ?: "Failed to update visit record."))
+                Result.failure(Exception(parseErrorMessage(response)))
             }
         } catch (e: Exception) {
             Result.failure(Exception(e.localizedMessage ?: "Network error updating visit record."))
@@ -68,7 +87,7 @@ class SevaRepository(
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
-                Result.failure(Exception("Failed to delete record."))
+                Result.failure(Exception(parseErrorMessage(response)))
             }
         } catch (e: Exception) {
             Result.failure(Exception(e.localizedMessage ?: "Network error deleting record."))
@@ -81,7 +100,7 @@ class SevaRepository(
             if (response.isSuccessful && response.body()?.success == true && response.body()?.data != null) {
                 Result.success(response.body()!!.data!!)
             } else {
-                Result.failure(Exception("Failed to fetch master data."))
+                Result.failure(Exception(parseErrorMessage(response)))
             }
         } catch (e: Exception) {
             Result.failure(Exception(e.localizedMessage ?: "Network error fetching master data."))

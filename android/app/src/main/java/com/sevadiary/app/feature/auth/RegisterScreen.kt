@@ -569,6 +569,8 @@ fun RegisterScreen(
                         3 -> {
                             if (username.length < 3 || username.length > 20) {
                                 localErrorMsg = "Username must be 3–20 characters"
+                            } else if (!username.all { it.isLetterOrDigit() }) {
+                                localErrorMsg = "Username must contain only English letters and numbers"
                             } else if (password.length < 6) {
                                 localErrorMsg = "Password must be at least 6 characters"
                             } else if (password != confirmPassword) {
