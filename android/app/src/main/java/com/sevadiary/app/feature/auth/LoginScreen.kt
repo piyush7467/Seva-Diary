@@ -63,11 +63,13 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(24.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .imePadding()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(36.dp))
+
             Box(
                 modifier = Modifier
                     .size(105.dp)
@@ -190,6 +192,8 @@ fun LoginScreen(
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
                 modifier = Modifier.clickable(onClick = onNavigateToRegister)
             )
+
+            Spacer(modifier = Modifier.height(48.dp))
         }
     }
 

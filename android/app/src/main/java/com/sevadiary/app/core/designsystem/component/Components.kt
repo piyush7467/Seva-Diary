@@ -2,8 +2,11 @@ package com.sevadiary.app.core.designsystem.component
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,6 +18,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sevadiary.app.core.designsystem.theme.ForestGreen
 import com.sevadiary.app.core.designsystem.theme.SaffronGold
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun SevaPrimaryButton(
@@ -115,6 +121,7 @@ fun SevaOutlinedButton(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SevaTextField(
     value: String,
@@ -131,10 +138,22 @@ fun SevaTextField(
     singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else 4
 ) {
-    Column(modifier = modifier.fillMaxWidth()) {
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    val coroutineScope = rememberCoroutineScope()
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .bringIntoViewRequester(bringIntoViewRequester)
+    ) {
         OutlinedTextField(
             value = value,
-            onValueChange = onValueChange,
+            onValueChange = {
+                onValueChange(it)
+                coroutineScope.launch {
+                    bringIntoViewRequester.bringIntoView()
+                }
+            },
             label = { Text(label) },
             placeholder = placeholder?.let { { Text(it) } },
             leadingIcon = leadingIcon?.let { { Icon(it, contentDescription = null) } },
@@ -145,7 +164,17 @@ fun SevaTextField(
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusEvent { focusState ->
+                    if (focusState.isFocused) {
+                        coroutineScope.launch {
+                            bringIntoViewRequester.bringIntoView()
+                            delay(250)
+                            bringIntoViewRequester.bringIntoView()
+                        }
+                    }
+                },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = ForestGreen,
                 focusedLabelColor = ForestGreen,
@@ -163,6 +192,7 @@ fun SevaTextField(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SevaPasswordField(
     value: String,
@@ -175,11 +205,22 @@ fun SevaPasswordField(
     keyboardActions: KeyboardActions = KeyboardActions.Default
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    val coroutineScope = rememberCoroutineScope()
 
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .bringIntoViewRequester(bringIntoViewRequester)
+    ) {
         OutlinedTextField(
             value = value,
-            onValueChange = onValueChange,
+            onValueChange = {
+                onValueChange(it)
+                coroutineScope.launch {
+                    bringIntoViewRequester.bringIntoView()
+                }
+            },
             label = { Text(label) },
             singleLine = true,
             isError = isError,
@@ -193,7 +234,17 @@ fun SevaPasswordField(
                 }
             },
             shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusEvent { focusState ->
+                    if (focusState.isFocused) {
+                        coroutineScope.launch {
+                            bringIntoViewRequester.bringIntoView()
+                            delay(250)
+                            bringIntoViewRequester.bringIntoView()
+                        }
+                    }
+                },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = ForestGreen,
                 focusedLabelColor = ForestGreen,

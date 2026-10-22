@@ -88,8 +88,10 @@ fun AddEditVisitScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .imePadding()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp)
-                .verticalScroll(rememberScrollState()),
+                .padding(top = 10.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Spacer(modifier = Modifier.height(4.dp))
@@ -355,7 +357,7 @@ fun AddEditVisitScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(56.dp))
         }
     }
 }

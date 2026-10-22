@@ -1,6 +1,8 @@
 package com.sevadiary.app.feature.auth
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Email
@@ -47,7 +49,10 @@ fun ForgotPasswordScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(24.dp),
+                .imePadding()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp)
+                .padding(top = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             if (isSubmitted) {
@@ -63,6 +68,7 @@ fun ForgotPasswordScreen(
                     text = stringResource(R.string.btn_back),
                     onClick = onNavigateBack
                 )
+                Spacer(modifier = Modifier.height(48.dp))
             } else {
                 Text(
                     text = stringResource(R.string.forgot_pw_instruction),
@@ -87,6 +93,8 @@ fun ForgotPasswordScreen(
                         }
                     }
                 )
+
+                Spacer(modifier = Modifier.height(48.dp))
             }
         }
     }
