@@ -25,13 +25,13 @@
 
     <!-- Onboarding -->
     <string name="onboarding_1_title">सेवा डायरी में आपका स्वागत है</string>
-    <string name="onboarding_1_desc">आपकी नियमित साधना और भक्ति का व्यक्तिगत रिकॉर्ड, शांति और समर्पण के साथ संजोने के लिए।</string>
-    <string name="onboarding_2_title">दैनिक नाम जाप रिकॉर्ड</string>
-    <string name="onboarding_2_desc">सरल एक-स्पर्श काउंटिंग, व्यक्तिगत लक्ष्य और कैलेंडर इतिहास के साथ अपने जाप का रिकॉर्ड रखें।</string>
-    <string name="onboarding_3_title">सतलोक आश्रम यात्रा विवरण</string>
-    <string name="onboarding_3_desc">सतलोक आश्रमों की यात्राएं, सेवा के प्रकार, दिन और अपने निजी अनुभव सहेजें।</string>
-    <string name="onboarding_4_title">व्यक्तिगत पीडीएफ रिपोर्ट</string>
-    <string name="onboarding_4_desc">अपने मोबाइल पर स्थानीय रूप से आश्रम यात्राओं और जाप की सुंदर पीडीएफ रिपोर्ट तैयार करें और साझा करें।</string>
+    <string name="onboarding_1_desc">सतगुरु रामपाल जी महाराज के आशीर्वाद से अपने दैनिक जाप, सेवा और भक्ति का रिकॉर्ड रखने के लिए एक आध्यात्मिक साथी।</string>
+    <string name="onboarding_2_title">नाम जाप</string>
+    <string name="onboarding_2_desc">अपने दैनिक नाम जाप का रिकॉर्ड रखें और सतगुरु रामपाल जी महाराज द्वारा दिखाए गए भक्ति मार्ग पर अडिग रहें।</string>
+    <string name="onboarding_3_title">ज्ञान और साधना</string>
+    <string name="onboarding_3_desc">शांतिमय और सार्थक जीवन के लिए सतगुरु रामपाल जी महाराज के यथार्थ ज्ञान और अनमोल वचनों को जानें।</string>
+    <string name="onboarding_4_title">सेवा और समर्पण</string>
+    <string name="onboarding_4_desc">सतगुरु रामपाल जी महाराज के मार्गदर्शन और आशीर्वाद से अपनी सेवा, सत्कर्म और भक्ति प्रगति को संजोएं।</string>
     <string name="onboarding_5_title">अपनी प्राथमिकताएं चुनें</string>
     <string name="onboarding_5_desc">अपनी भक्ति यात्रा को अनुकूलित करने के लिए पसंदीदा भाषा और थीम का चयन करें।</string>
     <string name="btn_get_started">शुरू करें</string>

@@ -25,13 +25,13 @@
 
     <!-- Onboarding -->
     <string name="onboarding_1_title">Welcome to Seva Diary</string>
-    <string name="onboarding_1_desc">Your personal space for dedicated spiritual practice, maintaining your sacred record with peace and devotion.</string>
-    <string name="onboarding_2_title">Track Daily Naam Jaap</string>
-    <string name="onboarding_2_desc">Maintain your daily chanting counts easily with one-tap increments, personal targets, and calendar progress tracking.</string>
-    <string name="onboarding_3_title">Satlok Ashram Visits</string>
-    <string name="onboarding_3_desc">Document your visits to Satlok Ashrams, inclusive durations, seva responsibilities, and memorable personal notes.</string>
-    <string name="onboarding_4_title">Personal PDF Reports</string>
-    <string name="onboarding_4_desc">Generate elegant, organized PDF summaries locally on your device for ashram visits and jaap history to view or share.</string>
+    <string name="onboarding_1_desc">A spiritual companion to record your daily jaap, seva and devotion with the blessings of Satguru Rampal Ji Maharaj.</string>
+    <string name="onboarding_2_title">Naam Jaap</string>
+    <string name="onboarding_2_desc">Keep a record of your daily naam jaap and stay consistent on the spiritual path shown by Satguru Rampal Ji Maharaj.</string>
+    <string name="onboarding_3_title">Learn &amp; Grow</string>
+    <string name="onboarding_3_desc">Explore the true knowledge and teachings of Satguru Rampal Ji Maharaj for a peaceful and purposeful life.</string>
+    <string name="onboarding_4_title">Seva &amp; Devotion</string>
+    <string name="onboarding_4_desc">Record your seva, good deeds and spiritual progress with the guidance and blessings of Satguru Rampal Ji Maharaj.</string>
     <string name="onboarding_5_title">Choose Your Preferences</string>
     <string name="onboarding_5_desc">Select your preferred language and display theme to personalize your devotional journey.</string>
     <string name="btn_get_started">Get Started</string>
