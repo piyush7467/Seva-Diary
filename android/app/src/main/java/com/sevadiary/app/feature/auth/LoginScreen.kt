@@ -3,6 +3,7 @@ package com.sevadiary.app.feature.auth
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -203,22 +204,29 @@ fun LoginScreen(
                         style = MaterialTheme.typography.bodySmall
                     )
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         FilterChip(
+                            selected = serverUrlInput.contains("vercel.app"),
+                            onClick = { serverUrlInput = ApiClient.CLOUD_URL },
+                            label = { Text("Cloud (Vercel)", style = MaterialTheme.typography.labelSmall) }
+                        )
+                        FilterChip(
                             selected = serverUrlInput.contains("127.0.0.1"),
-                            onClick = { serverUrlInput = "http://127.0.0.1:5000/" },
+                            onClick = { serverUrlInput = ApiClient.USB_URL },
                             label = { Text("USB", style = MaterialTheme.typography.labelSmall) }
                         )
                         FilterChip(
                             selected = serverUrlInput.contains("10.35.29.227"),
-                            onClick = { serverUrlInput = "http://10.35.29.227:5000/" },
+                            onClick = { serverUrlInput = ApiClient.WIFI_URL },
                             label = { Text("Wi-Fi", style = MaterialTheme.typography.labelSmall) }
                         )
                         FilterChip(
                             selected = serverUrlInput.contains("10.0.2.2"),
-                            onClick = { serverUrlInput = "http://10.0.2.2:5000/" },
+                            onClick = { serverUrlInput = ApiClient.EMULATOR_URL },
                             label = { Text("Emulator", style = MaterialTheme.typography.labelSmall) }
                         )
                     }

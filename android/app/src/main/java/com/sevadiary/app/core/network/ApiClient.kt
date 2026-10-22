@@ -5,6 +5,7 @@ import com.sevadiary.app.core.network.dto.RefreshRequest
 import com.sevadiary.app.core.security.SecureTokenManager
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -83,12 +84,27 @@ class AutoFailoverInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
         val originalUrl = originalRequest.url
+        val currentTarget = ApiClient.baseUrl.toHttpUrlOrNull()
 
-        if (originalUrl.port == 5000) {
+        // Dynamically route to current ApiClient.baseUrl if configured
+        val targetRequest = if (currentTarget != null &&
+            (originalUrl.host != currentTarget.host || originalUrl.scheme != currentTarget.scheme || originalUrl.port != currentTarget.port)) {
+            val rewrittenUrl = originalUrl.newBuilder()
+                .scheme(currentTarget.scheme)
+                .host(currentTarget.host)
+                .port(currentTarget.port)
+                .build()
+            originalRequest.newBuilder().url(rewrittenUrl).build()
+        } else {
+            originalRequest
+        }
+        val targetUrl = targetRequest.url
+
+        if (targetUrl.port == 5000) {
             val knownHost = activeHost
-            if (knownHost != null && knownHost != originalUrl.host) {
-                val updatedUrl = originalUrl.newBuilder().host(knownHost).build()
-                val updatedRequest = originalRequest.newBuilder().url(updatedUrl).build()
+            if (knownHost != null && knownHost != targetUrl.host) {
+                val updatedUrl = targetUrl.newBuilder().host(knownHost).build()
+                val updatedRequest = targetRequest.newBuilder().url(updatedUrl).build()
                 try {
                     return chain.proceed(updatedRequest)
                 } catch (_: Exception) {
@@ -97,16 +113,16 @@ class AutoFailoverInterceptor : Interceptor {
             }
 
             try {
-                val response = chain.proceed(originalRequest)
+                val response = chain.proceed(targetRequest)
                 if (response.isSuccessful || response.code < 500) {
-                    activeHost = originalUrl.host
+                    activeHost = targetUrl.host
                 }
                 return response
             } catch (primaryException: Exception) {
                 for (candidate in candidateHosts) {
-                    if (candidate == originalUrl.host) continue
-                    val fallbackUrl = originalUrl.newBuilder().host(candidate).build()
-                    val fallbackRequest = originalRequest.newBuilder().url(fallbackUrl).build()
+                    if (candidate == targetUrl.host) continue
+                    val fallbackUrl = targetUrl.newBuilder().host(candidate).build()
+                    val fallbackRequest = targetRequest.newBuilder().url(fallbackUrl).build()
                     try {
                         val response = chain.proceed(fallbackRequest)
                         activeHost = candidate
@@ -119,28 +135,18 @@ class AutoFailoverInterceptor : Interceptor {
             }
         }
 
-        return chain.proceed(originalRequest)
+        return chain.proceed(targetRequest)
     }
 }
 
 object ApiClient {
-    private fun isEmulator(): Boolean {
-        return (Build.FINGERPRINT.startsWith("generic")
-                || Build.FINGERPRINT.startsWith("unknown")
-                || Build.MODEL.contains("google_sdk")
-                || Build.MODEL.contains("Emulator")
-                || Build.MODEL.contains("Android SDK built for x86")
-                || Build.MANUFACTURER.contains("Genymotion")
-                || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
-                || "google_sdk" == Build.PRODUCT)
-    }
+    const val CLOUD_URL = "https://seva-diary-backend.vercel.app/"
+    const val USB_URL = "http://127.0.0.1:5000/"
+    const val WIFI_URL = "http://10.35.29.227:5000/"
+    const val EMULATOR_URL = "http://10.0.2.2:5000/"
 
-    // Default to 127.0.0.1 on physical device (adb reverse) or 10.0.2.2 on emulator
-    var baseUrl: String = if (isEmulator()) {
-        "http://10.0.2.2:5000/"
-    } else {
-        "http://127.0.0.1:5000/"
-    }
+    // Defaults to live production Vercel cloud; fallbacks/presets selectable in app
+    var baseUrl: String = CLOUD_URL
 
     val failoverInterceptor = AutoFailoverInterceptor()
 

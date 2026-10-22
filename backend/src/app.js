@@ -45,15 +45,18 @@ app.use(async (req, res, next) => {
   }
 });
 
-// API Routes
-app.get('/api/v1/health', (req, res) => {
+// Root & Health Endpoints
+const healthPayload = (req, res) => {
   res.status(200).json({
     status: 'healthy',
+    message: 'Seva Diary API is running',
     timestamp: new Date().toISOString(),
     environment: config.env,
     version: '1.0.0'
   });
-});
+};
+
+app.get(['/', '/health', '/api/health', '/api/v1/health'], healthPayload);
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
