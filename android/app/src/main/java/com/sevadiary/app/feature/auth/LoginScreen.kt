@@ -104,29 +104,29 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(6.dp))
 
             // Server URL indicator & configuration chip
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable {
-                        serverUrlInput = ApiClient.baseUrl
-                        showServerDialog = true
-                    }
-                    .padding(horizontal = 10.dp, vertical = 4.dp)
-            ) {
-                Icon(
-                    Icons.Default.Wifi,
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "Server: ${ApiClient.baseUrl}",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+//            Row(
+//                verticalAlignment = Alignment.CenterVertically,
+//                modifier = Modifier
+//                    .clip(RoundedCornerShape(8.dp))
+//                    .clickable {
+//                        serverUrlInput = ApiClient.baseUrl
+//                        showServerDialog = true
+//                    }
+//                    .padding(horizontal = 10.dp, vertical = 4.dp)
+//            ) {
+//                Icon(
+//                    Icons.Default.Wifi,
+//                    contentDescription = null,
+//                    modifier = Modifier.size(14.dp),
+//                    tint = MaterialTheme.colorScheme.primary
+//                )
+//                Spacer(modifier = Modifier.width(4.dp))
+//                Text(
+//                    text = "Server: ${ApiClient.baseUrl}",
+//                    style = MaterialTheme.typography.labelSmall,
+//                    color = MaterialTheme.colorScheme.onSurfaceVariant
+//                )
+//            }
 
             Spacer(modifier = Modifier.height(24.dp))
 

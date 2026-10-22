@@ -119,6 +119,8 @@ fun NavGraph(
         composable(Screen.Dashboard.route) {
             DashboardScreen(
                 devotionalName = devotionalName,
+                chantingViewModel = chantingViewModel,
+                sevaViewModel = sevaViewModel,
                 onNavigateToChanting = { navController.navigate(Screen.Chanting.route) },
                 onNavigateToAshram = { navController.navigate(Screen.AshramDiary.route) },
                 onNavigateToReports = { navController.navigate(Screen.Reports.route) },

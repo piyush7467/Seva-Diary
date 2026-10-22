@@ -154,4 +154,26 @@
     <string name="btn_logout">लॉगआउट</string>
     <string name="logout_confirm">क्या आप लॉगआउट करना चाहते हैं?</string>
     <string name="version_info">सेवा डायरी संस्करण 1.0.0</string>
+
+    <!-- Dashboard Additions -->
+    <string name="greeting_sat_saheb">सत साहेब,</string>
+    <string name="today_naam_jaap">आज का नाम जाप</string>
+    <string name="remaining_to_daily_target">दैनिक लक्ष्य तक पहुँचने के लिए %1$s शेष</string>
+    <string name="daily_target_completed">दैनिक लक्ष्य पूर्ण! सत साहेब</string>
+    <string name="this_month">इस माह</string>
+    <string name="total_jaap">कुल जाप</string>
+    <string name="last_ashram_visit">अंतिम आश्रम यात्रा</string>
+    <string name="no_visits_yet">कोई यात्रा नहीं</string>
+    <string name="log_your_visit">यात्रा दर्ज करें</string>
+    <string name="days_stay">%1$d दिन का प्रवास</string>
+    <string name="explore_features">सुविधाएं देखें</string>
+    <string name="view_all">सभी देखें</string>
+    <string name="feature_jaap_desc">दैनिक जाप संख्या दर्ज करें, लक्ष्य निर्धारित करें और इतिहास देखें</string>
+    <string name="feature_ashram_desc">यात्राएं दर्ज करें, रुकने की अवधि, सेवा कार्य और संस्मरण संजोएं</string>
+    <string name="feature_reports_desc">स्थानीय स्तर पर सुंदर पीडीएफ रिपोर्ट बनाएं और साझा करें</string>
+    <string name="quote_naam_aadhar">“नाम ही जीवन का सही आधार है।”</string>
+    <string name="quote_life_purpose">“मनुष्य जीवन का उद्देश्य परमात्मा की भक्ति करना है।”</string>
+    <string name="quote_author_rampal_ji">– संत रामपाल जी महाराज</string>
+    <string name="nav_visits">यात्राएं</string>
+    <string name="nav_profile">प्रोफाइल</string>
 </resources>

@@ -154,4 +154,26 @@
     <string name="btn_logout">Logout</string>
     <string name="logout_confirm">Are you sure you want to log out?</string>
     <string name="version_info">Seva Diary v1.0.0</string>
+
+    <!-- Dashboard Additions -->
+    <string name="greeting_sat_saheb">Sat Saheb,</string>
+    <string name="today_naam_jaap">Today\'s Naam Jaap</string>
+    <string name="remaining_to_daily_target">%1$s remaining to reach your daily target</string>
+    <string name="daily_target_completed">Daily target completed! Sat Saheb</string>
+    <string name="this_month">This Month</string>
+    <string name="total_jaap">Total Jaap</string>
+    <string name="last_ashram_visit">Last Ashram Visit</string>
+    <string name="no_visits_yet">No visits yet</string>
+    <string name="log_your_visit">Log your visit</string>
+    <string name="days_stay">%1$d days stay</string>
+    <string name="explore_features">Explore Features</string>
+    <string name="view_all">View All</string>
+    <string name="feature_jaap_desc">Record daily chanting count, set targets &amp; track calendar history</string>
+    <string name="feature_ashram_desc">Log visits, calculate stay duration, record seva duties &amp; memories</string>
+    <string name="feature_reports_desc">Generate elegant PDF reports locally and share directly via WhatsApp</string>
+    <string name="quote_naam_aadhar">“Naam hi jeevan ka sahi aadhar hai.”</string>
+    <string name="quote_life_purpose">“Manushya jeevan ka uddeshya Paramatma ki bhakti karna hai.”</string>
+    <string name="quote_author_rampal_ji">– Sant Rampal Ji Maharaj</string>
+    <string name="nav_visits">Visits</string>
+    <string name="nav_profile">Profile</string>
 </resources>
