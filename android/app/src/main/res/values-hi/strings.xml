@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">सेवा डायरी</string>
+    <string name="app_tagline">व्यक्तिगत भक्ति डायरी एवं नाम जाप रिकॉर्ड</string>
+
+    <!-- Navigation & Common -->
+    <string name="nav_home">होम</string>
+    <string name="nav_jaap">नाम जाप</string>
+    <string name="nav_ashram">आश्रम डायरी</string>
+    <string name="nav_reports">रिपोर्ट्स</string>
+    <string name="nav_settings">सेटिंग्स</string>
+    <string name="btn_continue">आगे बढ़ें</string>
+    <string name="btn_skip">छोड़ें</string>
+    <string name="btn_next">आगे</string>
+    <string name="btn_back">पीछे</string>
+    <string name="btn_save">सुरक्षित करें</string>
+    <string name="btn_cancel">रद्द करें</string>
+    <string name="btn_submit">जमा करें</string>
+    <string name="btn_retry">पुनः प्रयास करें</string>
+    <string name="btn_confirm">पुष्टि करें</string>
+    <string name="loading">लोड हो रहा है…</string>
+    <string name="success">सफल</string>
+    <string name="error_occurred">एक त्रुटि हुई। कृपया पुन: प्रयास करें।</string>
+    <string name="network_error">नेटवर्क त्रुटि। कृपया अपना इंटरनेट कनेक्शन जांचें।</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_1_title">सेवा डायरी में आपका स्वागत है</string>
+    <string name="onboarding_1_desc">आपकी नियमित साधना और भक्ति का व्यक्तिगत रिकॉर्ड, शांति और समर्पण के साथ संजोने के लिए।</string>
+    <string name="onboarding_2_title">दैनिक नाम जाप रिकॉर्ड</string>
+    <string name="onboarding_2_desc">सरल एक-स्पर्श काउंटिंग, व्यक्तिगत लक्ष्य और कैलेंडर इतिहास के साथ अपने जाप का रिकॉर्ड रखें।</string>
+    <string name="onboarding_3_title">सतलोक आश्रम यात्रा विवरण</string>
+    <string name="onboarding_3_desc">सतलोक आश्रमों की यात्राएं, सेवा के प्रकार, दिन और अपने निजी अनुभव सहेजें।</string>
+    <string name="onboarding_4_title">व्यक्तिगत पीडीएफ रिपोर्ट</string>
+    <string name="onboarding_4_desc">अपने मोबाइल पर स्थानीय रूप से आश्रम यात्राओं और जाप की सुंदर पीडीएफ रिपोर्ट तैयार करें और साझा करें।</string>
+    <string name="onboarding_5_title">अपनी प्राथमिकताएं चुनें</string>
+    <string name="onboarding_5_desc">अपनी भक्ति यात्रा को अनुकूलित करने के लिए पसंदीदा भाषा और थीम का चयन करें।</string>
+    <string name="btn_get_started">शुरू करें</string>
+
+    <!-- Language & Theme -->
+    <string name="pref_language">भाषा / Language</string>
+    <string name="lang_english">English</string>
+    <string name="lang_hindi">हिंदी (Hindi)</string>
+    <string name="pref_theme">थीम</string>
+    <string name="theme_system">सिस्टम अनुसार</string>
+    <string name="theme_light">हल्की (Light)</string>
+    <string name="theme_dark">भक्ति डार्क (Dark)</string>
+
+    <!-- Authentication -->
+    <string name="login_title">भक्त लॉगिन</string>
+    <string name="login_subtitle">अपनी सेवा डायरी में प्रवेश करें</string>
+    <string name="username_or_email">यूज़रनेम या ईमेल</string>
+    <string name="password">पासवर्ड</string>
+    <string name="forgot_password">पासवर्ड भूल गए?</string>
+    <string name="btn_login">लॉगिन करें</string>
+    <string name="no_account">खाता नहीं है? पंजीकरण करें</string>
+    <string name="already_have_account">पहले से पंजीकृत हैं? लॉगिन करें</string>
+
+    <!-- Registration -->
+    <string name="reg_title">भक्त पंजीकरण</string>
+    <string name="reg_step_1">चरण 1: व्यक्तिगत जानकारी</string>
+    <string name="reg_step_2">चरण 2: पता एवं नाम दीक्षा विवरण</string>
+    <string name="reg_step_3">चरण 3: खाता विवरण</string>
+    <string name="reg_step_4">समीक्षा एवं खाता निर्माण</string>
+
+    <string name="first_name">पहला नाम</string>
+    <string name="last_name">अंतिम नाम</string>
+    <string name="gender">लिंग</string>
+    <string name="gender_male">पुरुष</string>
+    <string name="gender_female">महिला</string>
+    <string name="gender_other">अन्य</string>
+    <string name="devotional_name">भक्ति प्रदर्शन नाम</string>
+    <string name="phone_number">फ़ोन नंबर</string>
+    <string name="email_address">ईमेल पता</string>
+
+    <string name="address_line">पता (वैकल्पिक)</string>
+    <string name="city_village">गाँव / शहर</string>
+    <string name="state_required">राज्य *</string>
+    <string name="select_state">राज्य चुनें</string>
+    <string name="district_required">जिला *</string>
+    <string name="select_district">जिला चुनें</string>
+    <string name="tehsil_required">तहसील *</string>
+    <string name="select_tehsil">तहसील चुनें</string>
+    <string name="mantra_required">मंत्र *</string>
+    <string name="select_mantra">मंत्र चुनें</string>
+    <string name="mantra_pratham_nam">प्रथम नाम</string>
+    <string name="mantra_satnam">सतनाम</string>
+    <string name="mantra_sarnam">सारनाम</string>
+    <string name="district">ज़िला</string>
+    <string name="state">राज्य</string>
+    <string name="pin_code">पिन कोड</string>
+    <string name="mantra_details_optional">अतिरिक्त आध्यात्मिक विवरण (वैकल्पिक)</string>
+
+    <string name="username">यूज़रनेम</string>
+    <string name="username_helper">3–20 अक्षर और अंक, रिक्त स्थान रहित</string>
+    <string name="confirm_password">पासवर्ड की पुष्टि करें</string>
+    <string name="terms_consent">मैं उपयोग की शर्तों और गोपनीयता नीति से सहमत हूँ</string>
+    <string name="btn_create_account">खाता बनाएँ</string>
+
+    <!-- Forgot Password -->
+    <string name="forgot_pw_title">पासवर्ड रीसेट करें</string>
+    <string name="forgot_pw_instruction">अपना पंजीकृत ईमेल पता दर्ज करें। हम आपको पासवर्ड रीसेट करने के लिए एक सुरक्षित लिंक भेजेंगे।</string>
+    <string name="btn_send_reset_link">रीसेट लिंक भेजें</string>
+    <string name="reset_link_sent_msg">यदि यह ईमेल पंजीकृत है, तो पासवर्ड रीसेट लिंक भेज दिया गया है। कृपया अपना इनबॉक्स देखें।</string>
+
+    <!-- Naam Jaap -->
+    <string name="jaap_title">दैनिक नाम जाप</string>
+    <string name="jaap_today_count">आज का जाप</string>
+    <string name="jaap_target">दैनिक लक्ष्य</string>
+    <string name="jaap_tap_count">+1 जाप</string>
+    <string name="jaap_undo">पूर्ववत (Undo)</string>
+    <string name="jaap_reset">रीसेट</string>
+    <string name="jaap_confirm_reset">क्या आप आज की गिनती को 0 पर रीसेट करना चाहते हैं?</string>
+    <string name="jaap_history">कैलेंडर इतिहास</string>
+    <string name="jaap_summary_week">इस सप्ताह</string>
+    <string name="jaap_summary_month">इस माह</string>
+    <string name="jaap_summary_total">कुल जाप</string>
+
+    <!-- Ashram Diary -->
+    <string name="ashram_diary_title">सतलोक आश्रम यात्रा विवरण</string>
+    <string name="ashram_new_visit">नई आश्रम यात्रा दर्ज करें</string>
+    <string name="ashram_select">सतलोक आश्रम चुनें</string>
+    <string name="ashram_custom_name">आश्रम का नाम / स्थान दर्ज करें</string>
+    <string name="start_date">प्रारंभ तिथि</string>
+    <string name="end_date">समाप्ति तिथि</string>
+    <string name="duration_days">अवधि</string>
+    <string name="days_count">%1$d दिन</string>
+    <string name="visit_purpose">यात्रा का उद्देश्य</string>
+    <string name="seva_type">सेवा का प्रकार</string>
+    <string name="custom_purpose_or_seva">उद्देश्य / सेवा विवरण लिखें</string>
+    <string name="notes_optional">व्यक्तिगत टिप्पणी (वैकल्पिक)</string>
+    <string name="location_details">स्थान / यात्रा विवरण (वैकल्पिक)</string>
+    <string name="btn_save_visit">यात्रा विवरण सहेजें</string>
+    <string name="no_visits_found">अभी तक कोई यात्रा दर्ज नहीं की गई है।</string>
+    <string name="filter_ashram">आश्रम अनुसार फ़िल्टर</string>
+    <string name="filter_purpose">उद्देश्य अनुसार फ़िल्टर</string>
+    <string name="filter_date_range">तिथि सीमा फ़िल्टर</string>
+
+    <!-- Reports -->
+    <string name="reports_title">व्यक्तिगत रिपोर्ट्स</string>
+    <string name="report_type_ashram">सतलोक आश्रम यात्रा रिपोर्ट</string>
+    <string name="report_type_jaap">नाम जाप प्रगति रिपोर्ट</string>
+    <string name="report_type_combined">संयुक्त सेवा एवं जाप रिपोर्ट</string>
+    <string name="btn_generate_pdf">लोकल पीडीएफ बनाएँ</string>
+    <string name="btn_preview">रिपोर्ट पूर्वावलोकन</string>
+    <string name="btn_download">डाउनलोड / सुरक्षित करें</string>
+    <string name="btn_share">रिपोर्ट साझा करें</string>
+    <string name="pdf_generated_success">पीडीएफ सफलतापूर्वक तैयार हो गई!</string>
+
+    <!-- Settings -->
+    <string name="settings_title">सेटिंग्स एवं प्रोफाइल</string>
+    <string name="profile_edit">प्रोफाइल संपादित करें</string>
+    <string name="onboarding_reopen">ऐप गाइड एवं टूर</string>
+    <string name="btn_logout">लॉगआउट</string>
+    <string name="logout_confirm">क्या आप लॉगआउट करना चाहते हैं?</string>
+    <string name="version_info">सेवा डायरी संस्करण 1.0.0</string>
+</resources>

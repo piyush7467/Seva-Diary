@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+  <!-- Dome & Flag -->
+  <path
+      android:fillColor="#D9822B"
+      android:pathData="M24,4l2,0v4l-2,0z M26,4l5,2 -5,2z"/>
+  <path
+      android:fillColor="#1E4D2B"
+      android:pathData="M24,8c-5,0 -9,4 -9,9h18C33,12 29,8 24,8z"/>
+  <!-- Central Arch & Pillars -->
+  <path
+      android:fillColor="#1E4D2B"
+      android:pathData="M11,18h26v4h-26z M13,22h4v18h-4z M31,22h4v18h-4z M22,22h4v7c0,1.1 -0.9,2 -2,2s-2,-0.9 -2,-2v-7z"/>
+  <!-- Steps & Base -->
+  <path
+      android:fillColor="#D9822B"
+      android:pathData="M9,40h30v4h-30z"/>
+</vector>

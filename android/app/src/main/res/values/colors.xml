@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="seed">#1E4D2B</color>
+    
+    <!-- Devotional Theme Colors -->
+    <color name="warm_ivory">#FDFBF7</color>
+    <color name="devotional_cream">#F6F2EA</color>
+    <color name="forest_green">#1E4D2B</color>
+    <color name="forest_green_dark">#14371E</color>
+    <color name="forest_green_light">#E2ECE4</color>
+    <color name="saffron_gold">#D9822B</color>
+    <color name="saffron_gold_light">#FFF3E0</color>
+    
+    <!-- Surface & Background -->
+    <color name="surface_light">#FFFFFF</color>
+    <color name="surface_dark">#22201D</color>
+    <color name="background_light">#FDFBF7</color>
+    <color name="background_dark">#161412</color>
+    
+    <!-- Text Colors -->
+    <color name="text_primary_light">#1F2421</color>
+    <color name="text_secondary_light">#5C645E</color>
+    <color name="text_primary_dark">#EDEBE8</color>
+    <color name="text_secondary_dark">#A6A4A0</color>
+    
+    <!-- Borders & Error -->
+    <color name="border_light">#E3DED4</color>
+    <color name="border_dark">#3A3632</color>
+    <color name="error">#BA1A1A</color>
+</resources>

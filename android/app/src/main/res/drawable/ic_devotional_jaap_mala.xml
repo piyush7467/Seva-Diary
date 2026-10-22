@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+  <!-- Devotional Prayer Beads (Jaap Mala) -->
+  <path
+      android:fillColor="#1E4D2B"
+      android:pathData="M24,6a3,3 0 1,0 0.001,0z M17,8a3,3 0 1,0 0.001,0z M31,8a3,3 0 1,0 0.001,0z M11,13a3,3 0 1,0 0.001,0z M37,13a3,3 0 1,0 0.001,0z M8,20a3,3 0 1,0 0.001,0z M40,20a3,3 0 1,0 0.001,0z M8,28a3,3 0 1,0 0.001,0z M40,28a3,3 0 1,0 0.001,0z M12,35a3,3 0 1,0 0.001,0z M36,35a3,3 0 1,0 0.001,0z M18,40a3,3 0 1,0 0.001,0z M30,40a3,3 0 1,0 0.001,0z M24,42a3.5,3.5 0 1,0 0.001,0z"/>
+  <!-- Tassel / Sumeru Bead -->
+  <path
+      android:fillColor="#D9822B"
+      android:pathData="M23,43h2v4h-2z M21,47h6v2h-6z"/>
+</vector>

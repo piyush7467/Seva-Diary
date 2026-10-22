@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Seva Diary</string>
+    <string name="app_tagline">Personal Devotional Diary &amp; Naam Jaap Tracker</string>
+
+    <!-- Navigation & Common -->
+    <string name="nav_home">Home</string>
+    <string name="nav_jaap">Naam Jaap</string>
+    <string name="nav_ashram">Ashram Diary</string>
+    <string name="nav_reports">Reports</string>
+    <string name="nav_settings">Settings</string>
+    <string name="btn_continue">Continue</string>
+    <string name="btn_skip">Skip</string>
+    <string name="btn_next">Next</string>
+    <string name="btn_back">Back</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_submit">Submit</string>
+    <string name="btn_retry">Retry</string>
+    <string name="btn_confirm">Confirm</string>
+    <string name="loading">Loading…</string>
+    <string name="success">Success</string>
+    <string name="error_occurred">An error occurred. Please try again.</string>
+    <string name="network_error">Network error. Please check your connection.</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_1_title">Welcome to Seva Diary</string>
+    <string name="onboarding_1_desc">Your personal space for dedicated spiritual practice, maintaining your sacred record with peace and devotion.</string>
+    <string name="onboarding_2_title">Track Daily Naam Jaap</string>
+    <string name="onboarding_2_desc">Maintain your daily chanting counts easily with one-tap increments, personal targets, and calendar progress tracking.</string>
+    <string name="onboarding_3_title">Satlok Ashram Visits</string>
+    <string name="onboarding_3_desc">Document your visits to Satlok Ashrams, inclusive durations, seva responsibilities, and memorable personal notes.</string>
+    <string name="onboarding_4_title">Personal PDF Reports</string>
+    <string name="onboarding_4_desc">Generate elegant, organized PDF summaries locally on your device for ashram visits and jaap history to view or share.</string>
+    <string name="onboarding_5_title">Choose Your Preferences</string>
+    <string name="onboarding_5_desc">Select your preferred language and display theme to personalize your devotional journey.</string>
+    <string name="btn_get_started">Get Started</string>
+
+    <!-- Language & Theme -->
+    <string name="pref_language">Language / भाषा</string>
+    <string name="lang_english">English</string>
+    <string name="lang_hindi">हिंदी (Hindi)</string>
+    <string name="pref_theme">Theme</string>
+    <string name="theme_system">System Default</string>
+    <string name="theme_light">Warm Light</string>
+    <string name="theme_dark">Devotional Dark</string>
+
+    <!-- Authentication -->
+    <string name="login_title">Devotee Login</string>
+    <string name="login_subtitle">Sign in to access your Seva Diary records</string>
+    <string name="username_or_email">Username or Email</string>
+    <string name="password">Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="btn_login">Sign In</string>
+    <string name="no_account">Don\'t have an account? Register</string>
+    <string name="already_have_account">Already registered? Sign In</string>
+
+    <!-- Registration -->
+    <string name="reg_title">Devotee Registration</string>
+    <string name="reg_step_1">Step 1: Personal Details</string>
+    <string name="reg_step_2">Step 2: Address &amp; Mantra Details</string>
+    <string name="reg_step_3">Step 3: Account Credentials</string>
+    <string name="reg_step_4">Review &amp; Create Account</string>
+
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="gender">Gender</string>
+    <string name="gender_male">Male</string>
+    <string name="gender_female">Female</string>
+    <string name="gender_other">Other</string>
+    <string name="devotional_name">Devotional Display Name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="email_address">Email Address</string>
+
+    <string name="address_line">Address Line (Optional)</string>
+    <string name="city_village">Village / City</string>
+    <string name="state_required">State *</string>
+    <string name="select_state">Select State</string>
+    <string name="district_required">District *</string>
+    <string name="select_district">Select District</string>
+    <string name="tehsil_required">Tehsil *</string>
+    <string name="select_tehsil">Select Tehsil</string>
+    <string name="mantra_required">Mantra *</string>
+    <string name="select_mantra">Select Mantra</string>
+    <string name="mantra_pratham_nam">Pratham Nam</string>
+    <string name="mantra_satnam">Satnam</string>
+    <string name="mantra_sarnam">Sarnam</string>
+    <string name="district">District</string>
+    <string name="state">State</string>
+    <string name="pin_code">PIN Code</string>
+    <string name="mantra_details_optional">Additional Spiritual Notes (Optional)</string>
+
+    <string name="username">Username</string>
+    <string name="username_helper">3–20 alphanumeric characters, no spaces</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="terms_consent">I agree to the Terms of Use and Privacy Policy</string>
+    <string name="btn_create_account">Create Account</string>
+
+    <!-- Forgot Password -->
+    <string name="forgot_pw_title">Reset Password</string>
+    <string name="forgot_pw_instruction">Enter your registered email address. We will send you a secure link to reset your password.</string>
+    <string name="btn_send_reset_link">Send Reset Link</string>
+    <string name="reset_link_sent_msg">If this email is registered, a password recovery link has been sent. Please check your inbox.</string>
+
+    <!-- Naam Jaap -->
+    <string name="jaap_title">Daily Naam Jaap</string>
+    <string name="jaap_today_count">Today\'s Count</string>
+    <string name="jaap_target">Daily Target</string>
+    <string name="jaap_tap_count">+1 Count</string>
+    <string name="jaap_undo">Undo</string>
+    <string name="jaap_reset">Reset</string>
+    <string name="jaap_confirm_reset">Are you sure you want to reset today\'s count to 0?</string>
+    <string name="jaap_history">Calendar History</string>
+    <string name="jaap_summary_week">This Week</string>
+    <string name="jaap_summary_month">This Month</string>
+    <string name="jaap_summary_total">All Time Total</string>
+
+    <!-- Ashram Diary -->
+    <string name="ashram_diary_title">Satlok Ashram Visits</string>
+    <string name="ashram_new_visit">Log New Ashram Visit</string>
+    <string name="ashram_select">Select Satlok Ashram</string>
+    <string name="ashram_custom_name">Enter Ashram Name / Location</string>
+    <string name="start_date">Start Date</string>
+    <string name="end_date">End Date</string>
+    <string name="duration_days">Duration</string>
+    <string name="days_count">%1$d Days</string>
+    <string name="visit_purpose">Purpose of Visit</string>
+    <string name="seva_type">Seva Type</string>
+    <string name="custom_purpose_or_seva">Specify Custom Purpose / Seva</string>
+    <string name="notes_optional">Personal Notes (Optional)</string>
+    <string name="location_details">Location / Transport Details (Optional)</string>
+    <string name="btn_save_visit">Save Visit Record</string>
+    <string name="no_visits_found">No ashram visits recorded yet.</string>
+    <string name="filter_ashram">Filter by Ashram</string>
+    <string name="filter_purpose">Filter by Purpose</string>
+    <string name="filter_date_range">Filter Date Range</string>
+
+    <!-- Reports -->
+    <string name="reports_title">Personal Reports</string>
+    <string name="report_type_ashram">Satlok Ashram Visits Report</string>
+    <string name="report_type_jaap">Naam Jaap Progress Report</string>
+    <string name="report_type_combined">Combined Seva &amp; Jaap Report</string>
+    <string name="btn_generate_pdf">Generate Local PDF</string>
+    <string name="btn_preview">Preview Report</string>
+    <string name="btn_download">Download / Export</string>
+    <string name="btn_share">Share Report</string>
+    <string name="pdf_generated_success">PDF generated successfully!</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings &amp; Profile</string>
+    <string name="profile_edit">Edit Profile</string>
+    <string name="onboarding_reopen">App Guide &amp; Tour</string>
+    <string name="btn_logout">Logout</string>
+    <string name="logout_confirm">Are you sure you want to log out?</string>
+    <string name="version_info">Seva Diary v1.0.0</string>
+</resources>

@@ -1,0 +1,22 @@
+# Environment files (never commit real credentials)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Logs & debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Serverless & Build
+.vercel/
+dist/
+coverage/
+
+# OS files
+.DS_Store
+Thumbs.db
