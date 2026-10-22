@@ -4,6 +4,7 @@ import android.view.SoundEffectConstants
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,6 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
@@ -40,6 +43,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
 import com.sevadiary.app.R
 import com.sevadiary.app.core.designsystem.component.DevotionalCard
@@ -75,52 +79,65 @@ fun ChantingScreen(
     Scaffold(
         containerColor = Color(0xFF0F1115),
         topBar = {
-            // Devotional Gradient Top Bar (Orange to Deep Crimson)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp)
-                    .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(
-                                Color(0xFFFF8C00), // Vibrant Saffron / Orange
-                                Color(0xFFE53935), // Red
-                                Color(0xFF7A0800)  // Deep Burgundy / Crimson
-                            )
-                        )
-                    )
-                    .padding(horizontal = 8.dp),
-                contentAlignment = Alignment.CenterStart
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = Color.Transparent
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = onBackClick) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
-                                tint = Color.White
-                            )
-                        }
-                        Text(
-                            text = "Counter",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(
+                                    Color(0xFFE65100), // Saffron / Orange
+                                    Color(0xFFC2185B), // Devotional Rose / Red
+                                    Color(0xFF7A0800)  // Deep Burgundy / Crimson
+                                )
                             )
                         )
-                    }
-
-                    Row {
-                        IconButton(onClick = { viewModel.loadData() }) {
-                            Icon(Icons.Default.Refresh, contentDescription = "Sync", tint = Color.White)
+                        .statusBarsPadding()
+                        .height(56.dp)
+                        .padding(horizontal = 4.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(onClick = onBackClick) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "Back",
+                                    tint = Color.White
+                                )
+                            }
+                            Column {
+                                Text(
+                                    text = "Naam Jaap Counter",
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                )
+                                Text(
+                                    text = "सत साहेब",
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        color = Color.White.copy(alpha = 0.85f),
+                                        fontSize = 11.sp
+                                    )
+                                )
+                            }
                         }
-                        IconButton(onClick = { showHistorySheet = true }) {
-                            Icon(Icons.Default.CalendarMonth, contentDescription = "History", tint = Color.White)
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(onClick = { viewModel.loadData() }) {
+                                Icon(Icons.Default.Refresh, contentDescription = "Sync", tint = Color.White)
+                            }
+                            IconButton(onClick = { showHistorySheet = true }) {
+                                Icon(Icons.Default.CalendarMonth, contentDescription = "History", tint = Color.White)
+                            }
                         }
                     }
                 }
@@ -131,17 +148,17 @@ fun ChantingScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 14.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             // Upper Control Row: Circular Reset Button | Circular Count Dial | Circular Mute Toggle
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
+                    .padding(horizontal = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -150,20 +167,20 @@ fun ChantingScreen(
                     modifier = Modifier
                         .size(46.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF141820))
-                        .border(BorderStroke(1.dp, Color(0xFF3E4452)), CircleShape)
+                        .background(Color(0xFF161A22))
+                        .border(BorderStroke(1.dp, Color(0xFF3F4756)), CircleShape)
                         .clickable { showResetDialog = true },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         Icons.Default.Refresh,
                         contentDescription = "Reset Counter",
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
+                        tint = Color(0xFFD6DCE5),
+                        modifier = Modifier.size(22.dp)
                     )
                 }
 
-                // Centered Circular Devotional Count Medallion with Progress Ring
+                // Centered Circular Devotional Count Medallion (Smooth Canvas Progress, Inset Padded, No Border Overlap)
                 val targetProgress = if (uiState.target > 0) {
                     (uiState.todayCount.toFloat() / uiState.target).coerceIn(0f, 1f)
                 } else {
@@ -177,26 +194,39 @@ fun ChantingScreen(
                         .background(
                             Brush.radialGradient(
                                 listOf(
-                                    Color(0xFF1B202A),
-                                    Color(0xFF0F1217),
-                                    Color(0xFF07090C)
+                                    Color(0xFF222834),
+                                    Color(0xFF13171F),
+                                    Color(0xFF090B0E)
                                 )
                             )
                         )
-                        .border(BorderStroke(2.dp, Color(0xFF8A94A6)), CircleShape)
+                        .border(BorderStroke(1.5.dp, Color(0xFF5A6374)), CircleShape)
                         .clickable { onCountTap() },
                     contentAlignment = Alignment.Center
                 ) {
-                    // Circular Progress indicator track
-                    CircularProgressIndicator(
-                        progress = { targetProgress },
+                    // Custom Canvas Progress Track: safely padded 6dp inside so it NEVER touches or overlaps the outer border
+                    Canvas(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(3.dp),
-                        color = SaffronGold,
-                        trackColor = Color(0xFF222834),
-                        strokeWidth = 3.5.dp
-                    )
+                            .padding(6.dp)
+                    ) {
+                        val stroke = 3.5.dp.toPx()
+                        // Inactive track
+                        drawCircle(
+                            color = Color(0xFF262C38),
+                            style = Stroke(width = stroke)
+                        )
+                        // Active progress arc
+                        if (targetProgress > 0.001f) {
+                            drawArc(
+                                color = SaffronGold,
+                                startAngle = -90f,
+                                sweepAngle = targetProgress * 360f,
+                                useCenter = false,
+                                style = Stroke(width = stroke, cap = StrokeCap.Round)
+                            )
+                        }
+                    }
 
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -207,7 +237,7 @@ fun ChantingScreen(
                             style = MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.ExtraBold,
                                 color = Color.White,
-                                fontSize = if (uiState.todayCount > 9999) 20.sp else 24.sp
+                                fontSize = if (uiState.todayCount > 9999) 19.sp else 23.sp
                             )
                         )
                         Text(
@@ -216,7 +246,7 @@ fun ChantingScreen(
                                 color = SaffronGold,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 9.sp,
-                                letterSpacing = 1.sp
+                                letterSpacing = 0.8.sp
                             )
                         )
                     }
@@ -227,93 +257,53 @@ fun ChantingScreen(
                     modifier = Modifier
                         .size(46.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF141820))
-                        .border(BorderStroke(1.dp, Color(0xFF3E4452)), CircleShape)
+                        .background(Color(0xFF161A22))
+                        .border(BorderStroke(1.dp, Color(0xFF3F4756)), CircleShape)
                         .clickable { isMuted = !isMuted },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = if (isMuted) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp,
                         contentDescription = if (isMuted) "Unmute" else "Mute",
-                        tint = if (isMuted) Color(0xFFE53935) else SaffronGold,
-                        modifier = Modifier.size(24.dp)
+                        tint = if (isMuted) Color(0xFFEF5350) else SaffronGold,
+                        modifier = Modifier.size(22.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             // Devotional Mandala Center Stage (Dark framed card with ornate corners)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(12.dp))
                     .background(
                         Brush.verticalGradient(
                             listOf(
-                                Color(0xFF1E222A),
-                                Color(0xFF13161D),
-                                Color(0xFF0D0F13)
+                                Color(0xFF1B1F27),
+                                Color(0xFF11141A),
+                                Color(0xFF0A0C0F)
                             )
                         )
                     )
-                    .border(BorderStroke(1.5.dp, Color(0xFF5A6270)), RoundedCornerShape(8.dp))
+                    .border(BorderStroke(1.5.dp, Color(0xFF6B7280)), RoundedCornerShape(12.dp))
                     .clickable { onCountTap() }
-                    .padding(vertical = 12.dp, horizontal = 8.dp)
             ) {
-                // 4 Ornate Silver Corner Filigrees
-                Icon(
-                    painter = painterResource(R.drawable.ic_devotional_ornate_corner),
-                    contentDescription = null,
-                    tint = Color(0xFFC5CCD6),
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .size(36.dp)
-                        .padding(2.dp)
-                )
-                Icon(
-                    painter = painterResource(R.drawable.ic_devotional_ornate_corner),
-                    contentDescription = null,
-                    tint = Color(0xFFC5CCD6),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(36.dp)
-                        .padding(2.dp)
-                        .graphicsLayer { rotationY = 180f }
-                )
-                Icon(
-                    painter = painterResource(R.drawable.ic_devotional_ornate_corner),
-                    contentDescription = null,
-                    tint = Color(0xFFC5CCD6),
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .size(36.dp)
-                        .padding(2.dp)
-                        .graphicsLayer { rotationX = 180f }
-                )
-                Icon(
-                    painter = painterResource(R.drawable.ic_devotional_ornate_corner),
-                    contentDescription = null,
-                    tint = Color(0xFFC5CCD6),
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .size(36.dp)
-                        .padding(2.dp)
-                        .graphicsLayer { rotationZ = 180f }
-                )
-
-                // Grid of 7 Sacred Images
+                // 1. Grid of 7 Sacred Images (padded 22dp inside so it NEVER touches corners)
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 22.dp, vertical = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Row 1: Central Guru Image (img1) with Silver Circular Border
+                    // Row 1: Central Guru Image (img1) with Gold and Silver Circular Border
                     Box(
                         modifier = Modifier
-                            .size(132.dp)
+                            .size(118.dp)
                             .clip(CircleShape)
-                            .background(Color.Black)
-                            .border(BorderStroke(2.5.dp, Color(0xFFD6DCE5)), CircleShape),
+                            .background(Color.White)
+                            .border(BorderStroke(2.5.dp, SaffronGold), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
@@ -326,76 +316,100 @@ fun ChantingScreen(
                         )
                     }
 
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Row 2: 3 Sacred Lotus Chakras (img2, img3, img4)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ChakraMedallion(R.drawable.img2, "Brahma Savitri Chakra")
+                        ChakraMedallion(R.drawable.img3, "Ganesh Chakra")
+                        ChakraMedallion(R.drawable.img4, "Vishnu Lakshmi Chakra")
+                    }
+
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    // Row 2: 3 Lotus Chakras (img2, img3, img4)
+                    // Subtle Devotional Divider with Gold Center Dot
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.img2),
-                            contentDescription = "Brahma Savitri Chakra",
-                            modifier = Modifier.size(92.dp),
-                            contentScale = ContentScale.Fit
-                        )
-                        Image(
-                            painter = painterResource(R.drawable.img3),
-                            contentDescription = "Ganesh Chakra",
-                            modifier = Modifier.size(92.dp),
-                            contentScale = ContentScale.Fit
-                        )
-                        Image(
-                            painter = painterResource(R.drawable.img4),
-                            contentDescription = "Vishnu Lakshmi Chakra",
-                            modifier = Modifier.size(92.dp),
-                            contentScale = ContentScale.Fit
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Horizontal Divider
-                    HorizontalDivider(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 24.dp),
-                        thickness = 1.dp,
-                        color = Color(0xFF474E59)
-                    )
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        HorizontalDivider(modifier = Modifier.weight(1f), thickness = 1.dp, color = Color(0xFF374151))
+                        Box(
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .size(6.dp)
+                                .clip(CircleShape)
+                                .background(SaffronGold)
+                        )
+                        HorizontalDivider(modifier = Modifier.weight(1f), thickness = 1.dp, color = Color(0xFF374151))
+                    }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                    // Row 3: 3 Lotus Chakras (img5, img6, img7)
+                    // Row 3: 3 Sacred Lotus Chakras (img5, img6, img7)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Image(
-                            painter = painterResource(R.drawable.img5),
-                            contentDescription = "Durga Sheranwali Chakra",
-                            modifier = Modifier.size(92.dp),
-                            contentScale = ContentScale.Fit
-                        )
-                        Image(
-                            painter = painterResource(R.drawable.img6),
-                            contentDescription = "Shiv Parvati Chakra",
-                            modifier = Modifier.size(92.dp),
-                            contentScale = ContentScale.Fit
-                        )
-                        Image(
-                            painter = painterResource(R.drawable.img7),
-                            contentDescription = "Kabir Sahib Jyoti Chakra",
-                            modifier = Modifier.size(92.dp),
-                            contentScale = ContentScale.Fit
-                        )
+                        ChakraMedallion(R.drawable.img5, "Durga Sheranwali Chakra")
+                        ChakraMedallion(R.drawable.img6, "Shiv Parvati Chakra")
+                        ChakraMedallion(R.drawable.img7, "Kabir Sahib Jyoti Chakra")
                     }
                 }
+
+                // 2. The 4 Ornate Silver Corner Filigrees (Drawn AFTER content with zIndex so they are ALWAYS fully visible)
+                Icon(
+                    painter = painterResource(R.drawable.ic_devotional_ornate_corner),
+                    contentDescription = null,
+                    tint = Color(0xFFE2E8F0),
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(4.dp)
+                        .size(42.dp)
+                        .zIndex(10f)
+                )
+                Icon(
+                    painter = painterResource(R.drawable.ic_devotional_ornate_corner),
+                    contentDescription = null,
+                    tint = Color(0xFFE2E8F0),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp)
+                        .size(42.dp)
+                        .graphicsLayer { scaleX = -1f }
+                        .zIndex(10f)
+                )
+                Icon(
+                    painter = painterResource(R.drawable.ic_devotional_ornate_corner),
+                    contentDescription = null,
+                    tint = Color(0xFFE2E8F0),
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(4.dp)
+                        .size(42.dp)
+                        .graphicsLayer { scaleY = -1f }
+                        .zIndex(10f)
+                )
+                Icon(
+                    painter = painterResource(R.drawable.ic_devotional_ornate_corner),
+                    contentDescription = null,
+                    tint = Color(0xFFE2E8F0),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(4.dp)
+                        .size(42.dp)
+                        .graphicsLayer { scaleX = -1f; scaleY = -1f }
+                        .zIndex(10f)
+                )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Unique Tactile Circular Counter Action Button (Depresses with spring bounce on tap)
             var isButtonPressed by remember { mutableStateOf(false) }
@@ -410,7 +424,7 @@ fun ChantingScreen(
 
             Box(
                 modifier = Modifier
-                    .size(94.dp)
+                    .size(88.dp)
                     .graphicsLayer {
                         scaleX = buttonScale
                         scaleY = buttonScale
@@ -419,23 +433,23 @@ fun ChantingScreen(
                     .background(
                         Brush.radialGradient(
                             listOf(
-                                Color(0xFF282F3B),
-                                Color(0xFF141820),
+                                Color(0xFF2A313E),
+                                Color(0xFF151821),
                                 Color(0xFF090B0E)
                             )
                         )
                     )
-                    .border(BorderStroke(2.5.dp, Color(0xFFB0B8C4)), CircleShape)
+                    .border(BorderStroke(2.dp, Color(0xFFB0B8C4)), CircleShape)
                     .clickable {
                         isButtonPressed = true
                         onCountTap()
                     },
                 contentAlignment = Alignment.Center
             ) {
-                // Concentric inner bevel ring
+                // Inner concentric groove
                 Box(
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(74.dp)
                         .clip(CircleShape)
                         .border(BorderStroke(1.dp, Color(0xFF5A6270).copy(alpha = 0.5f)), CircleShape)
                 )
@@ -454,12 +468,12 @@ fun ChantingScreen(
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "COUNT",
+                        text = "JAAP",
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.Bold,
                             color = Color.White,
                             letterSpacing = 1.2.sp,
-                            fontSize = 14.sp
+                            fontSize = 13.sp
                         )
                     )
                 }
@@ -475,7 +489,7 @@ fun ChantingScreen(
             // Devotional Mala Tracking Badge
             val completedMalas = uiState.todayCount / 108
             val currentBeads = uiState.todayCount % 108
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Surface(
                 color = Color(0xFF141720),
                 shape = CircleShape,
@@ -715,5 +729,27 @@ fun ChantingScreen(
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
+    }
+}
+
+@Composable
+private fun ChakraMedallion(resId: Int, description: String) {
+    Box(
+        modifier = Modifier
+            .size(74.dp)
+            .clip(CircleShape)
+            .background(Color.White)
+            .border(BorderStroke(1.5.dp, Color(0xFFC5CCD6)), CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painterResource(resId),
+            contentDescription = description,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(2.dp)
+                .clip(CircleShape),
+            contentScale = ContentScale.Fit
+        )
     }
 }
