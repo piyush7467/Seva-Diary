@@ -119,6 +119,17 @@
 
     <!-- Ashram Diary -->
     <string name="ashram_diary_title">सतलोक आश्रम यात्रा विवरण</string>
+    <string name="ashram_header_subtitle">यात्राएं, सेवा व संस्मरण संजोएं</string>
+    <string name="ashram_search_placeholder">आश्रम, संस्मरण या स्थान से खोजें</string>
+    <string name="ashram_filter_all">सभी आश्रम</string>
+    <string name="ashram_empty_title">आपकी यात्रा यहीं से शुरू होती है</string>
+    <string name="ashram_empty_desc">अपनी सतलोक आश्रम यात्राएं, सेवा कार्य, पावन तिथियां और संस्मरण एक ही स्थान पर संजोएं।</string>
+    <string name="ashram_feat_dates_title">यात्रा तिथियां दर्ज करें</string>
+    <string name="ashram_feat_dates_desc">अपनी यात्रा व्यवस्थित रखें</string>
+    <string name="ashram_feat_seva_title">सेवा विवरण दर्ज करें</string>
+    <string name="ashram_feat_seva_desc">अपने सेवा दायित्व याद रखें</string>
+    <string name="ashram_feat_notes_title">संस्मरण एवं विचार</string>
+    <string name="ashram_feat_notes_desc">आध्यात्मिक अनुभव सुरक्षित रखें</string>
     <string name="ashram_new_visit">नई आश्रम यात्रा दर्ज करें</string>
     <string name="ashram_select">सतलोक आश्रम चुनें</string>
     <string name="ashram_custom_name">आश्रम का नाम / स्थान दर्ज करें</string>

@@ -119,6 +119,17 @@
 
     <!-- Ashram Diary -->
     <string name="ashram_diary_title">Satlok Ashram Visits</string>
+    <string name="ashram_header_subtitle">Document Visits, Seva &amp; Memories</string>
+    <string name="ashram_search_placeholder">Search by ashram, notes or location</string>
+    <string name="ashram_filter_all">All Ashrams</string>
+    <string name="ashram_empty_title">Your journey begins here</string>
+    <string name="ashram_empty_desc">Record your Satlok Ashram visits, seva activities, important dates and special spiritual memories in one place.</string>
+    <string name="ashram_feat_dates_title">Save Visit Dates</string>
+    <string name="ashram_feat_dates_desc">Keep your journey organized</string>
+    <string name="ashram_feat_seva_title">Record Seva</string>
+    <string name="ashram_feat_seva_desc">Note your seva duties</string>
+    <string name="ashram_feat_notes_title">Memories &amp; Notes</string>
+    <string name="ashram_feat_notes_desc">Save your spiritual experiences</string>
     <string name="ashram_new_visit">Log New Ashram Visit</string>
     <string name="ashram_select">Select Satlok Ashram</string>
     <string name="ashram_custom_name">Enter Ashram Name / Location</string>
