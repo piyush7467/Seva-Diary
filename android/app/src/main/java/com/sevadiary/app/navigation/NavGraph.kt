@@ -124,13 +124,7 @@ fun NavGraph(
                 devotionalName = devotionalName,
                 chantingViewModel = chantingViewModel,
                 sevaViewModel = sevaViewModel,
-                onNavigateToChanting = {
-                    if (isJaapOnboardingCompleted) {
-                        navController.navigate(Screen.Chanting.route)
-                    } else {
-                        navController.navigate(Screen.JaapOnboarding.route)
-                    }
-                },
+                onNavigateToChanting = { navController.navigate(Screen.JaapOnboarding.route) },
                 onNavigateToAshram = { navController.navigate(Screen.AshramDiary.route) },
                 onNavigateToReports = { navController.navigate(Screen.Reports.route) },
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
@@ -140,7 +134,6 @@ fun NavGraph(
         composable(Screen.JaapOnboarding.route) {
             JaapOnboardingScreen(
                 onFinishOnboarding = {
-                    onFinishJaapOnboarding()
                     navController.navigate(Screen.Chanting.route) {
                         popUpTo(Screen.JaapOnboarding.route) { inclusive = true }
                     }
