@@ -259,4 +259,15 @@
     <string name="error_specify_custom_ashram">कृपया आश्रम का नाम लिखें।</string>
     <string name="error_specify_custom_purpose">कृपया यात्रा का उद्देश्य विवरण लिखें।</string>
     <string name="error_specify_custom_seva">कृपया सेवा का विवरण लिखें।</string>
+
+    <!-- Ashram Visits Screen Enhancements -->
+    <string name="ashram_your_visits">आपकी यात्राएं</string>
+    <string name="ashram_view_details">विवरण देखें</string>
+    <string name="ashram_sort_latest">नवीनतम पहले</string>
+    <string name="ashram_sort_oldest">पुरातन पहले</string>
+    <string name="ashram_quote_text">„सेवा, सत्संग\nऔर दिव्य स्मृतियां”</string>
+    <string name="ashram_visits_count">%1$d यात्राएं</string>
+    <string name="ashram_visits_single">1 यात्रा</string>
+    <string name="ashram_delete_title">आश्रम यात्रा हटाएं</string>
+    <string name="ashram_delete_confirm">क्या आप वाकई इस यात्रा रिकॉर्ड को हटाना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती।</string>
 </resources>

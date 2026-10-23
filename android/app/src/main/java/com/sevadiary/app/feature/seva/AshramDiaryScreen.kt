@@ -3,6 +3,7 @@ package com.sevadiary.app.feature.seva
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -23,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,6 +37,9 @@ import com.sevadiary.app.R
 import com.sevadiary.app.core.network.dto.SevaRecordDto
 import com.sevadiary.app.feature.seva.data.AshramMasterData
 import com.sevadiary.app.feature.seva.presentation.SevaViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 // Seva Diary Devotional Palette
 private val AshramBgColor = Color(0xFFFAF8F2)
@@ -45,7 +50,7 @@ private val AshramLightGold = Color(0xFFF4D58A)
 private val AshramPrimaryText = Color(0xFF252B27)
 private val AshramSecondaryText = Color(0xFF646B65)
 private val AshramCardBg = Color(0xFFFFFFFF)
-private val AshramBorderColor = Color(0xFFE2DDD3)
+private val AshramBorderColor = Color(0xFFE5DFD3)
 
 @Composable
 fun AshramDiaryScreen(
@@ -57,6 +62,8 @@ fun AshramDiaryScreen(
     val uiState by viewModel.uiState.collectAsState()
     var searchInput by remember { mutableStateOf("") }
     var recordToDelete by remember { mutableStateOf<SevaRecordDto?>(null) }
+    var sortDescending by remember { mutableStateOf(true) } // true: Latest First, false: Oldest First
+    var sortMenuExpanded by remember { mutableStateOf(false) }
 
     // Ensure fresh records on screen entry if not already loading
     LaunchedEffect(Unit) {
@@ -65,8 +72,8 @@ fun AshramDiaryScreen(
         }
     }
 
-    val filteredRecords = remember(uiState.records, searchInput, uiState.filterAshram) {
-        uiState.records.filter { record ->
+    val filteredRecords = remember(uiState.records, searchInput, uiState.filterAshram, sortDescending) {
+        val list = uiState.records.filter { record ->
             val matchesFilter = uiState.filterAshram == null || record.ashramCode.equals(uiState.filterAshram, ignoreCase = true)
             val query = searchInput.trim().lowercase()
             val matchesSearch = query.isBlank() ||
@@ -77,6 +84,11 @@ fun AshramDiaryScreen(
                 record.purpose.lowercase().contains(query) ||
                 record.sevaType.lowercase().contains(query)
             matchesFilter && matchesSearch
+        }
+        if (sortDescending) {
+            list.sortedByDescending { it.startDate }
+        } else {
+            list.sortedBy { it.startDate }
         }
     }
 
@@ -104,9 +116,9 @@ fun AshramDiaryScreen(
                     onClick = onAddNewVisit,
                     containerColor = AshramForestGreen,
                     contentColor = Color.White,
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(24.dp),
                     icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                    text = { Text("Log Visit", fontWeight = FontWeight.Bold) }
+                    text = { Text("Log Visit", fontWeight = FontWeight.Bold, fontSize = 14.sp) }
                 )
             }
         }
@@ -116,11 +128,16 @@ fun AshramDiaryScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            // Devotional Hero Banner (Visible when records exist or are loading)
+            if (uiState.records.isNotEmpty() || uiState.isLoading) {
+                DevotionalHeroBanner()
+            }
+
             // 1. Search Bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 6.dp)
+                    .padding(horizontal = 20.dp, vertical = 5.dp)
             ) {
                 AshramSearchBar(
                     query = searchInput,
@@ -131,59 +148,196 @@ fun AshramDiaryScreen(
                 )
             }
 
-            // 2. Location Filter Chips
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 6.dp),
-                contentPadding = PaddingValues(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(filterItems) { (code, nameRes) ->
-                    val rawName = stringResource(nameRes)
-                    val label = if (code == null) {
-                        rawName
-                    } else {
-                        rawName
-                            .replace("Satlok Ashram ", "")
-                            .replace("Shri ", "")
-                            .replace("Other Ashram / Location", "Other")
-                            .replace("सतलोक आश्रम ", "")
-                            .replace("श्री ", "")
-                            .replace("अन्य आश्रम / स्थान", "अन्य")
-                            .trim()
-                    }
-                    val isSelected = uiState.filterAshram == code
-                    Surface(
-                        onClick = {
-                            val next = if (uiState.filterAshram == code) null else code
-                            viewModel.onFilterAshram(next)
-                        },
-                        shape = RoundedCornerShape(20.dp),
-                        color = if (isSelected) AshramForestGreen else AshramCardBg,
-                        border = if (isSelected) null else BorderStroke(1.dp, AshramBorderColor),
-                        modifier = Modifier.height(38.dp)
+            // 2. Horizontally Scrollable Location Filter Chips
+            if (uiState.records.isNotEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    LazyRow(
+                        modifier = Modifier.weight(1f),
+                        contentPadding = PaddingValues(start = 20.dp, end = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier.padding(horizontal = 16.dp)
-                        ) {
-                            Text(
-                                text = label,
-                                style = MaterialTheme.typography.labelMedium.copy(
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                    color = if (isSelected) Color.White else AshramPrimaryText,
-                                    fontSize = 13.sp
-                                )
+                        items(filterItems) { (code, nameRes) ->
+                            val rawName = stringResource(nameRes)
+                            val label = if (code == null) {
+                                rawName
+                            } else {
+                                rawName
+                                    .replace("Satlok Ashram ", "")
+                                    .replace("Shri ", "")
+                                    .replace("Other Ashram / Location", "Other")
+                                    .replace("सतलोक आश्रम ", "")
+                                    .replace("श्री ", "")
+                                    .replace("अन्य आश्रम / स्थान", "अन्य")
+                                    .trim()
+                            }
+                            val isSelected = uiState.filterAshram == code
+                            Surface(
+                                onClick = {
+                                    val next = if (uiState.filterAshram == code) null else code
+                                    viewModel.onFilterAshram(next)
+                                },
+                                shape = RoundedCornerShape(20.dp),
+                                color = if (isSelected) AshramForestGreen else AshramCardBg,
+                                border = if (isSelected) null else BorderStroke(1.dp, AshramBorderColor),
+                                modifier = Modifier.height(36.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(horizontal = 14.dp)
+                                ) {
+                                    if (code != null) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_devotional_ashram),
+                                            contentDescription = null,
+                                            tint = if (isSelected) Color.White else AshramSaffronGold,
+                                            modifier = Modifier.size(15.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                    }
+                                    Text(
+                                        text = label,
+                                        style = MaterialTheme.typography.labelMedium.copy(
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                            color = if (isSelected) Color.White else AshramPrimaryText,
+                                            fontSize = 12.5.sp
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // Trailing Right Chevron Indicator Chip
+                    Surface(
+                        shape = CircleShape,
+                        color = AshramCardBg,
+                        border = BorderStroke(1.dp, AshramBorderColor),
+                        modifier = Modifier
+                            .padding(end = 20.dp)
+                            .size(34.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.Default.ChevronRight,
+                                contentDescription = "More ashrams",
+                                tint = AshramSecondaryText,
+                                modifier = Modifier.size(18.dp)
                             )
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            // 3. Section Header: "Your Visits" with visit count badge and Sort Action
+            if (uiState.records.isNotEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 6.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = stringResource(R.string.ashram_your_visits),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = AshramDarkGreen,
+                                fontSize = 17.sp
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = Color(0xFFE4EDE7)
+                        ) {
+                            val countText = if (filteredRecords.size == 1) {
+                                stringResource(R.string.ashram_visits_single)
+                            } else {
+                                stringResource(R.string.ashram_visits_count, filteredRecords.size)
+                            }
+                            Text(
+                                text = countText,
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = AshramForestGreen,
+                                    fontSize = 11.5.sp
+                                ),
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                            )
+                        }
+                    }
 
-            // 3. Main Content: Loading, Empty State, or Populated Visit List
+                    // Sort Selector
+                    Box {
+                        Surface(
+                            onClick = { sortMenuExpanded = true },
+                            shape = RoundedCornerShape(12.dp),
+                            color = Color.Transparent
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.SwapVert,
+                                    contentDescription = null,
+                                    tint = AshramSecondaryText,
+                                    modifier = Modifier.size(15.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = if (sortDescending) {
+                                        stringResource(R.string.ashram_sort_latest)
+                                    } else {
+                                        stringResource(R.string.ashram_sort_oldest)
+                                    },
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = AshramPrimaryText
+                                    )
+                                )
+                                Spacer(modifier = Modifier.width(2.dp))
+                                Icon(
+                                    imageVector = Icons.Default.KeyboardArrowDown,
+                                    contentDescription = null,
+                                    tint = AshramSecondaryText,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            }
+                        }
+
+                        DropdownMenu(
+                            expanded = sortMenuExpanded,
+                            onDismissRequest = { sortMenuExpanded = false },
+                            modifier = Modifier.background(AshramCardBg)
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.ashram_sort_latest), fontSize = 13.sp) },
+                                onClick = {
+                                    sortDescending = true
+                                    sortMenuExpanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.ashram_sort_oldest), fontSize = 13.sp) },
+                                onClick = {
+                                    sortDescending = false
+                                    sortMenuExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            // 4. Main Content: Loading, Empty State, or Populated Visit List
             when {
                 uiState.isLoading && uiState.records.isEmpty() -> {
                     Box(
@@ -259,209 +413,32 @@ fun AshramDiaryScreen(
                         }
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 88.dp),
+                            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 100.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(filteredRecords, key = { it.id }) { record ->
-                                val isOtherAshram = AshramMasterData.isOtherAshram(record.ashramCode)
-                                val ashramName = when {
-                                    isOtherAshram && record.customAshramName.isNotBlank() -> record.customAshramName
-                                    isOtherAshram -> stringResource(R.string.ashram_other)
-                                    else -> {
-                                        val ashramLoc = AshramMasterData.findByCode(record.ashramCode)
-                                        ashramLoc?.let { stringResource(it.nameRes) }
-                                            ?: uiState.masterData?.ashrams?.find { it.code.equals(record.ashramCode, ignoreCase = true) }?.labels?.en
-                                            ?: record.ashramCode.replace("_", " ")
-                                    }
-                                }
+                                AshramVisitCard(
+                                    record = record,
+                                    onEdit = { onEditVisit(record.id) },
+                                    onDelete = { recordToDelete = record }
+                                )
+                            }
 
-                                val isOtherPurpose = AshramMasterData.isOtherPurpose(record.purpose)
-                                val isSeva = record.purpose.equals("SEVA", ignoreCase = true)
-                                val isOtherSeva = AshramMasterData.isOtherSeva(record.sevaType)
-
-                                // Purpose Badge: If user chose "Other", display their actual entered content!
-                                val purposeBadgeText = when {
-                                    isOtherPurpose && record.customPurposeOrSeva.isNotBlank() -> record.customPurposeOrSeva
-                                    else -> stringResource(AshramMasterData.getPurposeNameRes(record.purpose))
-                                }
-
-                                // Seva Badge: If purpose is SEVA, display seva type (or custom content if Other Seva was chosen)
-                                val sevaBadgeText = if (isSeva && record.sevaType.isNotBlank()) {
-                                    when {
-                                        isOtherSeva && record.customPurposeOrSeva.isNotBlank() -> record.customPurposeOrSeva
-                                        else -> stringResource(AshramMasterData.getSevaTypeNameRes(record.sevaType))
-                                    }
-                                } else null
-
-                                Surface(
-                                    onClick = { onEditVisit(record.id) },
-                                    shape = RoundedCornerShape(16.dp),
-                                    color = AshramCardBg,
-                                    border = BorderStroke(1.dp, AshramBorderColor),
-                                    shadowElevation = 2.dp,
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp)
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.Top
-                                        ) {
-                                            Column(modifier = Modifier.weight(1f)) {
-                                                Text(
-                                                    text = ashramName,
-                                                    style = MaterialTheme.typography.titleMedium.copy(
-                                                        fontWeight = FontWeight.Bold,
-                                                        color = AshramForestGreen,
-                                                        fontSize = 16.sp
-                                                    )
-                                                )
-                                                Spacer(modifier = Modifier.height(4.dp))
-                                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                                    Icon(
-                                                        imageVector = Icons.Default.CalendarToday,
-                                                        contentDescription = null,
-                                                        tint = AshramSecondaryText,
-                                                        modifier = Modifier.size(14.dp)
-                                                    )
-                                                    Spacer(modifier = Modifier.width(6.dp))
-                                                    Text(
-                                                        text = "${record.startDate} → ${record.endDate} (${record.durationDays} days)",
-                                                        style = MaterialTheme.typography.bodySmall.copy(
-                                                            fontWeight = FontWeight.Medium,
-                                                            color = AshramSecondaryText,
-                                                            fontSize = 13.sp
-                                                        )
-                                                    )
-                                                }
-                                            }
-
-                                            Row {
-                                                IconButton(
-                                                    onClick = { onEditVisit(record.id) },
-                                                    modifier = Modifier.size(36.dp)
-                                                ) {
-                                                    Icon(
-                                                        imageVector = Icons.Default.Edit,
-                                                        contentDescription = "Edit",
-                                                        tint = AshramForestGreen,
-                                                        modifier = Modifier.size(18.dp)
-                                                    )
-                                                }
-                                                IconButton(
-                                                    onClick = { recordToDelete = record },
-                                                    modifier = Modifier.size(36.dp)
-                                                ) {
-                                                    Icon(
-                                                        imageVector = Icons.Default.Delete,
-                                                        contentDescription = "Delete",
-                                                        tint = MaterialTheme.colorScheme.error,
-                                                        modifier = Modifier.size(18.dp)
-                                                    )
-                                                }
-                                            }
-                                        }
-
-                                        Spacer(modifier = Modifier.height(10.dp))
-
-                                        // Badges for Purpose & Seva Type
-                                        Row(
-                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Surface(
-                                                shape = RoundedCornerShape(6.dp),
-                                                color = AshramForestGreen.copy(alpha = 0.12f)
-                                            ) {
-                                                Text(
-                                                    text = purposeBadgeText,
-                                                    style = MaterialTheme.typography.labelSmall.copy(
-                                                        color = AshramForestGreen,
-                                                        fontWeight = FontWeight.Bold
-                                                    ),
-                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                                )
-                                            }
-
-                                            if (!sevaBadgeText.isNullOrBlank()) {
-                                                Surface(
-                                                    shape = RoundedCornerShape(6.dp),
-                                                    color = AshramSaffronGold.copy(alpha = 0.15f)
-                                                ) {
-                                                    Text(
-                                                        text = sevaBadgeText,
-                                                        style = MaterialTheme.typography.labelSmall.copy(
-                                                            color = AshramSaffronGold,
-                                                            fontWeight = FontWeight.Bold
-                                                        ),
-                                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                                    )
-                                                }
-                                            }
-                                        }
-
-                                        // If user entered custom purpose/seva details while selecting a standard category, display it here
-                                        if (!isOtherPurpose && !(isSeva && isOtherSeva) && record.customPurposeOrSeva.isNotBlank()) {
-                                            Spacer(modifier = Modifier.height(6.dp))
-                                            Text(
-                                                text = record.customPurposeOrSeva,
-                                                style = MaterialTheme.typography.bodySmall.copy(
-                                                    color = AshramPrimaryText,
-                                                    fontWeight = FontWeight.Medium,
-                                                    fontSize = 13.sp
-                                                ),
-                                                maxLines = 2,
-                                                overflow = TextOverflow.Ellipsis
-                                            )
-                                        }
-
-                                    if (record.notes.isNotBlank()) {
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Text(
-                                            text = record.notes,
-                                            style = MaterialTheme.typography.bodySmall.copy(
-                                                color = AshramSecondaryText,
-                                                fontSize = 13.sp,
-                                                lineHeight = 18.sp
-                                            ),
-                                            maxLines = 2,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                    }
-
-                                    if (record.locationDetails.isNotBlank()) {
-                                        Spacer(modifier = Modifier.height(6.dp))
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(
-                                                imageVector = Icons.Default.Place,
-                                                contentDescription = null,
-                                                tint = AshramSecondaryText,
-                                                modifier = Modifier.size(14.dp)
-                                            )
-                                            Spacer(modifier = Modifier.width(4.dp))
-                                            Text(
-                                                text = record.locationDetails,
-                                                style = MaterialTheme.typography.bodySmall.copy(
-                                                    color = AshramSecondaryText,
-                                                    fontSize = 12.sp
-                                                ),
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis
-                                            )
-                                        }
-                                    }
-                                }
+                            // Subtle devotional footer flourish at bottom of scrollable list
+                            item {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                DevotionalGoldSeparator(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 40.dp)
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
                             }
                         }
                     }
                 }
             }
         }
-    }
     }
 
     // Delete Confirmation Dialog
@@ -470,14 +447,14 @@ fun AshramDiaryScreen(
             onDismissRequest = { recordToDelete = null },
             title = {
                 Text(
-                    text = "Delete Ashram Visit",
+                    text = stringResource(R.string.ashram_delete_title),
                     fontWeight = FontWeight.Bold,
                     color = AshramPrimaryText
                 )
             },
             text = {
                 Text(
-                    text = "Are you sure you want to delete this visit record? This action cannot be undone.",
+                    text = stringResource(R.string.ashram_delete_confirm),
                     color = AshramSecondaryText
                 )
             },
@@ -501,6 +478,475 @@ fun AshramDiaryScreen(
 }
 
 /**
+ * Top Devotional Hero Banner with Quotation, Lotus Motif, and Satlok Ashram Entrance photograph.
+ */
+@Composable
+private fun DevotionalHeroBanner() {
+    Surface(
+        shape = RoundedCornerShape(18.dp),
+        color = Color(0xFFF7F3E9),
+        border = BorderStroke(1.dp, Color(0xFFEADFCB)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 6.dp)
+            .height(124.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Right side: Satlok Ashram Entrance photograph (onboarding3.png)
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.onboarding3),
+                    contentDescription = "Satlok Ashram Entrance",
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth(0.56f)
+                        .clip(RoundedCornerShape(topEnd = 18.dp, bottomEnd = 18.dp))
+                )
+            }
+
+            // Smooth Horizontal Gradient Overlay to blend artwork into warm ivory background
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(
+                                Color(0xFFF7F3E9),
+                                Color(0xFFF7F3E9),
+                                Color(0xFFF7F3E9).copy(alpha = 0.85f),
+                                Color(0xFFF7F3E9).copy(alpha = 0.3f),
+                                Color.Transparent
+                            ),
+                            startX = 0f,
+                            endX = 600f
+                        )
+                    )
+            )
+
+            // Left side: Devotional Quotation and Lotus divider
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(0.58f)
+                    .padding(start = 16.dp, top = 14.dp, bottom = 14.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.ashram_quote_text),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.5.sp,
+                        lineHeight = 19.sp,
+                        color = AshramDarkGreen
+                    )
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .width(26.dp)
+                            .height(1.dp)
+                            .background(AshramSaffronGold.copy(alpha = 0.7f))
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_devotional_lotus),
+                        contentDescription = null,
+                        tint = AshramSaffronGold,
+                        modifier = Modifier.size(15.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(3.5.dp)
+                            .clip(CircleShape)
+                            .background(AshramSaffronGold)
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Compact, elegant visit card matching the exact devotional UI design.
+ */
+@Composable
+private fun AshramVisitCard(
+    record: SevaRecordDto,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
+) {
+    var menuExpanded by remember { mutableStateOf(false) }
+
+    val isOtherAshram = AshramMasterData.isOtherAshram(record.ashramCode)
+    val ashramName = when {
+        isOtherAshram && record.customAshramName.isNotBlank() -> record.customAshramName
+        isOtherAshram -> stringResource(R.string.ashram_other)
+        else -> {
+            val ashramLoc = AshramMasterData.findByCode(record.ashramCode)
+            ashramLoc?.let { stringResource(it.nameRes) }
+                ?: record.ashramCode.replace("_", " ")
+        }
+    }
+
+    val displayLocation = resolveAshramLocation(record)
+    val formattedStart = formatVisitDisplayDate(record.startDate)
+    val formattedEnd = formatVisitDisplayDate(record.endDate)
+    val displayDateRange = if (record.startDate == record.endDate || formattedEnd.isBlank()) {
+        formattedStart
+    } else {
+        "$formattedStart – $formattedEnd"
+    }
+    val durationText = if (record.durationDays <= 1) "1 day" else "${record.durationDays} days"
+
+    val isOtherPurpose = AshramMasterData.isOtherPurpose(record.purpose)
+    val isSeva = record.purpose.equals("SEVA", ignoreCase = true)
+    val isOtherSeva = AshramMasterData.isOtherSeva(record.sevaType)
+
+    // Purpose Badge Text: If "Other" was chosen, show actual entered content!
+    val purposeBadgeText = when {
+        isOtherPurpose && record.customPurposeOrSeva.isNotBlank() -> record.customPurposeOrSeva
+        isSeva && isOtherSeva && record.customPurposeOrSeva.isNotBlank() -> record.customPurposeOrSeva
+        isSeva && record.sevaType.isNotBlank() -> stringResource(AshramMasterData.getSevaTypeNameRes(record.sevaType))
+        else -> stringResource(AshramMasterData.getPurposeNameRes(record.purpose))
+    }
+
+    // Purpose Chip Styling & Icon
+    val (chipBgColor, chipTextColor, chipIcon) = getPurposeChipStyle(
+        purpose = record.purpose,
+        isOtherPurpose = isOtherPurpose
+    )
+
+    Surface(
+        onClick = onEdit,
+        shape = RoundedCornerShape(16.dp),
+        color = AshramCardBg,
+        border = BorderStroke(1.dp, Color(0xFFEBE6DD)),
+        shadowElevation = 2.dp,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            // 1. Left Thumbnail: Ashram Photograph (onboarding3.png)
+            Box(
+                modifier = Modifier
+                    .size(width = 90.dp, height = 90.dp)
+                    .clip(RoundedCornerShape(12.dp))
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.onboarding3),
+                    contentDescription = "Ashram View",
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            // 2. Right Details Column
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 12.dp)
+            ) {
+                // Ashram Title & 3-dots Menu
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Text(
+                        text = ashramName,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = AshramDarkGreen,
+                            fontSize = 14.5.sp
+                        ),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Box {
+                        IconButton(
+                            onClick = { menuExpanded = true },
+                            modifier = Modifier
+                                .size(24.dp)
+                                .offset(x = 4.dp, y = (-2).dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "Options",
+                                tint = AshramSecondaryText,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = menuExpanded,
+                            onDismissRequest = { menuExpanded = false },
+                            modifier = Modifier.background(AshramCardBg)
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Edit Visit", fontSize = 13.sp) },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = null,
+                                        tint = AshramForestGreen,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                },
+                                onClick = {
+                                    menuExpanded = false
+                                    onEdit()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        "Delete Visit",
+                                        color = MaterialTheme.colorScheme.error,
+                                        fontSize = 13.sp
+                                    )
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.error,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                },
+                                onClick = {
+                                    menuExpanded = false
+                                    onDelete()
+                                }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Location row
+                if (displayLocation.isNotBlank()) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Place,
+                            contentDescription = null,
+                            tint = AshramForestGreen,
+                            modifier = Modifier.size(13.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = displayLocation,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontSize = 12.sp,
+                                color = AshramSecondaryText
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(3.dp))
+                }
+
+                // Date & Duration row
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CalendarToday,
+                        contentDescription = null,
+                        tint = AshramSecondaryText,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "$displayDateRange ($durationText)",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontSize = 11.5.sp,
+                            color = AshramSecondaryText,
+                            fontWeight = FontWeight.Normal
+                        ),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Bottom row: Purpose chip on left & View Details on right
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Purpose Badge Chip
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = chipBgColor
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.5.dp)
+                        ) {
+                            Icon(
+                                imageVector = chipIcon,
+                                contentDescription = null,
+                                tint = chipTextColor,
+                                modifier = Modifier.size(12.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = purposeBadgeText,
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    color = chipTextColor,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 11.sp
+                                ),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+
+                    // View Details Action Button
+                    Surface(
+                        onClick = onEdit,
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color(0xFFF1F6F3)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.5.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.ashram_view_details),
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 11.sp,
+                                    color = AshramForestGreen
+                                )
+                            )
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                contentDescription = null,
+                                tint = AshramForestGreen,
+                                modifier = Modifier.size(11.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Returns customized soft background color, text color, and icon for devotional purpose categories.
+ */
+private fun getPurposeChipStyle(
+    purpose: String,
+    isOtherPurpose: Boolean
+): Triple<Color, Color, ImageVector> {
+    return when {
+        purpose.equals("BHANDARA", ignoreCase = true) -> {
+            Triple(
+                Color(0xFFFDF2E2), // soft peach/amber
+                Color(0xFFA66408), // dark amber
+                Icons.Default.SoupKitchen
+            )
+        }
+        purpose.equals("SEVA", ignoreCase = true) -> {
+            Triple(
+                Color(0xFFEAF4EE), // soft sage green
+                AshramForestGreen,
+                Icons.Default.VolunteerActivism
+            )
+        }
+        purpose.equals("SATSANG", ignoreCase = true) -> {
+            Triple(
+                Color(0xFFEBF2ED), // gentle green
+                Color(0xFF1B4F3A),
+                Icons.Default.SelfImprovement
+            )
+        }
+        purpose.equals("NAAM_DAAN", ignoreCase = true) -> {
+            Triple(
+                Color(0xFFFFF7E6),
+                Color(0xFFB87000),
+                Icons.Default.AutoAwesome
+            )
+        }
+        isOtherPurpose -> {
+            Triple(
+                Color(0xFFE8F1EC), // soft muted green
+                AshramForestGreen,
+                Icons.Default.Groups
+            )
+        }
+        else -> {
+            Triple(
+                Color(0xFFE8F1EC),
+                AshramForestGreen,
+                Icons.Default.Spa
+            )
+        }
+    }
+}
+
+/**
+ * Resolves formatted location label based on master data or custom details.
+ */
+private fun resolveAshramLocation(record: SevaRecordDto): String {
+    if (record.locationDetails.isNotBlank()) return record.locationDetails
+    val master = AshramMasterData.findByCode(record.ashramCode)
+    return when {
+        master != null && master.code == "DHANANA_DHAM" -> "Dhanana Dham"
+        master != null && master.code == "KARONTHA_DHAM" -> "Karontha Dham"
+        master != null && master.stateOrCountry.isNotBlank() -> {
+            val city = master.code.replace("_", " ").lowercase()
+                .split(" ").joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
+            "$city, ${master.stateOrCountry}"
+        }
+        master != null -> master.code.replace("_", " ")
+        record.customAshramName.isNotBlank() -> record.customAshramName
+        else -> "Satlok Ashram"
+    }
+}
+
+/**
+ * Parses and formats dates from 'yyyy-MM-dd' to 'dd MMM yyyy' safely.
+ */
+private fun formatVisitDisplayDate(dateStr: String?): String {
+    if (dateStr.isNullOrBlank()) return ""
+    return try {
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+        val date = inputFormat.parse(dateStr)
+        if (date != null) outputFormat.format(date) else dateStr
+    } catch (e: Exception) {
+        dateStr
+    }
+}
+
+/**
  * Compact Header matching design reference.
  */
 @Composable
@@ -512,7 +958,7 @@ private fun AshramCompactHeader(
         modifier = Modifier
             .fillMaxWidth()
             .statusBarsPadding()
-            .padding(horizontal = 8.dp, vertical = 6.dp),
+            .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onBackClick) {
@@ -532,14 +978,14 @@ private fun AshramCompactHeader(
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
-                    color = AshramForestGreen
+                    color = AshramDarkGreen
                 )
             )
             Text(
                 text = stringResource(R.string.ashram_header_subtitle),
                 style = MaterialTheme.typography.bodySmall.copy(
                     color = AshramSecondaryText,
-                    fontSize = 13.sp
+                    fontSize = 12.5.sp
                 )
             )
         }
@@ -572,7 +1018,7 @@ private fun AshramSearchBar(
                 text = stringResource(R.string.ashram_diary_search_placeholder),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = AshramSecondaryText.copy(alpha = 0.8f),
-                    fontSize = 14.sp
+                    fontSize = 13.5.sp
                 ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -583,7 +1029,7 @@ private fun AshramSearchBar(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search",
                 tint = AshramSecondaryText,
-                modifier = Modifier.size(22.dp)
+                modifier = Modifier.size(20.dp)
             )
         },
         trailingIcon = if (query.isNotBlank()) {
@@ -592,16 +1038,17 @@ private fun AshramSearchBar(
                     Icon(
                         imageVector = Icons.Default.Clear,
                         contentDescription = "Clear",
-                        tint = AshramSecondaryText
+                        tint = AshramSecondaryText,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }
         } else null,
         singleLine = true,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(26.dp),
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp),
+            .height(50.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = AshramCardBg,
             unfocusedContainerColor = AshramCardBg,
@@ -629,7 +1076,6 @@ private fun AshramEmptyState(
             .padding(top = 10.dp, bottom = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // If there is an actual network or connection error, show a polite alert banner with retry
         val displayError = if (errorMessage?.contains("Authentication required", ignoreCase = true) == true) {
             null
         } else {
@@ -874,7 +1320,7 @@ private fun DevotionalGoldSeparator(
             painter = painterResource(id = R.drawable.ic_devotional_lotus),
             contentDescription = null,
             tint = AshramSaffronGold,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(22.dp)
         )
 
         Spacer(modifier = Modifier.width(8.dp))

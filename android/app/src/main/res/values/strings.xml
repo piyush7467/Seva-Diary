@@ -259,4 +259,15 @@
     <string name="error_specify_custom_ashram">Please specify the custom ashram name.</string>
     <string name="error_specify_custom_purpose">Please specify your custom visit purpose.</string>
     <string name="error_specify_custom_seva">Please specify your custom seva type.</string>
+
+    <!-- Ashram Visits Screen Enhancements -->
+    <string name="ashram_your_visits">Your Visits</string>
+    <string name="ashram_view_details">View Details</string>
+    <string name="ashram_sort_latest">Latest First</string>
+    <string name="ashram_sort_oldest">Oldest First</string>
+    <string name="ashram_quote_text">„Seva, Satsang\nand Divine Memories”</string>
+    <string name="ashram_visits_count">%1$d visits</string>
+    <string name="ashram_visits_single">1 visit</string>
+    <string name="ashram_delete_title">Delete Ashram Visit</string>
+    <string name="ashram_delete_confirm">Are you sure you want to delete this visit record? This action cannot be undone.</string>
 </resources>
