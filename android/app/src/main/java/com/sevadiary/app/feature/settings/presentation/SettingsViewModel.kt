@@ -29,7 +29,9 @@ class SettingsViewModel(
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
     init {
-        loadProfile()
+        if (preferencesManager.isSessionValid()) {
+            loadProfile()
+        }
     }
 
     fun loadProfile() {
@@ -44,6 +46,7 @@ class SettingsViewModel(
                         isLoading = false
                     )
                     preferencesManager.setDevotionalName(profile.displayName)
+                    preferencesManager.refreshSessionTimestamp()
                 } else {
                     _uiState.value = _uiState.value.copy(isLoading = false)
                 }

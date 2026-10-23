@@ -34,6 +34,9 @@ fun SplashScreen(
     isOnboardingCompleted: Boolean,
     isLoggedIn: Boolean
 ) {
+    val currentOnboardingCompleted by rememberUpdatedState(isOnboardingCompleted)
+    val currentIsLoggedIn by rememberUpdatedState(isLoggedIn)
+
     val scale = remember { Animatable(0.8f) }
     val alpha = remember { Animatable(0.4f) }
 
@@ -51,8 +54,8 @@ fun SplashScreen(
         )
         delay(600)
         val destination = when {
-            !isOnboardingCompleted -> "onboarding"
-            isLoggedIn -> "dashboard"
+            !currentOnboardingCompleted -> "onboarding"
+            currentIsLoggedIn -> "dashboard"
             else -> "login"
         }
         onNavigateNext(destination)

@@ -60,8 +60,12 @@ class TokenAuthenticator(
             return response.request.newBuilder()
                 .header("Authorization", "Bearer ${newTokens.accessToken}")
                 .build()
-        } else {
+        } else if (refreshResponse != null && refreshResponse.code() in listOf(400, 401, 403)) {
+            // Only clear tokens if the refresh token was explicitly rejected as invalid/expired by backend
             tokenManager.clearTokens()
+            return null
+        } else {
+            // Network failure, timeout, or temporary server error: preserve tokens so user session is not dropped
             return null
         }
     }

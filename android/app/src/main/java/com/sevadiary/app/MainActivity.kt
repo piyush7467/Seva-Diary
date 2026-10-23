@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
         val settingsViewModel = SettingsViewModel(apiService, authRepository, preferencesManager)
 
         setContent {
-            val isOnboardingCompleted by preferencesManager.isOnboardingCompleted.collectAsState(initial = false)
+            val isOnboardingCompleted by preferencesManager.isOnboardingCompleted.collectAsState(initial = preferencesManager.isOnboardingCompletedSync())
             val currentLanguage by preferencesManager.appLanguage.collectAsState(initial = preferencesManager.getInitialLanguage())
             val rawLanguage by preferencesManager.rawAppLanguage.collectAsState(initial = preferencesManager.getInitialRawLanguage())
             var currentTheme by remember { mutableStateOf(preferencesManager.getInitialTheme()) }
@@ -74,7 +74,15 @@ class MainActivity : ComponentActivity() {
                 currentTheme = storedTheme
             }
 
-            val devotionalName by preferencesManager.devotionalName.collectAsState(initial = "")
+            var isSessionValid by remember { mutableStateOf(preferencesManager.isSessionValid()) }
+            val devotionalName by preferencesManager.devotionalName.collectAsState(initial = preferencesManager.getInitialDevotionalName())
+
+            // If session is valid on app launch, refresh its timestamp for continuous 1-day rolling window
+            LaunchedEffect(Unit) {
+                if (preferencesManager.isSessionValid()) {
+                    preferencesManager.refreshSessionTimestamp()
+                }
+            }
 
             val darkTheme = when (currentTheme) {
                 "light" -> false
@@ -83,6 +91,9 @@ class MainActivity : ComponentActivity() {
             }
 
             val navController = rememberNavController()
+
+            // Session is valid if 1-day duration has not expired and user has valid session credentials
+            val isUserLoggedIn = isSessionValid && (devotionalName.isNotBlank() || !tokenManager.getAccessToken().isNullOrBlank())
 
             SevaDiaryTheme(darkTheme = darkTheme) {
                 Surface(modifier = Modifier.fillMaxSize()) {
@@ -94,7 +105,7 @@ class MainActivity : ComponentActivity() {
                         reportsViewModel = reportsViewModel,
                         settingsViewModel = settingsViewModel,
                         isOnboardingCompleted = isOnboardingCompleted,
-                        isLoggedIn = !tokenManager.getAccessToken().isNullOrBlank() || devotionalName.isNotBlank(),
+                        isLoggedIn = isUserLoggedIn,
                         currentLanguage = currentLanguage,
                         rawLanguage = rawLanguage,
                         currentTheme = currentTheme,
@@ -118,14 +129,17 @@ class MainActivity : ComponentActivity() {
                             }
                         },
                         onLoginSuccess = { name ->
+                            isSessionValid = true
                             lifecycleScope.launch {
-                                preferencesManager.setDevotionalName(name)
+                                preferencesManager.saveLoginSession(name)
                                 chantingViewModel.loadData()
                                 sevaViewModel.loadRecords()
                                 settingsViewModel.loadProfile()
                             }
                         },
                         onLogout = {
+                            isSessionValid = false
+                            tokenManager.clearTokens()
                             lifecycleScope.launch {
                                 preferencesManager.clearSessionPreferences()
                             }
