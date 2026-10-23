@@ -176,4 +176,26 @@
     <string name="quote_author_rampal_ji">– संत रामपाल जी महाराज</string>
     <string name="nav_visits">यात्राएं</string>
     <string name="nav_profile">प्रोफाइल</string>
+
+    <!-- Naam Jaap Devotional 6-Step Onboarding -->
+    <string name="jaap_onboarding_header_title">नाम जाप</string>
+    <string name="jaap_onboarding_step_1_title">सतगुरु देव की जय</string>
+    <string name="jaap_onboarding_step_2_title">बंदीछोड़ कबीर साहेब की जय</string>
+    <string name="jaap_onboarding_step_3_title">बंदीछोड़ गरीबदास जी महाराज की जय</string>
+    <string name="jaap_onboarding_step_4_title">स्वामी रामदेवानन्द जी महाराज की जय</string>
+    <string name="jaap_onboarding_step_5_title">बंदीछोड़ सतगुरु रामपाल जी महाराज की जय</string>
+    <string name="jaap_onboarding_step_6_title">सत साहेब</string>
+    <string name="jaap_onboarding_step_1_hi">सतगुरु देव की जय</string>
+    <string name="jaap_onboarding_step_1_en">Satguru Dev Ki Jay</string>
+    <string name="jaap_onboarding_step_2_hi">बंदीछोड़ कबीर साहेब की जय</string>
+    <string name="jaap_onboarding_step_2_en">Bandi Chhod Kabir Saheb Ki Jay</string>
+    <string name="jaap_onboarding_step_3_hi">बंदीछोड़ गरीबदास जी महाराज की जय</string>
+    <string name="jaap_onboarding_step_3_en">Bandi Chhod Garibdas Ji Maharaj Ki Jay</string>
+    <string name="jaap_onboarding_step_4_hi">स्वामी रामदेवानन्द जी महाराज की जय</string>
+    <string name="jaap_onboarding_step_4_en">Swami Ramdevanand Ji Guru Maharaj Ki Jay</string>
+    <string name="jaap_onboarding_step_5_hi">बंदीछोड़ सतगुरु रामपाल जी महाराज की जय</string>
+    <string name="jaap_onboarding_step_5_en">Bandi Chhod Satguru Rampal Ji Maharaj Ki Jay</string>
+    <string name="jaap_onboarding_step_6_hi">सत साहेब</string>
+    <string name="jaap_onboarding_step_6_en">Sat Saheb</string>
+    <string name="btn_start_jaap">जाप शुरू करें</string>
 </resources>

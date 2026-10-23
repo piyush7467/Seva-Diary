@@ -65,6 +65,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val isOnboardingCompleted by preferencesManager.isOnboardingCompleted.collectAsState(initial = preferencesManager.isOnboardingCompletedSync())
+            val isJaapOnboardingCompleted by preferencesManager.isJaapOnboardingCompleted.collectAsState(initial = preferencesManager.isJaapOnboardingCompletedSync())
             val currentLanguage by preferencesManager.appLanguage.collectAsState(initial = preferencesManager.getInitialLanguage())
             val rawLanguage by preferencesManager.rawAppLanguage.collectAsState(initial = preferencesManager.getInitialRawLanguage())
             var currentTheme by remember { mutableStateOf(preferencesManager.getInitialTheme()) }
@@ -106,6 +107,7 @@ class MainActivity : ComponentActivity() {
                         settingsViewModel = settingsViewModel,
                         isOnboardingCompleted = isOnboardingCompleted,
                         isLoggedIn = isUserLoggedIn,
+                        isJaapOnboardingCompleted = isJaapOnboardingCompleted,
                         currentLanguage = currentLanguage,
                         rawLanguage = rawLanguage,
                         currentTheme = currentTheme,
@@ -126,6 +128,11 @@ class MainActivity : ComponentActivity() {
                         onFinishOnboarding = {
                             lifecycleScope.launch {
                                 preferencesManager.setOnboardingCompleted(true)
+                            }
+                        },
+                        onFinishJaapOnboarding = {
+                            lifecycleScope.launch {
+                                preferencesManager.setJaapOnboardingCompleted(true)
                             }
                         },
                         onLoginSuccess = { name ->

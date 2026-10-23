@@ -27,6 +27,7 @@ class PreferencesManager(context: Context) {
 
         private const val SESSION_PREFS_NAME = "seva_diary_session_pref"
         private const val KEY_ONBOARDING_COMPLETED_STRING = "onboarding_completed"
+        private const val KEY_JAAP_ONBOARDING_COMPLETED_STRING = "jaap_onboarding_completed"
         private const val KEY_IS_LOGGED_IN_STRING = "is_logged_in"
         private const val KEY_LOGIN_TIMESTAMP_STRING = "login_timestamp"
         private const val KEY_DEVOTIONAL_NAME_STRING = "devotional_name"
@@ -35,6 +36,7 @@ class PreferencesManager(context: Context) {
         const val SESSION_DURATION_MILLIS = 24 * 60 * 60 * 1000L
 
         private val KEY_ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
+        private val KEY_JAAP_ONBOARDING_COMPLETED = booleanPreferencesKey("jaap_onboarding_completed")
         private val KEY_IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
         private val KEY_LOGIN_TIMESTAMP = longPreferencesKey("login_timestamp")
         private val KEY_LANGUAGE = stringPreferencesKey("app_language")
@@ -48,6 +50,14 @@ class PreferencesManager(context: Context) {
         }
         .map { preferences ->
             preferences[KEY_ONBOARDING_COMPLETED] ?: isOnboardingCompletedSync()
+        }
+
+    val isJaapOnboardingCompleted: Flow<Boolean> = appContext.dataStore.data
+        .catch { exception ->
+            if (exception is IOException) emit(emptyPreferences()) else throw exception
+        }
+        .map { preferences ->
+            preferences[KEY_JAAP_ONBOARDING_COMPLETED] ?: isJaapOnboardingCompletedSync()
         }
 
     val isLoggedIn: Flow<Boolean> = appContext.dataStore.data
@@ -124,6 +134,14 @@ class PreferencesManager(context: Context) {
     fun isOnboardingCompletedSync(): Boolean {
         val prefs = appContext.getSharedPreferences(SESSION_PREFS_NAME, Context.MODE_PRIVATE)
         return prefs.getBoolean(KEY_ONBOARDING_COMPLETED_STRING, false)
+    }
+
+    /**
+     * Reads Naam Jaap devotional 6-step onboarding completion status synchronously.
+     */
+    fun isJaapOnboardingCompletedSync(): Boolean {
+        val prefs = appContext.getSharedPreferences(SESSION_PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getBoolean(KEY_JAAP_ONBOARDING_COMPLETED_STRING, false)
     }
 
     /**
@@ -204,6 +222,17 @@ class PreferencesManager(context: Context) {
 
         appContext.dataStore.edit { preferences ->
             preferences[KEY_ONBOARDING_COMPLETED] = completed
+        }
+    }
+
+    suspend fun setJaapOnboardingCompleted(completed: Boolean) {
+        appContext.getSharedPreferences(SESSION_PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_JAAP_ONBOARDING_COMPLETED_STRING, completed)
+            .apply()
+
+        appContext.dataStore.edit { preferences ->
+            preferences[KEY_JAAP_ONBOARDING_COMPLETED] = completed
         }
     }
 

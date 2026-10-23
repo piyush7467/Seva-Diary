@@ -11,6 +11,7 @@ import com.sevadiary.app.feature.auth.LoginScreen
 import com.sevadiary.app.feature.auth.RegisterScreen
 import com.sevadiary.app.feature.auth.presentation.AuthViewModel
 import com.sevadiary.app.feature.chanting.ChantingScreen
+import com.sevadiary.app.feature.chanting.JaapOnboardingScreen
 import com.sevadiary.app.feature.chanting.presentation.ChantingViewModel
 import com.sevadiary.app.feature.home.DashboardScreen
 import com.sevadiary.app.feature.onboarding.OnboardingScreen
@@ -33,6 +34,7 @@ fun NavGraph(
     settingsViewModel: SettingsViewModel,
     isOnboardingCompleted: Boolean,
     isLoggedIn: Boolean,
+    isJaapOnboardingCompleted: Boolean = false,
     currentLanguage: String,
     rawLanguage: String,
     currentTheme: String,
@@ -40,6 +42,7 @@ fun NavGraph(
     onLanguageChange: (String) -> Unit,
     onThemeChange: (String) -> Unit,
     onFinishOnboarding: () -> Unit,
+    onFinishJaapOnboarding: () -> Unit = {},
     onLoginSuccess: (devotionalName: String) -> Unit,
     onLogout: () -> Unit
 ) {
@@ -121,10 +124,28 @@ fun NavGraph(
                 devotionalName = devotionalName,
                 chantingViewModel = chantingViewModel,
                 sevaViewModel = sevaViewModel,
-                onNavigateToChanting = { navController.navigate(Screen.Chanting.route) },
+                onNavigateToChanting = {
+                    if (isJaapOnboardingCompleted) {
+                        navController.navigate(Screen.Chanting.route)
+                    } else {
+                        navController.navigate(Screen.JaapOnboarding.route)
+                    }
+                },
                 onNavigateToAshram = { navController.navigate(Screen.AshramDiary.route) },
                 onNavigateToReports = { navController.navigate(Screen.Reports.route) },
                 onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
+            )
+        }
+
+        composable(Screen.JaapOnboarding.route) {
+            JaapOnboardingScreen(
+                onFinishOnboarding = {
+                    onFinishJaapOnboarding()
+                    navController.navigate(Screen.Chanting.route) {
+                        popUpTo(Screen.JaapOnboarding.route) { inclusive = true }
+                    }
+                },
+                onBackClick = { navController.popBackStack() }
             )
         }
 
