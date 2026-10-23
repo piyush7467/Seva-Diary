@@ -120,7 +120,7 @@
     <!-- Ashram Diary -->
     <string name="ashram_diary_title">सतलोक आश्रम यात्रा विवरण</string>
     <string name="ashram_header_subtitle">यात्राएं, सेवा व संस्मरण संजोएं</string>
-    <string name="ashram_search_placeholder">आश्रम, संस्मरण या स्थान से खोजें</string>
+    <string name="ashram_diary_search_placeholder">आश्रम, संस्मरण या स्थान से खोजें</string>
     <string name="ashram_filter_all">सभी आश्रम</string>
     <string name="ashram_empty_title">आपकी यात्रा यहीं से शुरू होती है</string>
     <string name="ashram_empty_desc">अपनी सतलोक आश्रम यात्राएं, सेवा कार्य, पावन तिथियां और संस्मरण एक ही स्थान पर संजोएं।</string>
@@ -147,6 +147,33 @@
     <string name="filter_ashram">आश्रम अनुसार फ़िल्टर</string>
     <string name="filter_purpose">उद्देश्य अनुसार फ़िल्टर</string>
     <string name="filter_date_range">तिथि सीमा फ़िल्टर</string>
+
+    <!-- Ashram Dropdown & Master Locations -->
+    <string name="ashram_dropdown_label">आश्रम</string>
+    <string name="ashram_dropdown_placeholder">आश्रम चुनें</string>
+    <string name="ashram_search_placeholder">आश्रम खोजें</string>
+    <string name="ashram_no_results">कोई आश्रम नहीं मिला</string>
+    <string name="ashram_required_error">कृपया आश्रम चुनें</string>
+    <string name="select_ashram">आश्रम चुनें</string>
+
+    <string name="ashram_dhanana_dham">श्री धनाना धाम आश्रम</string>
+    <string name="ashram_karontha_dham">श्री करौँथा धाम आश्रम</string>
+    <string name="ashram_kurukshetra">कुरुक्षेत्र आश्रम</string>
+    <string name="ashram_mundka">मुंडका आश्रम, दिल्ली</string>
+    <string name="ashram_dhuri">धुरी आश्रम, पंजाब</string>
+    <string name="ashram_khamano">खमानो आश्रम, पंजाब</string>
+    <string name="ashram_shamli">शामली आश्रम, उत्तर प्रदेश</string>
+    <string name="ashram_sitapur">सीतापुर आश्रम, उत्तर प्रदेश</string>
+    <string name="ashram_sojat">सोजत आश्रम, राजस्थान</string>
+    <string name="ashram_betul">बैतूल आश्रम, मध्य प्रदेश</string>
+    <string name="ashram_indore">इंदौर आश्रम, मध्य प्रदेश</string>
+    <string name="ashram_dhawalapuri">धवलपुरी आश्रम, महाराष्ट्र</string>
+    <string name="ashram_dhanusha">धनुषा आश्रम, नेपाल</string>
+    <string name="ashram_dharwad">धारवाड़ आश्रम, कर्नाटक</string>
+    <string name="ashram_barwala">सतलोक आश्रम बरवाला</string>
+    <string name="ashram_rohtak">सतलोक आश्रम रोहतक</string>
+    <string name="ashram_bhiwani">सतलोक आश्रम भिवानी</string>
+    <string name="ashram_other">अन्य आश्रम / स्थान</string>
 
     <!-- Reports -->
     <string name="reports_title">व्यक्तिगत रिपोर्ट्स</string>

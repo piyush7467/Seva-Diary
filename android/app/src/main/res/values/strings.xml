@@ -120,7 +120,7 @@
     <!-- Ashram Diary -->
     <string name="ashram_diary_title">Satlok Ashram Visits</string>
     <string name="ashram_header_subtitle">Document Visits, Seva &amp; Memories</string>
-    <string name="ashram_search_placeholder">Search by ashram, notes or location</string>
+    <string name="ashram_diary_search_placeholder">Search by ashram, notes or location</string>
     <string name="ashram_filter_all">All Ashrams</string>
     <string name="ashram_empty_title">Your journey begins here</string>
     <string name="ashram_empty_desc">Record your Satlok Ashram visits, seva activities, important dates and special spiritual memories in one place.</string>
@@ -147,6 +147,33 @@
     <string name="filter_ashram">Filter by Ashram</string>
     <string name="filter_purpose">Filter by Purpose</string>
     <string name="filter_date_range">Filter Date Range</string>
+
+    <!-- Ashram Dropdown & Master Locations -->
+    <string name="ashram_dropdown_label">Ashram</string>
+    <string name="ashram_dropdown_placeholder">Select an Ashram</string>
+    <string name="ashram_search_placeholder">Search Ashram</string>
+    <string name="ashram_no_results">No Ashrams found</string>
+    <string name="ashram_required_error">Please select an Ashram</string>
+    <string name="select_ashram">Select Ashram</string>
+
+    <string name="ashram_dhanana_dham">Shri Dhanana Dham Ashram</string>
+    <string name="ashram_karontha_dham">Shri Karontha Dham Ashram</string>
+    <string name="ashram_kurukshetra">Kurukshetra Ashram</string>
+    <string name="ashram_mundka">Mundka Ashram, Delhi</string>
+    <string name="ashram_dhuri">Dhuri Ashram, Punjab</string>
+    <string name="ashram_khamano">Khamano Ashram, Punjab</string>
+    <string name="ashram_shamli">Shamli Ashram, Uttar Pradesh</string>
+    <string name="ashram_sitapur">Sitapur Ashram, Uttar Pradesh</string>
+    <string name="ashram_sojat">Sojat Ashram, Rajasthan</string>
+    <string name="ashram_betul">Betul Ashram, Madhya Pradesh</string>
+    <string name="ashram_indore">Indore Ashram, Madhya Pradesh</string>
+    <string name="ashram_dhawalapuri">Dhawalapuri Ashram, Maharashtra</string>
+    <string name="ashram_dhanusha">Dhanusha Ashram, Nepal</string>
+    <string name="ashram_dharwad">Dharwad Ashram, Karnataka</string>
+    <string name="ashram_barwala">Satlok Ashram Barwala</string>
+    <string name="ashram_rohtak">Satlok Ashram Rohtak</string>
+    <string name="ashram_bhiwani">Satlok Ashram Bhiwani</string>
+    <string name="ashram_other">Other Ashram / Location</string>
 
     <!-- Reports -->
     <string name="reports_title">Personal Reports</string>

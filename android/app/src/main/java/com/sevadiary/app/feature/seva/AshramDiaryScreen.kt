@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sevadiary.app.R
 import com.sevadiary.app.core.network.dto.SevaRecordDto
+import com.sevadiary.app.feature.seva.data.AshramMasterData
 import com.sevadiary.app.feature.seva.presentation.SevaViewModel
 
 // Seva Diary Devotional Palette
@@ -57,32 +58,14 @@ fun AshramDiaryScreen(
     var searchInput by remember { mutableStateOf("") }
     var recordToDelete by remember { mutableStateOf<SevaRecordDto?>(null) }
 
-    val defaultFilterOptions = remember {
-        listOf(
-            null to "All Ashrams",
-            "BARWALA" to "Barwala",
-            "ROHTAK" to "Rohtak",
-            "BHIWANI" to "Bhiwani",
-            "OTHER_ASHRAM" to "Other"
-        )
-    }
-
-    val filterOptions = remember(uiState.masterData) {
-        val masterAshrams = uiState.masterData?.ashrams
-        if (!masterAshrams.isNullOrEmpty()) {
-            val list = mutableListOf<Pair<String?, String>>()
-            list.add(null to "All Ashrams")
-            masterAshrams.forEach { ashram ->
-                val cleanLabel = ashram.labels.en
-                    .replace("Satlok Ashram ", "")
-                    .replace("Other Ashram / Location", "Other")
-                    .trim()
-                list.add(ashram.code to cleanLabel)
-            }
-            list
-        } else {
-            defaultFilterOptions
+    val allAshramsLabel = stringResource(R.string.ashram_filter_all)
+    val filterItems = remember(allAshramsLabel) {
+        val list = mutableListOf<Pair<String?, Int>>()
+        list.add(null to R.string.ashram_filter_all)
+        AshramMasterData.ashrams.forEach { loc ->
+            list.add(loc.code to loc.nameRes)
         }
+        list
     }
 
     Scaffold(
@@ -126,7 +109,7 @@ fun AshramDiaryScreen(
                 )
             }
 
-            // 2. Location Filter Chips (All Ashrams, Barwala, Rohtak, Bhiwani, Other...)
+            // 2. Location Filter Chips
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -134,7 +117,20 @@ fun AshramDiaryScreen(
                 contentPadding = PaddingValues(horizontal = 20.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(filterOptions) { (code, label) ->
+                items(filterItems) { (code, nameRes) ->
+                    val rawName = stringResource(nameRes)
+                    val label = if (code == null) {
+                        rawName
+                    } else {
+                        rawName
+                            .replace("Satlok Ashram ", "")
+                            .replace("Shri ", "")
+                            .replace("Other Ashram / Location", "Other")
+                            .replace("सतलोक आश्रम ", "")
+                            .replace("श्री ", "")
+                            .replace("अन्य आश्रम / स्थान", "अन्य")
+                            .trim()
+                    }
                     val isSelected = uiState.filterAshram == code
                     Surface(
                         onClick = {
@@ -267,11 +263,13 @@ fun AshramDiaryScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(uiState.records, key = { it.id }) { record ->
+                            val ashramLoc = AshramMasterData.findByCode(record.ashramCode)
                             val ashramName = if (record.ashramCode == "OTHER_ASHRAM" && record.customAshramName.isNotBlank()) {
                                 record.customAshramName
                             } else {
-                                val found = uiState.masterData?.ashrams?.find { it.code == record.ashramCode }
-                                found?.labels?.en ?: record.ashramCode
+                                ashramLoc?.let { stringResource(it.nameRes) }
+                                    ?: uiState.masterData?.ashrams?.find { it.code == record.ashramCode }?.labels?.en
+                                    ?: record.ashramCode
                             }
 
                             Surface(
@@ -534,7 +532,7 @@ private fun AshramSearchBar(
         onValueChange = onQueryChange,
         placeholder = {
             Text(
-                text = stringResource(R.string.ashram_search_placeholder),
+                text = stringResource(R.string.ashram_diary_search_placeholder),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = AshramSecondaryText.copy(alpha = 0.8f),
                     fontSize = 14.sp

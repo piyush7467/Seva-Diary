@@ -18,11 +18,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.sevadiary.app.R
 import com.sevadiary.app.core.designsystem.component.*
 import com.sevadiary.app.core.designsystem.theme.ForestGreen
 import com.sevadiary.app.core.designsystem.theme.SaffronGold
+import com.sevadiary.app.feature.seva.data.AshramLocation
+import com.sevadiary.app.feature.seva.data.AshramMasterData
 import com.sevadiary.app.feature.seva.presentation.SevaViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -42,7 +46,7 @@ fun AddEditVisitScreen(
 
     val todayStr = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()) }
 
-    var selectedAshramCode by remember { mutableStateOf(existingRecord?.ashramCode ?: "BARWALA") }
+    var selectedAshramCode by remember { mutableStateOf(existingRecord?.ashramCode ?: "") }
     var customAshramName by remember { mutableStateOf(existingRecord?.customAshramName ?: "") }
     var startDate by remember { mutableStateOf(existingRecord?.startDate ?: todayStr) }
     var endDate by remember { mutableStateOf(existingRecord?.endDate ?: todayStr) }
@@ -183,41 +187,167 @@ fun AddEditVisitScreen(
             // Ashram Dropdown Card
             DevotionalCard {
                 Text(
-                    text = stringResource(R.string.ashram_select),
+                    text = stringResource(R.string.ashram_dropdown_label),
                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
                 var ashramExpanded by remember { mutableStateOf(false) }
-                val ashramOptions = uiState.masterData?.ashrams ?: emptyList()
-                val currentAshramLabel = ashramOptions.find { it.code == selectedAshramCode }?.labels?.en ?: selectedAshramCode
+                var ashramSearchQuery by remember { mutableStateOf("") }
+
+                val allLocations = AshramMasterData.ashrams
+                val selectedLocation = AshramMasterData.findByCode(selectedAshramCode)
+                val currentDisplayLabel = selectedLocation?.let { stringResource(it.nameRes) } ?: ""
+
+                // Filter items by search query against localized name, state/country, or code
+                val filteredLocations = allLocations.filter { loc ->
+                    if (ashramSearchQuery.isBlank()) {
+                        true
+                    } else {
+                        val localizedName = stringResource(loc.nameRes)
+                        localizedName.contains(ashramSearchQuery, ignoreCase = true) ||
+                                loc.stateOrCountry.contains(ashramSearchQuery, ignoreCase = true) ||
+                                loc.code.contains(ashramSearchQuery, ignoreCase = true)
+                    }
+                }
 
                 ExposedDropdownMenuBox(
                     expanded = ashramExpanded,
-                    onExpandedChange = { ashramExpanded = !ashramExpanded }
+                    onExpandedChange = {
+                        ashramExpanded = !ashramExpanded
+                        if (!ashramExpanded) ashramSearchQuery = ""
+                    }
                 ) {
                     OutlinedTextField(
-                        value = currentAshramLabel,
+                        value = currentDisplayLabel,
                         onValueChange = {},
                         readOnly = true,
+                        placeholder = {
+                            Text(
+                                text = stringResource(R.string.ashram_dropdown_placeholder),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                            )
+                        },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = ashramExpanded) },
                         modifier = Modifier
                             .menuAnchor()
                             .fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                        )
                     )
+
                     ExposedDropdownMenu(
                         expanded = ashramExpanded,
-                        onDismissRequest = { ashramExpanded = false }
+                        onDismissRequest = {
+                            ashramExpanded = false
+                            ashramSearchQuery = ""
+                        },
+                        modifier = Modifier
+                            .heightIn(max = 340.dp)
+                            .background(MaterialTheme.colorScheme.surface)
                     ) {
-                        ashramOptions.forEach { ashram ->
-                            DropdownMenuItem(
-                                text = { Text("${ashram.labels.en} (${ashram.labels.hi})") },
-                                onClick = {
-                                    selectedAshramCode = ashram.code
-                                    ashramExpanded = false
+                        // Search bar inside dropdown
+                        OutlinedTextField(
+                            value = ashramSearchQuery,
+                            onValueChange = { ashramSearchQuery = it },
+                            placeholder = {
+                                Text(
+                                    text = stringResource(R.string.ashram_search_placeholder),
+                                    fontSize = 13.sp
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Search,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            },
+                            trailingIcon = if (ashramSearchQuery.isNotBlank()) {
+                                {
+                                    IconButton(
+                                        onClick = { ashramSearchQuery = "" },
+                                        modifier = Modifier.size(24.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Clear,
+                                            contentDescription = "Clear",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
                                 }
-                            )
+                            } else null,
+                            singleLine = true,
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp, vertical = 6.dp)
+                                .height(48.dp)
+                        )
+
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+                        if (filteredLocations.isEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 16.dp, horizontal = 16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.ashram_no_results),
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    ),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        } else {
+                            filteredLocations.forEach { loc ->
+                                val isSelected = loc.code == selectedAshramCode
+                                val localizedName = stringResource(loc.nameRes)
+                                DropdownMenuItem(
+                                    text = {
+                                        Column {
+                                            Text(
+                                                text = localizedName,
+                                                style = MaterialTheme.typography.bodyMedium.copy(
+                                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                                )
+                                            )
+                                            if (loc.stateOrCountry.isNotBlank()) {
+                                                Text(
+                                                    text = loc.stateOrCountry,
+                                                    style = MaterialTheme.typography.labelSmall.copy(
+                                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    },
+                                    leadingIcon = if (isSelected) {
+                                        {
+                                            Icon(
+                                                imageVector = Icons.Default.Check,
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
+                                    } else null,
+                                    onClick = {
+                                        selectedAshramCode = loc.code
+                                        ashramExpanded = false
+                                        ashramSearchQuery = ""
+                                        localError = null
+                                    },
+                                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -468,11 +598,15 @@ fun AddEditVisitScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            val ashramRequiredError = stringResource(R.string.ashram_required_error)
+
             SevaPrimaryButton(
                 text = stringResource(R.string.btn_save_visit),
                 isLoading = uiState.isSaving,
                 onClick = {
-                    if (selectedAshramCode == "OTHER_ASHRAM" && customAshramName.isBlank()) {
+                    if (selectedAshramCode.isBlank()) {
+                        localError = ashramRequiredError
+                    } else if (selectedAshramCode == "OTHER_ASHRAM" && customAshramName.isBlank()) {
                         localError = "Please specify the custom ashram name."
                     } else if (startDate.isBlank() || endDate.isBlank()) {
                         localError = "Start and End dates are required."
