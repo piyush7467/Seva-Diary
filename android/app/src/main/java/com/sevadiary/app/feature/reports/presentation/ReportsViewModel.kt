@@ -9,6 +9,7 @@ import com.sevadiary.app.core.pdf.AshramVisitPdfItem
 import com.sevadiary.app.core.pdf.ChantingPdfItem
 import com.sevadiary.app.core.pdf.PdfReportGenerator
 import com.sevadiary.app.feature.chanting.data.ChantingRepository
+import com.sevadiary.app.feature.seva.data.AshramMasterData
 import com.sevadiary.app.feature.seva.data.SevaRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,13 +51,29 @@ class ReportsViewModel(
                         "ASHRAM" -> {
                             val sevaResult = sevaRepository.getRecords(limit = 100)
                             val records = sevaResult.getOrDefault(emptyList()).map {
+                                val isOtherAshram = AshramMasterData.isOtherAshram(it.ashramCode)
+                                val resolvedAshramName = when {
+                                    isOtherAshram && it.customAshramName.isNotBlank() -> it.customAshramName
+                                    isOtherAshram -> "Other Ashram"
+                                    else -> it.ashramCode.replace("_", " ")
+                                }
+                                val resolvedPurpose = if (AshramMasterData.isOtherPurpose(it.purpose) && it.customPurposeOrSeva.isNotBlank()) {
+                                    it.customPurposeOrSeva
+                                } else {
+                                    it.purpose.replace("_", " ")
+                                }
+                                val resolvedSeva = if (AshramMasterData.isOtherSeva(it.sevaType) && it.customPurposeOrSeva.isNotBlank()) {
+                                    it.customPurposeOrSeva
+                                } else {
+                                    it.sevaType.replace("_", " ")
+                                }
                                 AshramVisitPdfItem(
-                                    ashramName = if (it.ashramCode == "OTHER_ASHRAM" && it.customAshramName.isNotBlank()) it.customAshramName else it.ashramCode,
+                                    ashramName = resolvedAshramName,
                                     startDate = it.startDate,
                                     endDate = it.endDate,
                                     durationDays = it.durationDays,
-                                    purpose = it.purpose,
-                                    sevaType = it.sevaType,
+                                    purpose = resolvedPurpose,
+                                    sevaType = resolvedSeva,
                                     notes = it.notes
                                 )
                             }
@@ -74,13 +91,29 @@ class ReportsViewModel(
                         else -> { // COMBINED
                             val sevaResult = sevaRepository.getRecords(limit = 100)
                             val records = sevaResult.getOrDefault(emptyList()).map {
+                                val isOtherAshram = AshramMasterData.isOtherAshram(it.ashramCode)
+                                val resolvedAshramName = when {
+                                    isOtherAshram && it.customAshramName.isNotBlank() -> it.customAshramName
+                                    isOtherAshram -> "Other Ashram"
+                                    else -> it.ashramCode.replace("_", " ")
+                                }
+                                val resolvedPurpose = if (AshramMasterData.isOtherPurpose(it.purpose) && it.customPurposeOrSeva.isNotBlank()) {
+                                    it.customPurposeOrSeva
+                                } else {
+                                    it.purpose.replace("_", " ")
+                                }
+                                val resolvedSeva = if (AshramMasterData.isOtherSeva(it.sevaType) && it.customPurposeOrSeva.isNotBlank()) {
+                                    it.customPurposeOrSeva
+                                } else {
+                                    it.sevaType.replace("_", " ")
+                                }
                                 AshramVisitPdfItem(
-                                    ashramName = if (it.ashramCode == "OTHER_ASHRAM" && it.customAshramName.isNotBlank()) it.customAshramName else it.ashramCode,
+                                    ashramName = resolvedAshramName,
                                     startDate = it.startDate,
                                     endDate = it.endDate,
                                     durationDays = it.durationDays,
-                                    purpose = it.purpose,
-                                    sevaType = it.sevaType,
+                                    purpose = resolvedPurpose,
+                                    sevaType = resolvedSeva,
                                     notes = it.notes
                                 )
                             }

@@ -58,6 +58,20 @@ fun AddEditVisitScreen(
 
     var localError by remember { mutableStateOf<String?>(null) }
 
+    LaunchedEffect(existingRecord) {
+        existingRecord?.let { record ->
+            selectedAshramCode = record.ashramCode
+            customAshramName = record.customAshramName
+            startDate = record.startDate
+            endDate = record.endDate
+            selectedPurpose = record.purpose
+            selectedSevaType = if (record.sevaType.isNotBlank()) record.sevaType else "BHANDARA_SEVA"
+            customPurposeOrSeva = record.customPurposeOrSeva
+            notes = record.notes
+            locationDetails = record.locationDetails
+        }
+    }
+
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
 
@@ -557,12 +571,20 @@ fun AddEditVisitScreen(
                     }
                 }
 
-                if (selectedPurpose == "OTHER_PURPOSE" || (selectedPurpose == "SEVA" && selectedSevaType == "OTHER_SEVA")) {
+                val isOtherPurpose = AshramMasterData.isOtherPurpose(selectedPurpose)
+                val isOtherSeva = selectedPurpose == "SEVA" && AshramMasterData.isOtherSeva(selectedSevaType)
+                if (isOtherPurpose || isOtherSeva) {
                     Spacer(modifier = Modifier.height(10.dp))
+                    val customPlaceholder = if (isOtherPurpose) {
+                        "e.g. Special spiritual programme, family visit, personal guidance..."
+                    } else {
+                        "e.g. Audio setup, hall arrangement, gardening..."
+                    }
                     SevaTextField(
                         value = customPurposeOrSeva,
                         onValueChange = { customPurposeOrSeva = it },
-                        label = stringResource(R.string.custom_purpose_or_seva)
+                        label = stringResource(R.string.custom_purpose_or_seva),
+                        placeholder = customPlaceholder
                     )
                 }
             }
@@ -607,28 +629,39 @@ fun AddEditVisitScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             val ashramRequiredError = stringResource(R.string.ashram_required_error)
+            val customAshramRequiredError = stringResource(R.string.error_specify_custom_ashram)
+            val customPurposeRequiredError = stringResource(R.string.error_specify_custom_purpose)
+            val customSevaRequiredError = stringResource(R.string.error_specify_custom_seva)
 
             SevaPrimaryButton(
                 text = stringResource(R.string.btn_save_visit),
                 isLoading = uiState.isSaving,
                 onClick = {
+                    val isOtherAshram = AshramMasterData.isOtherAshram(selectedAshramCode)
+                    val isOtherPurp = AshramMasterData.isOtherPurpose(selectedPurpose)
+                    val isOtherSev = selectedPurpose == "SEVA" && AshramMasterData.isOtherSeva(selectedSevaType)
+
                     if (selectedAshramCode.isBlank()) {
                         localError = ashramRequiredError
-                    } else if (selectedAshramCode == "OTHER_ASHRAM" && customAshramName.isBlank()) {
-                        localError = "Please specify the custom ashram name."
+                    } else if (isOtherAshram && customAshramName.isBlank()) {
+                        localError = customAshramRequiredError
                     } else if (startDate.isBlank() || endDate.isBlank()) {
                         localError = "Start and End dates are required."
+                    } else if (isOtherPurp && customPurposeOrSeva.isBlank()) {
+                        localError = customPurposeRequiredError
+                    } else if (isOtherSev && customPurposeOrSeva.isBlank()) {
+                        localError = customSevaRequiredError
                     } else {
                         localError = null
                         viewModel.saveVisit(
                             recordId = visitId,
                             ashramCode = selectedAshramCode,
-                            customAshramName = customAshramName,
+                            customAshramName = if (isOtherAshram) customAshramName.trim() else "",
                             startDate = startDate,
                             endDate = endDate,
                             purpose = selectedPurpose,
-                            sevaType = selectedSevaType,
-                            customPurposeOrSeva = customPurposeOrSeva,
+                            sevaType = if (selectedPurpose == "SEVA") selectedSevaType else "",
+                            customPurposeOrSeva = customPurposeOrSeva.trim(),
                             notes = notes,
                             locationDetails = locationDetails
                         )

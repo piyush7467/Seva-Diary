@@ -239,4 +239,24 @@
     <string name="jaap_onboarding_step_6_verse_hi">“अब शुद्ध मन और श्रद्धा से प्रभु के पावन नाम का सुमिरण आरंभ करें।”</string>
     <string name="jaap_onboarding_step_6_verse_en">“Commence your sacred Naam Jaap with a pure and devoted heart.”</string>
     <string name="btn_start_jaap">जाप शुरू करें</string>
+
+    <!-- Purpose & Seva Master Labels -->
+    <string name="purpose_satsang">सत्संग</string>
+    <string name="purpose_seva">सेवा</string>
+    <string name="purpose_bhandara">भंडारा</string>
+    <string name="purpose_programme">आश्रम समागम</string>
+    <string name="purpose_naam_daan">नाम दान</string>
+    <string name="purpose_other">अन्य</string>
+
+    <string name="seva_bhandara">भंडारा सेवा</string>
+    <string name="seva_safai">सफाई सेवा</string>
+    <string name="seva_vyavastha">व्यवस्था सेवा</string>
+    <string name="seva_jal">जल सेवा</string>
+    <string name="seva_security">सुरक्षा सेवा</string>
+    <string name="seva_it_media">ध्वनि एवं प्रसारण सेवा</string>
+    <string name="seva_other">अन्य सेवा</string>
+
+    <string name="error_specify_custom_ashram">कृपया आश्रम का नाम लिखें।</string>
+    <string name="error_specify_custom_purpose">कृपया यात्रा का उद्देश्य विवरण लिखें।</string>
+    <string name="error_specify_custom_seva">कृपया सेवा का विवरण लिखें।</string>
 </resources>

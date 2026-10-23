@@ -135,6 +135,49 @@ object AshramMasterData {
             } else null
     }
 
+    fun isOtherAshram(code: String?): Boolean {
+        if (code.isNullOrBlank()) return false
+        val c = code.trim().uppercase()
+        return c == "OTHER_ASHRAM" || c == "OTHER" || c.startsWith("OTHER")
+    }
+
+    fun isOtherPurpose(code: String?): Boolean {
+        if (code.isNullOrBlank()) return false
+        val c = code.trim().uppercase()
+        return c == "OTHER_PURPOSE" || c == "OTHER" || c.startsWith("OTHER")
+    }
+
+    fun isOtherSeva(code: String?): Boolean {
+        if (code.isNullOrBlank()) return false
+        val c = code.trim().uppercase()
+        return c == "OTHER_SEVA" || c == "OTHER" || c.startsWith("OTHER")
+    }
+
+    fun getPurposeNameRes(code: String?): Int {
+        return when (code?.trim()?.uppercase()) {
+            "SATSANG" -> R.string.purpose_satsang
+            "SEVA" -> R.string.purpose_seva
+            "BHANDARA" -> R.string.purpose_bhandara
+            "PROGRAMME" -> R.string.purpose_programme
+            "NAAM_DAAN" -> R.string.purpose_naam_daan
+            "OTHER_PURPOSE", "OTHER" -> R.string.purpose_other
+            else -> R.string.purpose_other
+        }
+    }
+
+    fun getSevaTypeNameRes(code: String?): Int {
+        return when (code?.trim()?.uppercase()) {
+            "BHANDARA_SEVA" -> R.string.seva_bhandara
+            "SAFAI_SEVA" -> R.string.seva_safai
+            "VYAVASTHA_SEVA" -> R.string.seva_vyavastha
+            "JAL_SEVA" -> R.string.seva_jal
+            "SECURITY_SEVA" -> R.string.seva_security
+            "IT_MEDIA_SEVA" -> R.string.seva_it_media
+            "OTHER_SEVA", "OTHER" -> R.string.seva_other
+            else -> R.string.seva_other
+        }
+    }
+
     val defaultPurposes: List<MasterDataItem> = listOf(
         MasterDataItem("SATSANG", "Satsang (Spiritual Discourse)", "सत्संग"),
         MasterDataItem("SEVA", "Seva (Selfless Service)", "सेवा"),
