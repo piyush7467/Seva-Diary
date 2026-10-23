@@ -62,7 +62,7 @@ fun DashboardScreen(
 
     // Naam Jaap summary values
     val todayCount = chantingUiState.todayCount
-    val target = if (chantingUiState.target > 0) chantingUiState.target else 1000
+    val target = if (chantingUiState.target > 0) chantingUiState.target else 108
     val progress = (todayCount.toFloat() / target.toFloat()).coerceIn(0f, 1f)
     val percentage = (progress * 100).toInt()
     val remaining = (target - todayCount).coerceAtLeast(0)

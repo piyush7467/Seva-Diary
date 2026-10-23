@@ -653,7 +653,7 @@ fun ChantingScreen(
             },
             confirmButton = {
                 TextButton(onClick = {
-                    val parsed = targetInput.toIntOrNull() ?: 1000
+                    val parsed = targetInput.toIntOrNull() ?: 108
                     viewModel.setTarget(parsed)
                     showTargetDialog = false
                 }) {

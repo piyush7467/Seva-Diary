@@ -15,7 +15,7 @@ import java.util.Locale
 
 data class ChantingUiState(
     val todayCount: Int = 0,
-    val target: Int = 1000,
+    val target: Int = 108,
     val summary: ChantingSummaryDto = ChantingSummaryDto(0, 0, 0, 0, 0),
     val history: List<ChantingEntryDto> = emptyList(),
     val isLoading: Boolean = false,
