@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -20,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.sevadiary.app.R
 import com.sevadiary.app.core.designsystem.component.*
@@ -439,24 +441,20 @@ fun RegisterScreen(
                         placeholder = "e.g. Dhanaana / Barwala"
                     )
 
-                    // Address Line & PIN Code
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        SevaTextField(
-                            value = addressLine,
-                            onValueChange = { addressLine = it },
-                            label = stringResource(R.string.address_line),
-                            modifier = Modifier.weight(1.5f)
-                        )
-                        SevaTextField(
-                            value = pinCode,
-                            onValueChange = { pinCode = it },
-                            label = stringResource(R.string.pin_code),
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
+                    // Address Line (Optional)
+                    SevaTextField(
+                        value = addressLine,
+                        onValueChange = { addressLine = it },
+                        label = stringResource(R.string.address_line)
+                    )
+
+                    // PIN Code
+                    SevaTextField(
+                        value = pinCode,
+                        onValueChange = { pinCode = it },
+                        label = stringResource(R.string.pin_code),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
 
                     // Additional Spiritual Notes (Optional)
                     SevaTextField(
