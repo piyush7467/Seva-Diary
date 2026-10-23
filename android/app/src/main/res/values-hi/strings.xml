@@ -18,6 +18,7 @@
     <string name="btn_submit">जमा करें</string>
     <string name="btn_retry">पुनः प्रयास करें</string>
     <string name="btn_confirm">पुष्टि करें</string>
+    <string name="btn_ok">ठीक है</string>
     <string name="loading">लोड हो रहा है…</string>
     <string name="success">सफल</string>
     <string name="error_occurred">एक त्रुटि हुई। कृपया पुन: प्रयास करें।</string>

@@ -18,6 +18,7 @@
     <string name="btn_submit">Submit</string>
     <string name="btn_retry">Retry</string>
     <string name="btn_confirm">Confirm</string>
+    <string name="btn_ok">OK</string>
     <string name="loading">Loading…</string>
     <string name="success">Success</string>
     <string name="error_occurred">An error occurred. Please try again.</string>

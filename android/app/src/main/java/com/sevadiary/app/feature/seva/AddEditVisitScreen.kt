@@ -27,6 +27,7 @@ import com.sevadiary.app.feature.seva.presentation.SevaViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +53,89 @@ fun AddEditVisitScreen(
     var locationDetails by remember { mutableStateOf(existingRecord?.locationDetails ?: "") }
 
     var localError by remember { mutableStateOf<String?>(null) }
+
+    var showStartDatePicker by remember { mutableStateOf(false) }
+    var showEndDatePicker by remember { mutableStateOf(false) }
+
+    // Start Date Picker Dialog
+    if (showStartDatePicker) {
+        val initialMillis = remember(startDate) { parseDateToUtcMillis(startDate) }
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialMillis)
+        DatePickerDialog(
+            onDismissRequest = { showStartDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            val chosenDate = utcMillisToDateString(millis)
+                            startDate = chosenDate
+                            if (endDate < chosenDate) {
+                                endDate = chosenDate
+                            }
+                        }
+                        showStartDatePicker = false
+                    }
+                ) {
+                    Text(stringResource(R.string.btn_ok), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showStartDatePicker = false }) {
+                    Text(stringResource(R.string.btn_cancel))
+                }
+            }
+        ) {
+            DatePicker(
+                state = datePickerState,
+                colors = DatePickerDefaults.colors(
+                    selectedDayContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedDayContentColor = MaterialTheme.colorScheme.onPrimary,
+                    todayDateBorderColor = MaterialTheme.colorScheme.primary,
+                    todayContentColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
+    }
+
+    // End Date Picker Dialog
+    if (showEndDatePicker) {
+        val initialMillis = remember(endDate) { parseDateToUtcMillis(endDate) }
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialMillis)
+        DatePickerDialog(
+            onDismissRequest = { showEndDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            val chosenDate = utcMillisToDateString(millis)
+                            endDate = chosenDate
+                            if (startDate > chosenDate) {
+                                startDate = chosenDate
+                            }
+                        }
+                        showEndDatePicker = false
+                    }
+                ) {
+                    Text(stringResource(R.string.btn_ok), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEndDatePicker = false }) {
+                    Text(stringResource(R.string.btn_cancel))
+                }
+            }
+        ) {
+            DatePicker(
+                state = datePickerState,
+                colors = DatePickerDefaults.colors(
+                    selectedDayContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedDayContentColor = MaterialTheme.colorScheme.onPrimary,
+                    todayDateBorderColor = MaterialTheme.colorScheme.primary,
+                    todayContentColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
+    }
 
     // Live Duration Calculation
     val calculatedDuration = remember(startDate, endDate) {
@@ -162,20 +246,73 @@ fun AddEditVisitScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    SevaTextField(
-                        value = startDate,
-                        onValueChange = { startDate = it },
-                        label = stringResource(R.string.start_date),
-                        placeholder = "YYYY-MM-DD",
-                        modifier = Modifier.weight(1f)
-                    )
-                    SevaTextField(
-                        value = endDate,
-                        onValueChange = { endDate = it },
-                        label = stringResource(R.string.end_date),
-                        placeholder = "YYYY-MM-DD",
-                        modifier = Modifier.weight(1f)
-                    )
+                    // Start Date Picker Field
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable { showStartDatePicker = true }
+                    ) {
+                        OutlinedTextField(
+                            value = startDate,
+                            onValueChange = {},
+                            readOnly = true,
+                            enabled = false,
+                            label = { Text(stringResource(R.string.start_date)) },
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.CalendarToday,
+                                    contentDescription = "Select Start Date",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                                disabledBorderColor = MaterialTheme.colorScheme.outline,
+                                disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                disabledTrailingIconColor = MaterialTheme.colorScheme.primary,
+                                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+                    }
+
+                    // End Date Picker Field
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable { showEndDatePicker = true }
+                    ) {
+                        OutlinedTextField(
+                            value = endDate,
+                            onValueChange = {},
+                            readOnly = true,
+                            enabled = false,
+                            label = { Text(stringResource(R.string.end_date)) },
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.CalendarToday,
+                                    contentDescription = "Select End Date",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                                disabledBorderColor = MaterialTheme.colorScheme.outline,
+                                disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                disabledTrailingIconColor = MaterialTheme.colorScheme.primary,
+                                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -360,4 +497,22 @@ fun AddEditVisitScreen(
             Spacer(modifier = Modifier.height(56.dp))
         }
     }
+}
+
+private fun parseDateToUtcMillis(dateStr: String): Long {
+    return try {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+        }
+        sdf.parse(dateStr)?.time ?: System.currentTimeMillis()
+    } catch (e: Exception) {
+        System.currentTimeMillis()
+    }
+}
+
+private fun utcMillisToDateString(millis: Long): String {
+    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).apply {
+        timeZone = TimeZone.getTimeZone("UTC")
+    }
+    return sdf.format(Date(millis))
 }
