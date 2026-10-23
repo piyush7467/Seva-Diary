@@ -476,8 +476,12 @@ fun AddEditVisitScreen(
 
                 // Purpose Dropdown
                 var purposeExpanded by remember { mutableStateOf(false) }
-                val purposeOptions = uiState.masterData?.purposes ?: emptyList()
-                val currentPurposeLabel = purposeOptions.find { it.code == selectedPurpose }?.labels?.en ?: selectedPurpose
+                val purposeOptions = uiState.masterData?.purposes?.map {
+                    it.code to "${it.labels.en} (${it.labels.hi})"
+                } ?: AshramMasterData.defaultPurposes.map {
+                    it.code to "${it.enLabel} (${it.hiLabel})"
+                }
+                val currentPurposeLabel = purposeOptions.find { it.first == selectedPurpose }?.second ?: selectedPurpose
 
                 ExposedDropdownMenuBox(
                     expanded = purposeExpanded,
@@ -498,11 +502,11 @@ fun AddEditVisitScreen(
                         expanded = purposeExpanded,
                         onDismissRequest = { purposeExpanded = false }
                     ) {
-                        purposeOptions.forEach { p ->
+                        purposeOptions.forEach { (code, label) ->
                             DropdownMenuItem(
-                                text = { Text("${p.labels.en} (${p.labels.hi})") },
+                                text = { Text(label) },
                                 onClick = {
-                                    selectedPurpose = p.code
+                                    selectedPurpose = code
                                     purposeExpanded = false
                                 }
                             )
@@ -514,8 +518,12 @@ fun AddEditVisitScreen(
                 if (selectedPurpose == "SEVA") {
                     Spacer(modifier = Modifier.height(12.dp))
                     var sevaExpanded by remember { mutableStateOf(false) }
-                    val sevaOptions = uiState.masterData?.sevaTypes ?: emptyList()
-                    val currentSevaLabel = sevaOptions.find { it.code == selectedSevaType }?.labels?.en ?: selectedSevaType
+                    val sevaOptions = uiState.masterData?.sevaTypes?.map {
+                        it.code to "${it.labels.en} (${it.labels.hi})"
+                    } ?: AshramMasterData.defaultSevaTypes.map {
+                        it.code to "${it.enLabel} (${it.hiLabel})"
+                    }
+                    val currentSevaLabel = sevaOptions.find { it.first == selectedSevaType }?.second ?: selectedSevaType
 
                     ExposedDropdownMenuBox(
                         expanded = sevaExpanded,
@@ -536,11 +544,11 @@ fun AddEditVisitScreen(
                             expanded = sevaExpanded,
                             onDismissRequest = { sevaExpanded = false }
                         ) {
-                            sevaOptions.forEach { s ->
+                            sevaOptions.forEach { (code, label) ->
                                 DropdownMenuItem(
-                                    text = { Text("${s.labels.en} (${s.labels.hi})") },
+                                    text = { Text(label) },
                                     onClick = {
-                                        selectedSevaType = s.code
+                                        selectedSevaType = code
                                         sevaExpanded = false
                                     }
                                 )

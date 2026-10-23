@@ -134,4 +134,29 @@ object AshramMasterData {
                 ashrams.find { it.code == "KHAMANO" }
             } else null
     }
+
+    val defaultPurposes: List<MasterDataItem> = listOf(
+        MasterDataItem("SATSANG", "Satsang (Spiritual Discourse)", "सत्संग"),
+        MasterDataItem("SEVA", "Seva (Selfless Service)", "सेवा"),
+        MasterDataItem("BHANDARA", "Bhandara (Community Meal)", "भंडारा"),
+        MasterDataItem("PROGRAMME", "Ashram Event / Programme", "आश्रम समागम / कार्यक्रम"),
+        MasterDataItem("NAAM_DAAN", "Naam Daan Related Visit", "नाम दान संबंधी यात्रा"),
+        MasterDataItem("OTHER_PURPOSE", "Other", "अन्य")
+    )
+
+    val defaultSevaTypes: List<MasterDataItem> = listOf(
+        MasterDataItem("BHANDARA_SEVA", "Bhandara Seva (Kitchen & Meal)", "भंडारा सेवा"),
+        MasterDataItem("SAFAI_SEVA", "Sanitation & Cleanliness (Safai)", "सफाई सेवा"),
+        MasterDataItem("VYAVASTHA_SEVA", "Discipline & Crowd Management", "व्यवस्था / अनुशासन सेवा"),
+        MasterDataItem("JAL_SEVA", "Water Distribution (Jal Seva)", "जल सेवा"),
+        MasterDataItem("SECURITY_SEVA", "Premises Security", "सुरक्षा सेवा"),
+        MasterDataItem("IT_MEDIA_SEVA", "IT, Sound & Broadcasting", "ध्वनि एवं प्रसारण सेवा"),
+        MasterDataItem("OTHER_SEVA", "Other Seva", "अन्य सेवा")
+    )
 }
+
+data class MasterDataItem(
+    val code: String,
+    val enLabel: String,
+    val hiLabel: String
+)

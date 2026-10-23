@@ -3,15 +3,17 @@ package com.sevadiary.app.core.network
 import android.os.Build
 import com.sevadiary.app.core.network.dto.RefreshRequest
 import com.sevadiary.app.core.security.SecureTokenManager
-import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Interceptor
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.Route
 import okhttp3.logging.HttpLoggingInterceptor
+import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
@@ -33,9 +35,17 @@ class AuthInterceptor(private val tokenManager: SecureTokenManager) : Intercepto
 }
 
 class TokenAuthenticator(
-    private val tokenManager: SecureTokenManager,
-    private val getRefreshService: () -> SevaDiaryApiService
+    private val tokenManager: SecureTokenManager
 ) : Authenticator {
+
+    // Bare client dedicated exclusively to token refresh without AuthInterceptor or Authenticator (zero recursion/deadlock risk)
+    private val refreshHttpClient by lazy {
+        OkHttpClient.Builder()
+            .connectTimeout(5, TimeUnit.SECONDS)
+            .readTimeout(8, TimeUnit.SECONDS)
+            .writeTimeout(8, TimeUnit.SECONDS)
+            .build()
+    }
 
     @Synchronized
     override fun authenticate(route: Route?, response: Response): Request? {
@@ -43,30 +53,56 @@ class TokenAuthenticator(
             return null
         }
 
-        val currentRefreshToken = tokenManager.getRefreshToken() ?: return null
-
-        val refreshResponse = runBlocking {
-            try {
-                getRefreshService().refresh(RefreshRequest(currentRefreshToken))
-            } catch (e: Exception) {
-                null
-            }
+        // Avoid repeated refresh if another concurrent request already updated the token
+        val currentAccessToken = tokenManager.getAccessToken()
+        val authHeader = response.request.header("Authorization")
+        if (authHeader != null && !currentAccessToken.isNullOrBlank() && authHeader != "Bearer $currentAccessToken") {
+            return response.request.newBuilder()
+                .header("Authorization", "Bearer $currentAccessToken")
+                .build()
         }
 
-        val newTokens = refreshResponse?.body()?.data
-        if (refreshResponse != null && refreshResponse.isSuccessful && newTokens != null) {
-            tokenManager.saveTokens(newTokens.accessToken, newTokens.refreshToken)
+        val currentRefreshToken = tokenManager.getRefreshToken() ?: return null
 
-            return response.request.newBuilder()
-                .header("Authorization", "Bearer ${newTokens.accessToken}")
+        return try {
+            val refreshUrl = ApiClient.baseUrl.trimEnd('/') + "/api/v1/auth/refresh"
+            val jsonPayload = JSONObject().apply {
+                put("refreshToken", currentRefreshToken)
+            }.toString()
+
+            val requestBody = jsonPayload.toRequestBody("application/json; charset=utf-8".toMediaType())
+            val refreshRequest = Request.Builder()
+                .url(refreshUrl)
+                .post(requestBody)
                 .build()
-        } else if (refreshResponse != null && refreshResponse.code() in listOf(400, 401, 403)) {
-            // Only clear tokens if the refresh token was explicitly rejected as invalid/expired by backend
-            tokenManager.clearTokens()
-            return null
-        } else {
-            // Network failure, timeout, or temporary server error: preserve tokens so user session is not dropped
-            return null
+
+            val refreshResponse = refreshHttpClient.newCall(refreshRequest).execute()
+            if (refreshResponse.isSuccessful) {
+                val rawBody = refreshResponse.body?.string()
+                if (!rawBody.isNullOrBlank()) {
+                    val rootJson = JSONObject(rawBody)
+                    if (rootJson.optBoolean("success", false) && rootJson.has("data")) {
+                        val dataObj = rootJson.getJSONObject("data")
+                        val newAccessToken = dataObj.optString("accessToken", "")
+                        val newRefreshToken = dataObj.optString("refreshToken", "")
+                        if (newAccessToken.isNotBlank() && newRefreshToken.isNotBlank()) {
+                            tokenManager.saveTokens(newAccessToken, newRefreshToken)
+                            return response.request.newBuilder()
+                                .header("Authorization", "Bearer $newAccessToken")
+                                .build()
+                        }
+                    }
+                }
+                null
+            } else if (refreshResponse.code in listOf(400, 401, 403)) {
+                // Refresh token has expired or is invalid on server
+                tokenManager.clearTokens()
+                null
+            } else {
+                null
+            }
+        } catch (_: Exception) {
+            null
         }
     }
 }
@@ -171,12 +207,8 @@ object ApiClient {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
-        var retrofitInstance: Retrofit? = null
-
         val authInterceptor = AuthInterceptor(tokenManager)
-        val tokenAuthenticator = TokenAuthenticator(tokenManager) {
-            retrofitInstance!!.create(SevaDiaryApiService::class.java)
-        }
+        val tokenAuthenticator = TokenAuthenticator(tokenManager)
 
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(failoverInterceptor)
@@ -188,7 +220,7 @@ object ApiClient {
             .writeTimeout(15, TimeUnit.SECONDS)
             .build()
 
-        retrofitInstance = Retrofit.Builder()
+        val retrofitInstance = Retrofit.Builder()
             .baseUrl(baseUrl)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())

@@ -6,10 +6,12 @@ import com.sevadiary.app.core.network.dto.CreateSevaRecordRequest
 import com.sevadiary.app.core.network.dto.MasterDataResponse
 import com.sevadiary.app.core.network.dto.SevaRecordDto
 import com.sevadiary.app.feature.seva.data.SevaRepository
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 
 data class SevaUiState(
     val records: List<SevaRecordDto> = emptyList(),
@@ -37,9 +39,15 @@ class SevaViewModel(
 
     fun loadMasterData() {
         viewModelScope.launch {
-            val result = repository.getMasterData()
-            result.onSuccess { data ->
-                _uiState.value = _uiState.value.copy(masterData = data)
+            try {
+                withTimeout(6000L) {
+                    val result = repository.getMasterData()
+                    result.onSuccess { data ->
+                        _uiState.value = _uiState.value.copy(masterData = data)
+                    }
+                }
+            } catch (_: Exception) {
+                // Non-critical: defaults will be used for dropdowns
             }
         }
     }
@@ -47,25 +55,43 @@ class SevaViewModel(
     fun loadRecords() {
         _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
         viewModelScope.launch {
-            val result = repository.getRecords(
-                ashramCode = _uiState.value.filterAshram,
-                purpose = _uiState.value.filterPurpose,
-                search = _uiState.value.searchQuery.ifBlank { null }
-            )
-            result.fold(
-                onSuccess = { list ->
-                    _uiState.value = _uiState.value.copy(
-                        records = list,
-                        isLoading = false
+            try {
+                withTimeout(8000L) {
+                    val result = repository.getRecords(
+                        ashramCode = _uiState.value.filterAshram,
+                        purpose = _uiState.value.filterPurpose,
+                        search = _uiState.value.searchQuery.ifBlank { null }
                     )
-                },
-                onFailure = { error ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        errorMessage = error.message
+                    result.fold(
+                        onSuccess = { list ->
+                            _uiState.value = _uiState.value.copy(
+                                records = list,
+                                isLoading = false,
+                                errorMessage = null
+                            )
+                        },
+                        onFailure = { error ->
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                errorMessage = error.message
+                            )
+                        }
                     )
                 }
-            )
+            } catch (e: TimeoutCancellationException) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = "Server response timed out. Please check your connection."
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = e.localizedMessage ?: "Unable to load visits."
+                )
+            } finally {
+                // Guaranteed failsafe: isLoading will NEVER remain true
+                _uiState.value = _uiState.value.copy(isLoading = false)
+            }
         }
     }
 
@@ -107,33 +133,43 @@ class SevaViewModel(
     ) {
         _uiState.value = _uiState.value.copy(isSaving = true, errorMessage = null, saveSuccess = false)
         viewModelScope.launch {
-            val request = CreateSevaRecordRequest(
-                ashramCode = ashramCode,
-                customAshramName = customAshramName.trim(),
-                startDate = startDate,
-                endDate = endDate,
-                purpose = purpose,
-                sevaType = if (purpose == "SEVA") sevaType else "",
-                customPurposeOrSeva = customPurposeOrSeva.trim(),
-                notes = notes.trim(),
-                locationDetails = locationDetails.trim()
-            )
+            try {
+                withTimeout(10000L) {
+                    val request = CreateSevaRecordRequest(
+                        ashramCode = ashramCode,
+                        customAshramName = customAshramName.trim(),
+                        startDate = startDate,
+                        endDate = endDate,
+                        purpose = purpose,
+                        sevaType = if (purpose == "SEVA") sevaType else "",
+                        customPurposeOrSeva = customPurposeOrSeva.trim(),
+                        notes = notes.trim(),
+                        locationDetails = locationDetails.trim()
+                    )
 
-            val result = if (recordId != null) {
-                repository.updateRecord(recordId, request)
-            } else {
-                repository.createRecord(request)
-            }
+                    val result = if (recordId != null) {
+                        repository.updateRecord(recordId, request)
+                    } else {
+                        repository.createRecord(request)
+                    }
 
-            result.fold(
-                onSuccess = {
-                    _uiState.value = _uiState.value.copy(isSaving = false, saveSuccess = true)
-                    loadRecords()
-                },
-                onFailure = { error ->
-                    _uiState.value = _uiState.value.copy(isSaving = false, errorMessage = error.message)
+                    result.fold(
+                        onSuccess = {
+                            _uiState.value = _uiState.value.copy(isSaving = false, saveSuccess = true)
+                            loadRecords()
+                        },
+                        onFailure = { error ->
+                            _uiState.value = _uiState.value.copy(isSaving = false, errorMessage = error.message)
+                        }
+                    )
                 }
-            )
+            } catch (e: TimeoutCancellationException) {
+                _uiState.value = _uiState.value.copy(isSaving = false, errorMessage = "Save request timed out. Please retry.")
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(isSaving = false, errorMessage = e.localizedMessage ?: "Unable to save visit record.")
+            } finally {
+                _uiState.value = _uiState.value.copy(isSaving = false)
+            }
         }
     }
 

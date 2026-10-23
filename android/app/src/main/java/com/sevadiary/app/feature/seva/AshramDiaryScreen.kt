@@ -58,6 +58,13 @@ fun AshramDiaryScreen(
     var searchInput by remember { mutableStateOf("") }
     var recordToDelete by remember { mutableStateOf<SevaRecordDto?>(null) }
 
+    // Ensure fresh records on screen entry if not already loading
+    LaunchedEffect(Unit) {
+        if (uiState.records.isEmpty() && !uiState.isLoading) {
+            viewModel.loadRecords()
+        }
+    }
+
     val allAshramsLabel = stringResource(R.string.ashram_filter_all)
     val filterItems = remember(allAshramsLabel) {
         val list = mutableListOf<Pair<String?, Int>>()
@@ -161,9 +168,9 @@ fun AshramDiaryScreen(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // 3. Main Content: Loading, Error, Empty State, or Populated Visit List
+            // 3. Main Content: Loading, Empty State, or Populated Visit List
             when {
-                uiState.isLoading -> {
+                uiState.isLoading && uiState.records.isEmpty() -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -172,40 +179,6 @@ fun AshramDiaryScreen(
                             color = AshramForestGreen,
                             strokeWidth = 3.dp
                         )
-                    }
-                }
-
-                !uiState.errorMessage.isNullOrBlank() && uiState.records.isEmpty() -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(24.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Warning,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.size(36.dp)
-                            )
-                            Text(
-                                text = uiState.errorMessage.orEmpty(),
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodyMedium,
-                                textAlign = TextAlign.Center
-                            )
-                            Button(
-                                onClick = { viewModel.loadRecords() },
-                                colors = ButtonDefaults.buttonColors(containerColor = AshramForestGreen),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Text(stringResource(R.string.btn_retry))
-                            }
-                        }
                     }
                 }
 
@@ -250,14 +223,26 @@ fun AshramDiaryScreen(
                     } else {
                         // Devotional Empty State matching design
                         AshramEmptyState(
-                            onAddNewVisit = onAddNewVisit
+                            errorMessage = uiState.errorMessage,
+                            onAddNewVisit = onAddNewVisit,
+                            onRefreshClick = { viewModel.loadRecords() }
                         )
                     }
                 }
 
                 else -> {
                     // Populated Visit List
-                    LazyColumn(
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        if (uiState.isLoading) {
+                            LinearProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(3.dp),
+                                color = AshramForestGreen,
+                                trackColor = AshramBorderColor
+                            )
+                        }
+                        LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 88.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -426,6 +411,7 @@ fun AshramDiaryScreen(
             }
         }
     }
+    }
 
     // Delete Confirmation Dialog
     if (recordToDelete != null) {
@@ -580,7 +566,9 @@ private fun AshramSearchBar(
  */
 @Composable
 private fun AshramEmptyState(
-    onAddNewVisit: () -> Unit
+    errorMessage: String? = null,
+    onAddNewVisit: () -> Unit,
+    onRefreshClick: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -590,6 +578,45 @@ private fun AshramEmptyState(
             .padding(top = 10.dp, bottom = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // If there is an actual network or connection error, show a polite alert banner with retry
+        val displayError = if (errorMessage?.contains("Authentication required", ignoreCase = true) == true) {
+            null
+        } else {
+            errorMessage
+        }
+
+        if (!displayError.isNullOrBlank()) {
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = Color(0xFFFDF2E9),
+                border = BorderStroke(1.dp, Color(0xFFF3C89B)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 14.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CloudOff,
+                        contentDescription = null,
+                        tint = AshramSaffronGold,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = displayError,
+                        style = MaterialTheme.typography.bodySmall.copy(color = AshramPrimaryText),
+                        modifier = Modifier.weight(1f)
+                    )
+                    TextButton(onClick = onRefreshClick) {
+                        Text("Retry", fontWeight = FontWeight.Bold, color = AshramForestGreen)
+                    }
+                }
+            }
+        }
+
         // 1. Wide landscape card of the Satlok Ashram Entrance Photograph (onboarding3.png)
         Surface(
             shape = RoundedCornerShape(20.dp),
