@@ -270,4 +270,21 @@
     <string name="ashram_visits_single">1 visit</string>
     <string name="ashram_delete_title">Delete Ashram Visit</string>
     <string name="ashram_delete_confirm">Are you sure you want to delete this visit record? This action cannot be undone.</string>
+
+    <!-- Visit Details Screen Strings -->
+    <string name="visit_details_title">Visit Details</string>
+    <string name="visit_details_subtitle">Your spiritual journey</string>
+    <string name="visit_info_title">Visit Information</string>
+    <string name="visit_info_purpose">Purpose</string>
+    <string name="visit_info_type">Visit type</string>
+    <string name="visit_info_type_personal">Personal Visit</string>
+    <string name="visit_info_status">Status</string>
+    <string name="visit_status_completed">Completed</string>
+    <string name="visit_status_ongoing">Ongoing</string>
+    <string name="visit_seva_activities">Seva Activities</string>
+    <string name="visit_memories_notes">Memories &amp; Notes</string>
+    <string name="visit_reflection_default">A blessed visit filled with seva, satsang and divine peace.</string>
+    <string name="btn_edit_visit">Edit Visit</string>
+    <string name="btn_delete_visit">Delete Visit</string>
+    <string name="visit_not_found">Visit record not found</string>
 </resources>

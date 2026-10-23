@@ -270,4 +270,21 @@
     <string name="ashram_visits_single">1 यात्रा</string>
     <string name="ashram_delete_title">आश्रम यात्रा हटाएं</string>
     <string name="ashram_delete_confirm">क्या आप वाकई इस यात्रा रिकॉर्ड को हटाना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती।</string>
+
+    <!-- Visit Details Screen Strings -->
+    <string name="visit_details_title">यात्रा विवरण</string>
+    <string name="visit_details_subtitle">आपकी आध्यात्मिक यात्रा</string>
+    <string name="visit_info_title">यात्रा जानकारी</string>
+    <string name="visit_info_purpose">उद्देश्य</string>
+    <string name="visit_info_type">यात्रा प्रकार</string>
+    <string name="visit_info_type_personal">व्यक्तिगत यात्रा</string>
+    <string name="visit_info_status">स्थिति</string>
+    <string name="visit_status_completed">पूर्ण</string>
+    <string name="visit_status_ongoing">जारी</string>
+    <string name="visit_seva_activities">सेवा गतिविधियाँ</string>
+    <string name="visit_memories_notes">स्मृतियां एवं अनुभव</string>
+    <string name="visit_reflection_default">सेवा, सत्संग और प्रभु कृपा से परिपूर्ण एक पावन यात्रा।</string>
+    <string name="btn_edit_visit">यात्रा संशोधित करें</string>
+    <string name="btn_delete_visit">यात्रा हटाएं</string>
+    <string name="visit_not_found">यात्रा विवरण उपलब्ध नहीं है</string>
 </resources>

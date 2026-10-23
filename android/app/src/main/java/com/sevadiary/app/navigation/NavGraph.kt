@@ -19,6 +19,7 @@ import com.sevadiary.app.feature.reports.ReportsScreen
 import com.sevadiary.app.feature.reports.presentation.ReportsViewModel
 import com.sevadiary.app.feature.seva.AddEditVisitScreen
 import com.sevadiary.app.feature.seva.AshramDiaryScreen
+import com.sevadiary.app.feature.seva.AshramVisitDetailsScreen
 import com.sevadiary.app.feature.seva.presentation.SevaViewModel
 import com.sevadiary.app.feature.settings.SettingsScreen
 import com.sevadiary.app.feature.settings.presentation.SettingsViewModel
@@ -154,7 +155,26 @@ fun NavGraph(
                 viewModel = sevaViewModel,
                 onBackClick = { navController.popBackStack() },
                 onAddNewVisit = { navController.navigate(Screen.AddEditVisit.createRoute(null)) },
+                onViewVisitDetails = { visitId -> navController.navigate(Screen.VisitDetails.createRoute(visitId)) },
                 onEditVisit = { visitId -> navController.navigate(Screen.AddEditVisit.createRoute(visitId)) }
+            )
+        }
+
+        composable(
+            route = Screen.VisitDetails.route,
+            arguments = listOf(
+                navArgument("visitId") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val visitId = backStackEntry.arguments?.getString("visitId") ?: ""
+            AshramVisitDetailsScreen(
+                viewModel = sevaViewModel,
+                visitId = visitId,
+                onBackClick = { navController.popBackStack() },
+                onEditVisit = { id -> navController.navigate(Screen.AddEditVisit.createRoute(id)) },
+                onDeleteVisitSuccess = { navController.popBackStack() }
             )
         }
 

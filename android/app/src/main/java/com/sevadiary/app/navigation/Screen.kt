@@ -10,6 +10,9 @@ sealed class Screen(val route: String) {
     object JaapOnboarding : Screen("jaap_onboarding")
     object Chanting : Screen("chanting")
     object AshramDiary : Screen("ashram_diary")
+    object VisitDetails : Screen("visit_details/{visitId}") {
+        fun createRoute(visitId: String) = "visit_details/$visitId"
+    }
     object AddEditVisit : Screen("add_edit_visit?visitId={visitId}") {
         fun createRoute(visitId: String? = null) = if (visitId != null) "add_edit_visit?visitId=$visitId" else "add_edit_visit"
     }

@@ -57,6 +57,7 @@ fun AshramDiaryScreen(
     viewModel: SevaViewModel,
     onBackClick: () -> Unit,
     onAddNewVisit: () -> Unit,
+    onViewVisitDetails: (visitId: String) -> Unit,
     onEditVisit: (visitId: String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -419,6 +420,7 @@ fun AshramDiaryScreen(
                             items(filteredRecords, key = { it.id }) { record ->
                                 AshramVisitCard(
                                     record = record,
+                                    onViewDetails = { onViewVisitDetails(record.id) },
                                     onEdit = { onEditVisit(record.id) },
                                     onDelete = { recordToDelete = record }
                                 )
@@ -579,6 +581,7 @@ private fun DevotionalHeroBanner() {
 @Composable
 private fun AshramVisitCard(
     record: SevaRecordDto,
+    onViewDetails: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
@@ -624,7 +627,7 @@ private fun AshramVisitCard(
     )
 
     Surface(
-        onClick = onEdit,
+        onClick = onViewDetails,
         shape = RoundedCornerShape(16.dp),
         color = AshramCardBg,
         border = BorderStroke(1.dp, Color(0xFFEBE6DD)),
@@ -697,7 +700,22 @@ private fun AshramVisitCard(
                             modifier = Modifier.background(AshramCardBg)
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Edit Visit", fontSize = 13.sp) },
+                                text = { Text(stringResource(R.string.ashram_view_details), fontSize = 13.sp) },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Default.Visibility,
+                                        contentDescription = null,
+                                        tint = AshramForestGreen,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                },
+                                onClick = {
+                                    menuExpanded = false
+                                    onViewDetails()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.btn_edit_visit), fontSize = 13.sp) },
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Edit,
@@ -714,7 +732,7 @@ private fun AshramVisitCard(
                             DropdownMenuItem(
                                 text = {
                                     Text(
-                                        "Delete Visit",
+                                        stringResource(R.string.btn_delete_visit),
                                         color = MaterialTheme.colorScheme.error,
                                         fontSize = 13.sp
                                     )
@@ -827,7 +845,7 @@ private fun AshramVisitCard(
 
                     // View Details Action Button
                     Surface(
-                        onClick = onEdit,
+                        onClick = onViewDetails,
                         shape = RoundedCornerShape(12.dp),
                         color = Color(0xFFF1F6F3)
                     ) {
