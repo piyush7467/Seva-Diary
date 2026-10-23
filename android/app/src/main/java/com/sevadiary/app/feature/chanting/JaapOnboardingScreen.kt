@@ -42,7 +42,9 @@ data class JaapOnboardingStep(
     @param:DrawableRes val imageRes: Int,
     @param:StringRes val titleRes: Int,
     @param:StringRes val hindiRes: Int,
-    @param:StringRes val englishRes: Int
+    @param:StringRes val englishRes: Int,
+    @param:StringRes val verseHindiRes: Int? = null,
+    @param:StringRes val verseEnglishRes: Int? = null
 )
 
 val jaapOnboardingSteps = listOf(
@@ -86,7 +88,9 @@ val jaapOnboardingSteps = listOf(
         imageRes = R.drawable.chantingonboarding6,
         titleRes = R.string.jaap_onboarding_step_6_title,
         hindiRes = R.string.jaap_onboarding_step_6_hi,
-        englishRes = R.string.jaap_onboarding_step_6_en
+        englishRes = R.string.jaap_onboarding_step_6_en,
+        verseHindiRes = R.string.jaap_onboarding_step_6_verse_hi,
+        verseEnglishRes = R.string.jaap_onboarding_step_6_verse_en
     )
 )
 
@@ -165,8 +169,10 @@ fun JaapOnboardingScreen(
                 onSkipClick = onFinishOnboarding
             )
 
+            val isLastPage = pagerState.currentPage == steps.size - 1
+
             // Flexible space letting saint portrait remain visible and clear
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(if (isLastPage) 0.8f else 1f))
 
             // Golden Message Card displaying the saint/greeting reverence
             GoldenMessageCard(
@@ -176,7 +182,11 @@ fun JaapOnboardingScreen(
                     .padding(horizontal = 20.dp)
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            if (isLastPage) {
+                Spacer(modifier = Modifier.weight(0.2f))
+            } else {
+                Spacer(modifier = Modifier.height(14.dp))
+            }
 
             // Step Indicator Dots (1 to 6)
             OnboardingProgressIndicator(
@@ -371,6 +381,46 @@ private fun GoldenMessageCard(
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
+
+            // Sacred Closing Verse / Readiness Message (Screen 6)
+            if (step.verseHindiRes != null && step.verseEnglishRes != null) {
+                Spacer(modifier = Modifier.height(14.dp))
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = DevotionalSaffronGold.copy(alpha = 0.08f),
+                    border = BorderStroke(1.dp, DevotionalSaffronGold.copy(alpha = 0.35f)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = stringResource(id = step.verseHindiRes),
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.SemiBold,
+                                color = DevotionalForestGreen,
+                                fontSize = 15.sp,
+                                textAlign = TextAlign.Center,
+                                lineHeight = 22.sp
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = stringResource(id = step.verseEnglishRes),
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Normal,
+                                color = DevotionalDarkText.copy(alpha = 0.85f),
+                                fontSize = 13.sp,
+                                textAlign = TextAlign.Center,
+                                lineHeight = 18.sp
+                            )
+                        )
+                    }
+                }
+            }
         }
     }
 }

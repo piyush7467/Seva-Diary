@@ -197,5 +197,7 @@
     <string name="jaap_onboarding_step_5_en">Bandi Chhod Satguru Rampal Ji Maharaj Ki Jay</string>
     <string name="jaap_onboarding_step_6_hi">सत साहेब</string>
     <string name="jaap_onboarding_step_6_en">Sat Saheb</string>
+    <string name="jaap_onboarding_step_6_verse_hi">“अब शुद्ध मन और श्रद्धा से प्रभु के पावन नाम का सुमिरण आरंभ करें।”</string>
+    <string name="jaap_onboarding_step_6_verse_en">“Commence your sacred Naam Jaap with a pure and devoted heart.”</string>
     <string name="btn_start_jaap">जाप शुरू करें</string>
 </resources>
