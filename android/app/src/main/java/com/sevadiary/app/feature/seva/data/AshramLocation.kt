@@ -1,7 +1,14 @@
 package com.sevadiary.app.feature.seva.data
 
 import androidx.annotation.StringRes
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import com.sevadiary.app.R
+import com.sevadiary.app.core.designsystem.theme.DevotionalEmerald
+import com.sevadiary.app.core.designsystem.theme.RadiantGold
 
 /**
  * Reusable Master Ashram Location entity containing stable identifier,
@@ -203,3 +210,45 @@ data class MasterDataItem(
     val enLabel: String,
     val hiLabel: String
 )
+
+data class AshramColors(
+    val isDark: Boolean,
+    val bg: Color,
+    val cardBg: Color,
+    val bannerBg: Color,
+    val bannerBorder: Color,
+    val border: Color,
+    val primary: Color,
+    val onPrimary: Color,
+    val darkGreen: Color,
+    val gold: Color,
+    val primaryText: Color,
+    val secondaryText: Color,
+    val chipUnselectedBg: Color,
+    val badgeSageBg: Color,
+    val buttonSubtleBg: Color
+)
+
+@Composable
+fun rememberAshramColors(): AshramColors {
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    return remember(isDark) {
+        AshramColors(
+            isDark = isDark,
+            bg = if (isDark) Color(0xFF141312) else Color(0xFFFAF8F2),
+            cardBg = if (isDark) Color(0xFF1E1C1A) else Color(0xFFFFFFFF),
+            bannerBg = if (isDark) Color(0xFF19251C) else Color(0xFFF7F3E9),
+            bannerBorder = if (isDark) Color(0xFF2C3E2F) else Color(0xFFEADFCB),
+            border = if (isDark) Color(0xFF38332C) else Color(0xFFE5DFD3),
+            primary = if (isDark) DevotionalEmerald else Color(0xFF174C38),
+            onPrimary = if (isDark) Color(0xFF0C2B16) else Color.White,
+            darkGreen = if (isDark) Color(0xFFE2F4E6) else Color(0xFF103C2D),
+            gold = if (isDark) RadiantGold else Color(0xFFD99A32),
+            primaryText = if (isDark) Color(0xFFF2EFE9) else Color(0xFF252B27),
+            secondaryText = if (isDark) Color(0xFFA8A39B) else Color(0xFF646B65),
+            chipUnselectedBg = if (isDark) Color(0xFF262320) else Color(0xFFFFFFFF),
+            badgeSageBg = if (isDark) Color(0xFF163B23) else Color(0xFFE4EDE7),
+            buttonSubtleBg = if (isDark) Color(0xFF183823) else Color(0xFFF1F6F3)
+        )
+    }
+}

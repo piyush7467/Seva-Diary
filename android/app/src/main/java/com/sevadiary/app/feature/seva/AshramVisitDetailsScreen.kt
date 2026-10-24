@@ -27,20 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sevadiary.app.R
 import com.sevadiary.app.core.network.dto.SevaRecordDto
+import com.sevadiary.app.feature.seva.data.AshramColors
 import com.sevadiary.app.feature.seva.data.AshramMasterData
+import com.sevadiary.app.feature.seva.data.rememberAshramColors
 import com.sevadiary.app.feature.seva.presentation.SevaViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
-
-// Devotional Theme Palette
-private val AshramBgColor = Color(0xFFFAF8F2)
-private val AshramForestGreen = Color(0xFF174C38)
-private val AshramDarkGreen = Color(0xFF103C2D)
-private val AshramSaffronGold = Color(0xFFD99A32)
-private val AshramPrimaryText = Color(0xFF252B27)
-private val AshramSecondaryText = Color(0xFF646B65)
-private val AshramCardBg = Color(0xFFFFFFFF)
-private val AshramBorderColor = Color(0xFFE5DFD3)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,6 +43,7 @@ fun AshramVisitDetailsScreen(
     onEditVisit: (visitId: String) -> Unit,
     onDeleteVisitSuccess: () -> Unit
 ) {
+    val colors = rememberAshramColors()
     val uiState by viewModel.uiState.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
     var menuExpanded by remember { mutableStateOf(false) }
@@ -65,7 +58,7 @@ fun AshramVisitDetailsScreen(
     val record = uiState.records.find { it.id == visitId }
 
     Scaffold(
-        containerColor = AshramBgColor,
+        containerColor = colors.bg,
         topBar = {
             TopAppBar(
                 title = {
@@ -74,14 +67,14 @@ fun AshramVisitDetailsScreen(
                             text = stringResource(R.string.visit_details_title),
                             style = MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = AshramDarkGreen,
+                                color = colors.darkGreen,
                                 fontSize = 20.sp
                             )
                         )
                         Text(
                             text = stringResource(R.string.visit_details_subtitle),
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = AshramSecondaryText,
+                                color = colors.secondaryText,
                                 fontSize = 12.5.sp
                             )
                         )
@@ -92,7 +85,7 @@ fun AshramVisitDetailsScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = AshramPrimaryText
+                            tint = colors.primaryText
                         )
                     }
                 },
@@ -103,21 +96,21 @@ fun AshramVisitDetailsScreen(
                                 Icon(
                                     imageVector = Icons.Default.MoreVert,
                                     contentDescription = "Options",
-                                    tint = AshramSecondaryText
+                                    tint = colors.secondaryText
                                 )
                             }
                             DropdownMenu(
                                 expanded = menuExpanded,
                                 onDismissRequest = { menuExpanded = false },
-                                modifier = Modifier.background(AshramCardBg)
+                                modifier = Modifier.background(colors.cardBg)
                             ) {
                                 DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.btn_edit_visit), fontSize = 14.sp) },
+                                    text = { Text(stringResource(R.string.btn_edit_visit), color = colors.primaryText, fontSize = 14.sp) },
                                     leadingIcon = {
                                         Icon(
                                             imageVector = Icons.Default.Edit,
                                             contentDescription = null,
-                                            tint = AshramForestGreen,
+                                            tint = colors.primary,
                                             modifier = Modifier.size(18.dp)
                                         )
                                     },
@@ -151,7 +144,7 @@ fun AshramVisitDetailsScreen(
                         }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = AshramBgColor)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.bg)
             )
         }
     ) { innerPadding ->
@@ -163,7 +156,7 @@ fun AshramVisitDetailsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 if (uiState.isLoading) {
-                    CircularProgressIndicator(color = AshramForestGreen)
+                    CircularProgressIndicator(color = colors.primary)
                 } else {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -173,23 +166,23 @@ fun AshramVisitDetailsScreen(
                         Icon(
                             imageVector = Icons.Default.Info,
                             contentDescription = null,
-                            tint = AshramSecondaryText,
+                            tint = colors.secondaryText,
                             modifier = Modifier.size(48.dp)
                         )
                         Text(
                             text = stringResource(R.string.visit_not_found),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = AshramPrimaryText
+                                color = colors.primaryText
                             ),
                             textAlign = TextAlign.Center
                         )
                         Button(
                             onClick = onBackClick,
-                            colors = ButtonDefaults.buttonColors(containerColor = AshramForestGreen),
+                            colors = ButtonDefaults.buttonColors(containerColor = colors.primary),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("Go Back", color = Color.White, fontWeight = FontWeight.Bold)
+                            Text("Go Back", color = colors.onPrimary, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -198,6 +191,7 @@ fun AshramVisitDetailsScreen(
             // Render Populated Visit Details
             VisitDetailsContent(
                 record = record,
+                colors = colors,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
@@ -215,13 +209,13 @@ fun AshramVisitDetailsScreen(
                 Text(
                     text = stringResource(R.string.ashram_delete_title),
                     fontWeight = FontWeight.Bold,
-                    color = AshramPrimaryText
+                    color = colors.primaryText
                 )
             },
             text = {
                 Text(
                     text = stringResource(R.string.ashram_delete_confirm),
-                    color = AshramSecondaryText
+                    color = colors.secondaryText
                 )
             },
             confirmButton = {
@@ -237,10 +231,10 @@ fun AshramVisitDetailsScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text(stringResource(R.string.btn_cancel), color = AshramPrimaryText)
+                    Text(stringResource(R.string.btn_cancel), color = colors.primaryText)
                 }
             },
-            containerColor = AshramCardBg,
+            containerColor = colors.cardBg,
             shape = RoundedCornerShape(16.dp)
         )
     }
@@ -249,6 +243,7 @@ fun AshramVisitDetailsScreen(
 @Composable
 private fun VisitDetailsContent(
     record: SevaRecordDto,
+    colors: AshramColors,
     modifier: Modifier = Modifier,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
@@ -369,7 +364,7 @@ private fun VisitDetailsContent(
                 text = ashramName,
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    color = AshramDarkGreen,
+                    color = colors.darkGreen,
                     fontSize = 21.sp
                 )
             )
@@ -382,14 +377,14 @@ private fun VisitDetailsContent(
                     Icon(
                         imageVector = Icons.Default.Place,
                         contentDescription = null,
-                        tint = AshramForestGreen,
+                        tint = colors.primary,
                         modifier = Modifier.size(15.dp)
                     )
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
                         text = displayLocation,
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = AshramSecondaryText,
+                            color = colors.secondaryText,
                             fontSize = 13.5.sp
                         )
                     )
@@ -407,14 +402,14 @@ private fun VisitDetailsContent(
                     Icon(
                         imageVector = Icons.Default.CalendarToday,
                         contentDescription = null,
-                        tint = AshramSecondaryText,
+                        tint = colors.secondaryText,
                         modifier = Modifier.size(14.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = displayDateRange,
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = AshramSecondaryText,
+                            color = colors.secondaryText,
                             fontSize = 13.5.sp,
                             fontWeight = FontWeight.Normal
                         )
@@ -423,12 +418,12 @@ private fun VisitDetailsContent(
 
                 Surface(
                     shape = RoundedCornerShape(12.dp),
-                    color = Color(0xFFD9ECE1)
+                    color = colors.badgeSageBg
                 ) {
                     Text(
                         text = durationText,
                         style = MaterialTheme.typography.labelMedium.copy(
-                            color = AshramDarkGreen,
+                            color = colors.primary,
                             fontWeight = FontWeight.Bold,
                             fontSize = 12.sp
                         ),
@@ -443,8 +438,8 @@ private fun VisitDetailsContent(
         // 3. Devotional Quote / Reflection Card
         Surface(
             shape = RoundedCornerShape(14.dp),
-            color = Color(0xFFEEF5F1),
-            border = BorderStroke(1.dp, Color(0xFFDCE8E0)),
+            color = if (colors.isDark) Color(0xFF1A261E) else Color(0xFFEEF5F1),
+            border = BorderStroke(1.dp, if (colors.isDark) Color(0xFF283D2F) else Color(0xFFDCE8E0)),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp)
@@ -456,7 +451,7 @@ private fun VisitDetailsContent(
                 Text(
                     text = "❝",
                     style = MaterialTheme.typography.titleLarge.copy(
-                        color = AshramForestGreen,
+                        color = colors.primary,
                         fontSize = 22.sp
                     )
                 )
@@ -464,7 +459,7 @@ private fun VisitDetailsContent(
                 Text(
                     text = reflectionText,
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        color = Color(0xFF2C4638),
+                        color = if (colors.isDark) Color(0xFFD2E8DA) else Color(0xFF2C4638),
                         fontSize = 13.5.sp,
                         lineHeight = 20.sp
                     ),
@@ -485,7 +480,7 @@ private fun VisitDetailsContent(
                 text = stringResource(R.string.visit_info_title),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    color = AshramDarkGreen,
+                    color = colors.darkGreen,
                     fontSize = 16.sp
                 )
             )
@@ -493,6 +488,19 @@ private fun VisitDetailsContent(
             Spacer(modifier = Modifier.height(12.dp))
 
             // Row 1: Purpose
+            val purposeChipBg = when {
+                record.purpose.equals("BHANDARA", ignoreCase = true) -> if (colors.isDark) Color(0xFF382310) else Color(0xFFFDF1DF)
+                record.purpose.equals("SEVA", ignoreCase = true) -> if (colors.isDark) Color(0xFF13361E) else Color(0xFFEAF4EE)
+                record.purpose.equals("SATSANG", ignoreCase = true) -> if (colors.isDark) Color(0xFF162D20) else Color(0xFFEBF2ED)
+                else -> if (colors.isDark) Color(0xFF382310) else Color(0xFFFDF1DF)
+            }
+            val purposeChipText = when {
+                record.purpose.equals("BHANDARA", ignoreCase = true) -> if (colors.isDark) colors.gold else Color(0xFFA66408)
+                record.purpose.equals("SEVA", ignoreCase = true) -> colors.primary
+                record.purpose.equals("SATSANG", ignoreCase = true) -> if (colors.isDark) Color(0xFF81C784) else Color(0xFF1B4F3A)
+                else -> if (colors.isDark) colors.gold else Color(0xFFA66408)
+            }
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -502,14 +510,14 @@ private fun VisitDetailsContent(
                     Icon(
                         imageVector = Icons.Default.LocalOffer,
                         contentDescription = null,
-                        tint = AshramForestGreen,
+                        tint = colors.primary,
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = stringResource(R.string.visit_info_purpose),
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = AshramPrimaryText,
+                            color = colors.primaryText,
                             fontSize = 14.sp
                         )
                     )
@@ -517,12 +525,12 @@ private fun VisitDetailsContent(
 
                 Surface(
                     shape = RoundedCornerShape(12.dp),
-                    color = Color(0xFFFDF1DF)
+                    color = purposeChipBg
                 ) {
                     Text(
                         text = purposeBadgeText,
                         style = MaterialTheme.typography.labelMedium.copy(
-                            color = Color(0xFFA66408),
+                            color = purposeChipText,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 12.sp
                         ),
@@ -534,7 +542,7 @@ private fun VisitDetailsContent(
             }
 
             Spacer(modifier = Modifier.height(10.dp))
-            HorizontalDivider(color = AshramBorderColor.copy(alpha = 0.5f), thickness = 0.8.dp)
+            HorizontalDivider(color = colors.border.copy(alpha = 0.6f), thickness = 0.8.dp)
             Spacer(modifier = Modifier.height(10.dp))
 
             // Row 2: Visit type
@@ -547,14 +555,14 @@ private fun VisitDetailsContent(
                     Icon(
                         imageVector = Icons.Default.Groups,
                         contentDescription = null,
-                        tint = AshramForestGreen,
+                        tint = colors.primary,
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = stringResource(R.string.visit_info_type),
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = AshramPrimaryText,
+                            color = colors.primaryText,
                             fontSize = 14.sp
                         )
                     )
@@ -564,14 +572,14 @@ private fun VisitDetailsContent(
                     text = stringResource(R.string.visit_info_type_personal),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.SemiBold,
-                        color = AshramPrimaryText,
+                        color = colors.primaryText,
                         fontSize = 13.5.sp
                     )
                 )
             }
 
             Spacer(modifier = Modifier.height(10.dp))
-            HorizontalDivider(color = AshramBorderColor.copy(alpha = 0.5f), thickness = 0.8.dp)
+            HorizontalDivider(color = colors.border.copy(alpha = 0.6f), thickness = 0.8.dp)
             Spacer(modifier = Modifier.height(10.dp))
 
             // Row 3: Status
@@ -584,14 +592,14 @@ private fun VisitDetailsContent(
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
-                        tint = Color(0xFF1E7E34),
+                        tint = if (colors.isDark) Color(0xFF4ADE80) else Color(0xFF1E7E34),
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = stringResource(R.string.visit_info_status),
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = AshramPrimaryText,
+                            color = colors.primaryText,
                             fontSize = 14.sp
                         )
                     )
@@ -599,12 +607,12 @@ private fun VisitDetailsContent(
 
                 Surface(
                     shape = RoundedCornerShape(12.dp),
-                    color = Color(0xFFE2F2E7)
+                    color = if (colors.isDark) Color(0xFF12341D) else Color(0xFFE2F2E7)
                 ) {
                     Text(
                         text = stringResource(R.string.visit_status_completed),
                         style = MaterialTheme.typography.labelMedium.copy(
-                            color = Color(0xFF1E7E34),
+                            color = if (colors.isDark) Color(0xFF4ADE80) else Color(0xFF1E7E34),
                             fontWeight = FontWeight.Bold,
                             fontSize = 12.sp
                         ),
@@ -626,7 +634,7 @@ private fun VisitDetailsContent(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_devotional_namaskar),
                     contentDescription = null,
-                    tint = AshramSaffronGold,
+                    tint = colors.gold,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -634,7 +642,7 @@ private fun VisitDetailsContent(
                     text = stringResource(R.string.visit_seva_activities),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        color = AshramDarkGreen,
+                        color = colors.darkGreen,
                         fontSize = 16.sp
                     )
                 )
@@ -651,13 +659,13 @@ private fun VisitDetailsContent(
                         modifier = Modifier
                             .size(5.dp)
                             .clip(CircleShape)
-                            .background(AshramSecondaryText)
+                            .background(colors.secondaryText)
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = activity,
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = Color(0xFF4A544E),
+                            color = if (colors.isDark) Color(0xFFDCD6CC) else Color(0xFF4A544E),
                             fontSize = 13.5.sp
                         )
                     )
@@ -677,7 +685,7 @@ private fun VisitDetailsContent(
                 Icon(
                     imageVector = Icons.Default.Description,
                     contentDescription = null,
-                    tint = AshramSaffronGold,
+                    tint = colors.gold,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -685,7 +693,7 @@ private fun VisitDetailsContent(
                     text = stringResource(R.string.visit_memories_notes),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        color = AshramDarkGreen,
+                        color = colors.darkGreen,
                         fontSize = 16.sp
                     )
                 )
@@ -702,7 +710,7 @@ private fun VisitDetailsContent(
             Text(
                 text = notesContent,
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = Color(0xFF4A544E),
+                    color = if (colors.isDark) Color(0xFFDCD6CC) else Color(0xFF4A544E),
                     fontSize = 13.5.sp,
                     lineHeight = 21.sp
                 )
@@ -722,7 +730,7 @@ private fun VisitDetailsContent(
             Surface(
                 onClick = onEditClick,
                 shape = RoundedCornerShape(16.dp),
-                color = AshramForestGreen,
+                color = colors.primary,
                 shadowElevation = 2.dp,
                 modifier = Modifier
                     .weight(1f)
@@ -736,7 +744,7 @@ private fun VisitDetailsContent(
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = colors.onPrimary,
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -744,7 +752,7 @@ private fun VisitDetailsContent(
                         text = stringResource(R.string.btn_edit_visit),
                         style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            color = Color.White,
+                            color = colors.onPrimary,
                             fontSize = 14.sp
                         )
                     )
@@ -755,8 +763,8 @@ private fun VisitDetailsContent(
             Surface(
                 onClick = onDeleteClick,
                 shape = RoundedCornerShape(16.dp),
-                color = Color(0xFFFFF6F6),
-                border = BorderStroke(1.dp, Color(0xFFF3C7C7)),
+                color = if (colors.isDark) Color(0xFF2E1717) else Color(0xFFFFF6F6),
+                border = BorderStroke(1.dp, if (colors.isDark) Color(0xFF5A2525) else Color(0xFFF3C7C7)),
                 shadowElevation = 1.dp,
                 modifier = Modifier
                     .weight(1f)
@@ -770,7 +778,7 @@ private fun VisitDetailsContent(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error,
+                        tint = if (colors.isDark) Color(0xFFFFB4AB) else MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -778,7 +786,7 @@ private fun VisitDetailsContent(
                         text = stringResource(R.string.btn_delete_visit),
                         style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.error,
+                            color = if (colors.isDark) Color(0xFFFFB4AB) else MaterialTheme.colorScheme.error,
                             fontSize = 14.sp
                         )
                     )

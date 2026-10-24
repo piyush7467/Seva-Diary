@@ -25,12 +25,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sevadiary.app.R
-
-private val AshramBgColor = Color(0xFFFAF8F2)
-private val AshramForestGreen = Color(0xFF174C38)
-private val AshramDarkGreen = Color(0xFF103C2D)
-private val AshramSecondaryText = Color(0xFF646B65)
-private val AshramBorderColor = Color(0xFFE5DFD3)
+import com.sevadiary.app.feature.seva.data.AshramColors
+import com.sevadiary.app.feature.seva.data.rememberAshramColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,8 +37,10 @@ fun AllFeaturesScreen(
     onNavigateToReports: () -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
+    val colors = rememberAshramColors()
+
     Scaffold(
-        containerColor = AshramBgColor,
+        containerColor = colors.bg,
         topBar = {
             TopAppBar(
                 title = {
@@ -51,14 +49,14 @@ fun AllFeaturesScreen(
                             text = stringResource(R.string.all_features_title),
                             style = MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = AshramDarkGreen,
+                                color = colors.darkGreen,
                                 fontSize = 20.sp
                             )
                         )
                         Text(
                             text = stringResource(R.string.all_features_subtitle),
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = AshramSecondaryText,
+                                color = colors.secondaryText,
                                 fontSize = 12.5.sp
                             )
                         )
@@ -69,11 +67,11 @@ fun AllFeaturesScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color(0xFF252B27)
+                            tint = colors.primaryText
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = AshramBgColor)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.bg)
             )
         }
     ) { innerPadding ->
@@ -89,12 +87,13 @@ fun AllFeaturesScreen(
                 FeatureCardItem(
                     title = stringResource(R.string.jaap_title),
                     description = stringResource(R.string.feature_jaap_desc),
-                    iconBgColor = Color(0xFFFFEEF1),
+                    colors = colors,
+                    iconBgColor = if (colors.isDark) Color(0xFF351F24) else Color(0xFFFFEEF1),
                     icon = {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_devotional_jaap_mala),
                             contentDescription = null,
-                            tint = Color(0xFFD94A6B),
+                            tint = if (colors.isDark) Color(0xFFF28B9F) else Color(0xFFD94A6B),
                             modifier = Modifier.size(28.dp)
                         )
                     },
@@ -107,12 +106,13 @@ fun AllFeaturesScreen(
                 FeatureCardItem(
                     title = stringResource(R.string.ashram_diary_title),
                     description = stringResource(R.string.feature_ashram_desc),
-                    iconBgColor = Color(0xFFFEF0DE),
+                    colors = colors,
+                    iconBgColor = if (colors.isDark) Color(0xFF38291A) else Color(0xFFFEF0DE),
                     icon = {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_devotional_ashram),
                             contentDescription = null,
-                            tint = Color(0xFFD97706),
+                            tint = colors.gold,
                             modifier = Modifier.size(28.dp)
                         )
                     },
@@ -125,12 +125,13 @@ fun AllFeaturesScreen(
                 FeatureCardItem(
                     title = stringResource(R.string.reports_title),
                     description = stringResource(R.string.feature_reports_desc),
-                    iconBgColor = Color(0xFFE8F7ED),
+                    colors = colors,
+                    iconBgColor = if (colors.isDark) Color(0xFF193220) else Color(0xFFE8F7ED),
                     icon = {
                         Icon(
                             imageVector = Icons.Default.Description,
                             contentDescription = null,
-                            tint = Color(0xFF1E7E34),
+                            tint = colors.primary,
                             modifier = Modifier.size(26.dp)
                         )
                     },
@@ -143,12 +144,13 @@ fun AllFeaturesScreen(
                 FeatureCardItem(
                     title = stringResource(R.string.feature_profile_title),
                     description = stringResource(R.string.feature_profile_desc),
-                    iconBgColor = Color(0xFFEDE8F5),
+                    colors = colors,
+                    iconBgColor = if (colors.isDark) Color(0xFF2B2138) else Color(0xFFEDE8F5),
                     icon = {
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = null,
-                            tint = Color(0xFF5E35B1),
+                            tint = if (colors.isDark) Color(0xFFB39DDB) else Color(0xFF5E35B1),
                             modifier = Modifier.size(26.dp)
                         )
                     },
@@ -163,6 +165,7 @@ fun AllFeaturesScreen(
 private fun FeatureCardItem(
     title: String,
     description: String,
+    colors: AshramColors,
     iconBgColor: Color,
     icon: @Composable () -> Unit,
     onClick: () -> Unit
@@ -170,8 +173,8 @@ private fun FeatureCardItem(
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(18.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, AshramBorderColor),
+        color = colors.cardBg,
+        border = BorderStroke(1.dp, colors.border),
         shadowElevation = 1.5.dp,
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -198,7 +201,7 @@ private fun FeatureCardItem(
                     text = title,
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF252B27),
+                        color = colors.primaryText,
                         fontSize = 16.sp
                     )
                 )
@@ -206,7 +209,7 @@ private fun FeatureCardItem(
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall.copy(
-                        color = AshramSecondaryText,
+                        color = colors.secondaryText,
                         fontSize = 12.5.sp,
                         lineHeight = 17.sp
                     ),
@@ -221,13 +224,13 @@ private fun FeatureCardItem(
                 modifier = Modifier
                     .size(34.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFF4EFE6)),
+                    .background(if (colors.isDark) Color(0xFF262320) else Color(0xFFF4EFE6)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
                     contentDescription = null,
-                    tint = AshramSecondaryText,
+                    tint = colors.secondaryText,
                     modifier = Modifier.size(18.dp)
                 )
             }

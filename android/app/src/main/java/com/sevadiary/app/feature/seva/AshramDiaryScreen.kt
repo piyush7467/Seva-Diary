@@ -35,22 +35,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sevadiary.app.R
 import com.sevadiary.app.core.network.dto.SevaRecordDto
+import com.sevadiary.app.feature.seva.data.AshramColors
 import com.sevadiary.app.feature.seva.data.AshramMasterData
+import com.sevadiary.app.feature.seva.data.rememberAshramColors
 import com.sevadiary.app.feature.seva.presentation.SevaViewModel
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
-
-// Seva Diary Devotional Palette
-private val AshramBgColor = Color(0xFFFAF8F2)
-private val AshramForestGreen = Color(0xFF174C38)
-private val AshramDarkGreen = Color(0xFF103C2D)
-private val AshramSaffronGold = Color(0xFFD99A32)
-private val AshramLightGold = Color(0xFFF4D58A)
-private val AshramPrimaryText = Color(0xFF252B27)
-private val AshramSecondaryText = Color(0xFF646B65)
-private val AshramCardBg = Color(0xFFFFFFFF)
-private val AshramBorderColor = Color(0xFFE5DFD3)
 
 @Composable
 fun AshramDiaryScreen(
@@ -60,6 +50,7 @@ fun AshramDiaryScreen(
     onViewVisitDetails: (visitId: String) -> Unit,
     onEditVisit: (visitId: String) -> Unit
 ) {
+    val colors = rememberAshramColors()
     val uiState by viewModel.uiState.collectAsState()
     var searchInput by remember { mutableStateOf("") }
     var recordToDelete by remember { mutableStateOf<SevaRecordDto?>(null) }
@@ -104,9 +95,10 @@ fun AshramDiaryScreen(
     }
 
     Scaffold(
-        containerColor = AshramBgColor,
+        containerColor = colors.bg,
         topBar = {
             AshramCompactHeader(
+                colors = colors,
                 onBackClick = onBackClick,
                 onRefreshClick = { viewModel.loadRecords() }
             )
@@ -115,8 +107,8 @@ fun AshramDiaryScreen(
             if (uiState.records.isNotEmpty()) {
                 ExtendedFloatingActionButton(
                     onClick = onAddNewVisit,
-                    containerColor = AshramForestGreen,
-                    contentColor = Color.White,
+                    containerColor = colors.primary,
+                    contentColor = colors.onPrimary,
                     shape = RoundedCornerShape(24.dp),
                     icon = { Icon(Icons.Default.Add, contentDescription = null) },
                     text = { Text("Log Visit", fontWeight = FontWeight.Bold, fontSize = 14.sp) }
@@ -131,7 +123,7 @@ fun AshramDiaryScreen(
         ) {
             // Devotional Hero Banner (Visible when records exist or are loading)
             if (uiState.records.isNotEmpty() || uiState.isLoading) {
-                DevotionalHeroBanner()
+                DevotionalHeroBanner(colors = colors)
             }
 
             // 1. Search Bar
@@ -142,6 +134,7 @@ fun AshramDiaryScreen(
             ) {
                 AshramSearchBar(
                     query = searchInput,
+                    colors = colors,
                     onQueryChange = {
                         searchInput = it
                         viewModel.onSearchQueryChange(it)
@@ -183,8 +176,8 @@ fun AshramDiaryScreen(
                                     viewModel.onFilterAshram(next)
                                 },
                                 shape = RoundedCornerShape(20.dp),
-                                color = if (isSelected) AshramForestGreen else AshramCardBg,
-                                border = if (isSelected) null else BorderStroke(1.dp, AshramBorderColor),
+                                color = if (isSelected) colors.primary else colors.chipUnselectedBg,
+                                border = if (isSelected) null else BorderStroke(1.dp, colors.border),
                                 modifier = Modifier.height(36.dp)
                             ) {
                                 Row(
@@ -195,7 +188,7 @@ fun AshramDiaryScreen(
                                         Icon(
                                             painter = painterResource(id = R.drawable.ic_devotional_ashram),
                                             contentDescription = null,
-                                            tint = if (isSelected) Color.White else AshramSaffronGold,
+                                            tint = if (isSelected) colors.onPrimary else colors.gold,
                                             modifier = Modifier.size(15.dp)
                                         )
                                         Spacer(modifier = Modifier.width(6.dp))
@@ -204,7 +197,7 @@ fun AshramDiaryScreen(
                                         text = label,
                                         style = MaterialTheme.typography.labelMedium.copy(
                                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                            color = if (isSelected) Color.White else AshramPrimaryText,
+                                            color = if (isSelected) colors.onPrimary else colors.primaryText,
                                             fontSize = 12.5.sp
                                         )
                                     )
@@ -216,8 +209,8 @@ fun AshramDiaryScreen(
                     // Trailing Right Chevron Indicator Chip
                     Surface(
                         shape = CircleShape,
-                        color = AshramCardBg,
-                        border = BorderStroke(1.dp, AshramBorderColor),
+                        color = colors.chipUnselectedBg,
+                        border = BorderStroke(1.dp, colors.border),
                         modifier = Modifier
                             .padding(end = 20.dp)
                             .size(34.dp)
@@ -226,7 +219,7 @@ fun AshramDiaryScreen(
                             Icon(
                                 imageVector = Icons.Default.ChevronRight,
                                 contentDescription = "More ashrams",
-                                tint = AshramSecondaryText,
+                                tint = colors.secondaryText,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -248,14 +241,14 @@ fun AshramDiaryScreen(
                             text = stringResource(R.string.ashram_your_visits),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = AshramDarkGreen,
+                                color = colors.darkGreen,
                                 fontSize = 17.sp
                             )
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Surface(
                             shape = RoundedCornerShape(12.dp),
-                            color = Color(0xFFE4EDE7)
+                            color = colors.badgeSageBg
                         ) {
                             val countText = if (filteredRecords.size == 1) {
                                 stringResource(R.string.ashram_visits_single)
@@ -266,7 +259,7 @@ fun AshramDiaryScreen(
                                 text = countText,
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontWeight = FontWeight.SemiBold,
-                                    color = AshramForestGreen,
+                                    color = colors.primary,
                                     fontSize = 11.5.sp
                                 ),
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
@@ -288,7 +281,7 @@ fun AshramDiaryScreen(
                                 Icon(
                                     imageVector = Icons.Default.SwapVert,
                                     contentDescription = null,
-                                    tint = AshramSecondaryText,
+                                    tint = colors.secondaryText,
                                     modifier = Modifier.size(15.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
@@ -301,14 +294,14 @@ fun AshramDiaryScreen(
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Medium,
-                                        color = AshramPrimaryText
+                                        color = colors.primaryText
                                     )
                                 )
                                 Spacer(modifier = Modifier.width(2.dp))
                                 Icon(
                                     imageVector = Icons.Default.KeyboardArrowDown,
                                     contentDescription = null,
-                                    tint = AshramSecondaryText,
+                                    tint = colors.secondaryText,
                                     modifier = Modifier.size(14.dp)
                                 )
                             }
@@ -317,17 +310,17 @@ fun AshramDiaryScreen(
                         DropdownMenu(
                             expanded = sortMenuExpanded,
                             onDismissRequest = { sortMenuExpanded = false },
-                            modifier = Modifier.background(AshramCardBg)
+                            modifier = Modifier.background(colors.cardBg)
                         ) {
                             DropdownMenuItem(
-                                text = { Text(stringResource(R.string.ashram_sort_latest), fontSize = 13.sp) },
+                                text = { Text(stringResource(R.string.ashram_sort_latest), color = colors.primaryText, fontSize = 13.sp) },
                                 onClick = {
                                     sortDescending = true
                                     sortMenuExpanded = false
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text(stringResource(R.string.ashram_sort_oldest), fontSize = 13.sp) },
+                                text = { Text(stringResource(R.string.ashram_sort_oldest), color = colors.primaryText, fontSize = 13.sp) },
                                 onClick = {
                                     sortDescending = false
                                     sortMenuExpanded = false
@@ -346,7 +339,7 @@ fun AshramDiaryScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            color = AshramForestGreen,
+                            color = colors.primary,
                             strokeWidth = 3.dp
                         )
                     }
@@ -356,6 +349,7 @@ fun AshramDiaryScreen(
                     // Devotional Empty State matching design
                     AshramEmptyState(
                         errorMessage = uiState.errorMessage,
+                        colors = colors,
                         onAddNewVisit = onAddNewVisit,
                         onRefreshClick = { viewModel.loadRecords() }
                     )
@@ -376,14 +370,14 @@ fun AshramDiaryScreen(
                             Icon(
                                 imageVector = Icons.Default.SearchOff,
                                 contentDescription = null,
-                                tint = AshramSecondaryText,
+                                tint = colors.secondaryText,
                                 modifier = Modifier.size(44.dp)
                             )
                             Text(
                                 text = "No visits match your search or filter.",
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontWeight = FontWeight.Bold,
-                                    color = AshramPrimaryText
+                                    color = colors.primaryText
                                 ),
                                 textAlign = TextAlign.Center
                             )
@@ -394,7 +388,7 @@ fun AshramDiaryScreen(
                                     viewModel.onFilterAshram(null)
                                 }
                             ) {
-                                Text("Clear Filters", color = AshramForestGreen, fontWeight = FontWeight.Bold)
+                                Text("Clear Filters", color = colors.primary, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -408,8 +402,8 @@ fun AshramDiaryScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(3.dp),
-                                color = AshramForestGreen,
-                                trackColor = AshramBorderColor
+                                color = colors.primary,
+                                trackColor = colors.border
                             )
                         }
                         LazyColumn(
@@ -420,6 +414,7 @@ fun AshramDiaryScreen(
                             items(filteredRecords, key = { it.id }) { record ->
                                 AshramVisitCard(
                                     record = record,
+                                    colors = colors,
                                     onViewDetails = { onViewVisitDetails(record.id) },
                                     onEdit = { onEditVisit(record.id) },
                                     onDelete = { recordToDelete = record }
@@ -430,6 +425,7 @@ fun AshramDiaryScreen(
                             item {
                                 Spacer(modifier = Modifier.height(8.dp))
                                 DevotionalGoldSeparator(
+                                    colors = colors,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(horizontal = 40.dp)
@@ -451,13 +447,13 @@ fun AshramDiaryScreen(
                 Text(
                     text = stringResource(R.string.ashram_delete_title),
                     fontWeight = FontWeight.Bold,
-                    color = AshramPrimaryText
+                    color = colors.primaryText
                 )
             },
             text = {
                 Text(
                     text = stringResource(R.string.ashram_delete_confirm),
-                    color = AshramSecondaryText
+                    color = colors.secondaryText
                 )
             },
             confirmButton = {
@@ -470,10 +466,10 @@ fun AshramDiaryScreen(
             },
             dismissButton = {
                 TextButton(onClick = { recordToDelete = null }) {
-                    Text(stringResource(R.string.btn_cancel), color = AshramPrimaryText)
+                    Text(stringResource(R.string.btn_cancel), color = colors.primaryText)
                 }
             },
-            containerColor = AshramCardBg,
+            containerColor = colors.cardBg,
             shape = RoundedCornerShape(16.dp)
         )
     }
@@ -483,11 +479,11 @@ fun AshramDiaryScreen(
  * Top Devotional Hero Banner with Quotation, Lotus Motif, and Satlok Ashram Entrance photograph.
  */
 @Composable
-private fun DevotionalHeroBanner() {
+private fun DevotionalHeroBanner(colors: AshramColors) {
     Surface(
         shape = RoundedCornerShape(18.dp),
-        color = Color(0xFFF7F3E9),
-        border = BorderStroke(1.dp, Color(0xFFEADFCB)),
+        color = colors.bannerBg,
+        border = BorderStroke(1.dp, colors.bannerBorder),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 6.dp)
@@ -511,17 +507,17 @@ private fun DevotionalHeroBanner() {
                 )
             }
 
-            // Smooth Horizontal Gradient Overlay to blend artwork into warm ivory background
+            // Smooth Horizontal Gradient Overlay to blend artwork into background
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
                         Brush.horizontalGradient(
                             colors = listOf(
-                                Color(0xFFF7F3E9),
-                                Color(0xFFF7F3E9),
-                                Color(0xFFF7F3E9).copy(alpha = 0.85f),
-                                Color(0xFFF7F3E9).copy(alpha = 0.3f),
+                                colors.bannerBg,
+                                colors.bannerBg,
+                                colors.bannerBg.copy(alpha = 0.85f),
+                                colors.bannerBg.copy(alpha = 0.3f),
                                 Color.Transparent
                             ),
                             startX = 0f,
@@ -544,7 +540,7 @@ private fun DevotionalHeroBanner() {
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.5.sp,
                         lineHeight = 19.sp,
-                        color = AshramDarkGreen
+                        color = colors.darkGreen
                     )
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -553,13 +549,13 @@ private fun DevotionalHeroBanner() {
                         modifier = Modifier
                             .width(26.dp)
                             .height(1.dp)
-                            .background(AshramSaffronGold.copy(alpha = 0.7f))
+                            .background(colors.gold.copy(alpha = 0.7f))
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Icon(
                         painter = painterResource(id = R.drawable.ic_devotional_lotus),
                         contentDescription = null,
-                        tint = AshramSaffronGold,
+                        tint = colors.gold,
                         modifier = Modifier.size(15.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
@@ -567,7 +563,7 @@ private fun DevotionalHeroBanner() {
                         modifier = Modifier
                             .size(3.5.dp)
                             .clip(CircleShape)
-                            .background(AshramSaffronGold)
+                            .background(colors.gold)
                     )
                 }
             }
@@ -581,6 +577,7 @@ private fun DevotionalHeroBanner() {
 @Composable
 private fun AshramVisitCard(
     record: SevaRecordDto,
+    colors: AshramColors,
     onViewDetails: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit
@@ -623,15 +620,16 @@ private fun AshramVisitCard(
     // Purpose Chip Styling & Icon
     val (chipBgColor, chipTextColor, chipIcon) = getPurposeChipStyle(
         purpose = record.purpose,
-        isOtherPurpose = isOtherPurpose
+        isOtherPurpose = isOtherPurpose,
+        colors = colors
     )
 
     Surface(
         onClick = onViewDetails,
         shape = RoundedCornerShape(16.dp),
-        color = AshramCardBg,
-        border = BorderStroke(1.dp, Color(0xFFEBE6DD)),
-        shadowElevation = 2.dp,
+        color = colors.cardBg,
+        border = BorderStroke(1.dp, colors.border),
+        shadowElevation = 1.5.dp,
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -671,7 +669,7 @@ private fun AshramVisitCard(
                         text = ashramName,
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            color = AshramDarkGreen,
+                            color = colors.darkGreen,
                             fontSize = 14.5.sp
                         ),
                         maxLines = 2,
@@ -689,7 +687,7 @@ private fun AshramVisitCard(
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
                                 contentDescription = "Options",
-                                tint = AshramSecondaryText,
+                                tint = colors.secondaryText,
                                 modifier = Modifier.size(18.dp)
                             )
                         }
@@ -697,15 +695,15 @@ private fun AshramVisitCard(
                         DropdownMenu(
                             expanded = menuExpanded,
                             onDismissRequest = { menuExpanded = false },
-                            modifier = Modifier.background(AshramCardBg)
+                            modifier = Modifier.background(colors.cardBg)
                         ) {
                             DropdownMenuItem(
-                                text = { Text(stringResource(R.string.ashram_view_details), fontSize = 13.sp) },
+                                text = { Text(stringResource(R.string.ashram_view_details), color = colors.primaryText, fontSize = 13.sp) },
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Visibility,
                                         contentDescription = null,
-                                        tint = AshramForestGreen,
+                                        tint = colors.primary,
                                         modifier = Modifier.size(16.dp)
                                     )
                                 },
@@ -715,12 +713,12 @@ private fun AshramVisitCard(
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text(stringResource(R.string.btn_edit_visit), fontSize = 13.sp) },
+                                text = { Text(stringResource(R.string.btn_edit_visit), color = colors.primaryText, fontSize = 13.sp) },
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Edit,
                                         contentDescription = null,
-                                        tint = AshramForestGreen,
+                                        tint = colors.primary,
                                         modifier = Modifier.size(16.dp)
                                     )
                                 },
@@ -765,7 +763,7 @@ private fun AshramVisitCard(
                         Icon(
                             imageVector = Icons.Default.Place,
                             contentDescription = null,
-                            tint = AshramForestGreen,
+                            tint = colors.primary,
                             modifier = Modifier.size(13.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -773,7 +771,7 @@ private fun AshramVisitCard(
                             text = displayLocation,
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontSize = 12.sp,
-                                color = AshramSecondaryText
+                                color = colors.secondaryText
                             ),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -790,7 +788,7 @@ private fun AshramVisitCard(
                     Icon(
                         imageVector = Icons.Default.CalendarToday,
                         contentDescription = null,
-                        tint = AshramSecondaryText,
+                        tint = colors.secondaryText,
                         modifier = Modifier.size(12.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -798,7 +796,7 @@ private fun AshramVisitCard(
                         text = "$displayDateRange ($durationText)",
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontSize = 11.5.sp,
-                            color = AshramSecondaryText,
+                            color = colors.secondaryText,
                             fontWeight = FontWeight.Normal
                         ),
                         maxLines = 1,
@@ -847,7 +845,7 @@ private fun AshramVisitCard(
                     Surface(
                         onClick = onViewDetails,
                         shape = RoundedCornerShape(12.dp),
-                        color = Color(0xFFF1F6F3)
+                        color = colors.buttonSubtleBg
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -858,14 +856,14 @@ private fun AshramVisitCard(
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontWeight = FontWeight.SemiBold,
                                     fontSize = 11.sp,
-                                    color = AshramForestGreen
+                                    color = colors.primary
                                 )
                             )
                             Spacer(modifier = Modifier.width(3.dp))
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                                 contentDescription = null,
-                                tint = AshramForestGreen,
+                                tint = colors.primary,
                                 modifier = Modifier.size(11.dp)
                             )
                         }
@@ -877,52 +875,53 @@ private fun AshramVisitCard(
 }
 
 /**
- * Returns customized soft background color, text color, and icon for devotional purpose categories.
+ * Returns customized soft background color, text color, and icon for devotional purpose categories with dark theme support.
  */
 private fun getPurposeChipStyle(
     purpose: String,
-    isOtherPurpose: Boolean
+    isOtherPurpose: Boolean,
+    colors: AshramColors
 ): Triple<Color, Color, ImageVector> {
     return when {
         purpose.equals("BHANDARA", ignoreCase = true) -> {
             Triple(
-                Color(0xFFFDF2E2), // soft peach/amber
-                Color(0xFFA66408), // dark amber
+                if (colors.isDark) Color(0xFF382310) else Color(0xFFFDF2E2),
+                if (colors.isDark) colors.gold else Color(0xFFA66408),
                 Icons.Default.SoupKitchen
             )
         }
         purpose.equals("SEVA", ignoreCase = true) -> {
             Triple(
-                Color(0xFFEAF4EE), // soft sage green
-                AshramForestGreen,
+                if (colors.isDark) Color(0xFF13361E) else Color(0xFFEAF4EE),
+                colors.primary,
                 Icons.Default.VolunteerActivism
             )
         }
         purpose.equals("SATSANG", ignoreCase = true) -> {
             Triple(
-                Color(0xFFEBF2ED), // gentle green
-                Color(0xFF1B4F3A),
+                if (colors.isDark) Color(0xFF162D20) else Color(0xFFEBF2ED),
+                if (colors.isDark) Color(0xFF81C784) else Color(0xFF1B4F3A),
                 Icons.Default.SelfImprovement
             )
         }
         purpose.equals("NAAM_DAAN", ignoreCase = true) -> {
             Triple(
-                Color(0xFFFFF7E6),
-                Color(0xFFB87000),
+                if (colors.isDark) Color(0xFF3B2E15) else Color(0xFFFFF7E6),
+                colors.gold,
                 Icons.Default.AutoAwesome
             )
         }
         isOtherPurpose -> {
             Triple(
-                Color(0xFFE8F1EC), // soft muted green
-                AshramForestGreen,
+                if (colors.isDark) Color(0xFF172B1F) else Color(0xFFE8F1EC),
+                colors.primary,
                 Icons.Default.Groups
             )
         }
         else -> {
             Triple(
-                Color(0xFFE8F1EC),
-                AshramForestGreen,
+                if (colors.isDark) Color(0xFF172B1F) else Color(0xFFE8F1EC),
+                colors.primary,
                 Icons.Default.Spa
             )
         }
@@ -969,6 +968,7 @@ private fun formatVisitDisplayDate(dateStr: String?): String {
  */
 @Composable
 private fun AshramCompactHeader(
+    colors: AshramColors,
     onBackClick: () -> Unit,
     onRefreshClick: () -> Unit
 ) {
@@ -983,7 +983,7 @@ private fun AshramCompactHeader(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
-                tint = AshramPrimaryText,
+                tint = colors.primaryText,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -996,13 +996,13 @@ private fun AshramCompactHeader(
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
-                    color = AshramDarkGreen
+                    color = colors.darkGreen
                 )
             )
             Text(
                 text = stringResource(R.string.ashram_header_subtitle),
                 style = MaterialTheme.typography.bodySmall.copy(
-                    color = AshramSecondaryText,
+                    color = colors.secondaryText,
                     fontSize = 12.5.sp
                 )
             )
@@ -1012,7 +1012,7 @@ private fun AshramCompactHeader(
             Icon(
                 imageVector = Icons.Default.Refresh,
                 contentDescription = "Refresh",
-                tint = AshramForestGreen,
+                tint = colors.primary,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -1025,6 +1025,7 @@ private fun AshramCompactHeader(
 @Composable
 private fun AshramSearchBar(
     query: String,
+    colors: AshramColors,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -1035,7 +1036,7 @@ private fun AshramSearchBar(
             Text(
                 text = stringResource(R.string.ashram_diary_search_placeholder),
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = AshramSecondaryText.copy(alpha = 0.8f),
+                    color = colors.secondaryText.copy(alpha = 0.8f),
                     fontSize = 13.5.sp
                 ),
                 maxLines = 1,
@@ -1046,7 +1047,7 @@ private fun AshramSearchBar(
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search",
-                tint = AshramSecondaryText,
+                tint = colors.secondaryText,
                 modifier = Modifier.size(20.dp)
             )
         },
@@ -1056,7 +1057,7 @@ private fun AshramSearchBar(
                     Icon(
                         imageVector = Icons.Default.Clear,
                         contentDescription = "Clear",
-                        tint = AshramSecondaryText,
+                        tint = colors.secondaryText,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -1068,11 +1069,13 @@ private fun AshramSearchBar(
             .fillMaxWidth()
             .height(50.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = AshramCardBg,
-            unfocusedContainerColor = AshramCardBg,
-            focusedBorderColor = AshramForestGreen,
-            unfocusedBorderColor = AshramBorderColor,
-            cursorColor = AshramForestGreen
+            focusedContainerColor = colors.cardBg,
+            unfocusedContainerColor = colors.cardBg,
+            focusedBorderColor = colors.primary,
+            unfocusedBorderColor = colors.border,
+            cursorColor = colors.primary,
+            focusedTextColor = colors.primaryText,
+            unfocusedTextColor = colors.primaryText
         )
     )
 }
@@ -1083,6 +1086,7 @@ private fun AshramSearchBar(
 @Composable
 private fun AshramEmptyState(
     errorMessage: String? = null,
+    colors: AshramColors,
     onAddNewVisit: () -> Unit,
     onRefreshClick: () -> Unit = {}
 ) {
@@ -1103,8 +1107,8 @@ private fun AshramEmptyState(
         if (!displayError.isNullOrBlank()) {
             Surface(
                 shape = RoundedCornerShape(12.dp),
-                color = Color(0xFFFDF2E9),
-                border = BorderStroke(1.dp, Color(0xFFF3C89B)),
+                color = if (colors.isDark) Color(0xFF3D2714) else Color(0xFFFDF2E9),
+                border = BorderStroke(1.dp, if (colors.isDark) Color(0xFF5A3B1F) else Color(0xFFF3C89B)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 14.dp)
@@ -1116,17 +1120,17 @@ private fun AshramEmptyState(
                     Icon(
                         imageVector = Icons.Default.CloudOff,
                         contentDescription = null,
-                        tint = AshramSaffronGold,
+                        tint = colors.gold,
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = displayError,
-                        style = MaterialTheme.typography.bodySmall.copy(color = AshramPrimaryText),
+                        style = MaterialTheme.typography.bodySmall.copy(color = colors.primaryText),
                         modifier = Modifier.weight(1f)
                     )
                     TextButton(onClick = onRefreshClick) {
-                        Text("Retry", fontWeight = FontWeight.Bold, color = AshramForestGreen)
+                        Text("Retry", fontWeight = FontWeight.Bold, color = colors.primary)
                     }
                 }
             }
@@ -1135,7 +1139,7 @@ private fun AshramEmptyState(
         // 1. Wide landscape card of the Satlok Ashram Entrance Photograph (onboarding3.png)
         Surface(
             shape = RoundedCornerShape(20.dp),
-            border = BorderStroke(1.dp, Color(0xFFEADBBE)),
+            border = BorderStroke(1.dp, colors.bannerBorder),
             shadowElevation = 3.dp,
             modifier = Modifier
                 .fillMaxWidth()
@@ -1153,7 +1157,7 @@ private fun AshramEmptyState(
         Spacer(modifier = Modifier.height(16.dp))
 
         // 2. Gold Decorative Separator with lotus and ornamental lines
-        DevotionalGoldSeparator()
+        DevotionalGoldSeparator(colors = colors)
 
         Spacer(modifier = Modifier.height(14.dp))
 
@@ -1162,7 +1166,7 @@ private fun AshramEmptyState(
             text = stringResource(R.string.ashram_empty_title),
             style = MaterialTheme.typography.headlineSmall.copy(
                 fontWeight = FontWeight.Bold,
-                color = AshramForestGreen,
+                color = colors.darkGreen,
                 fontSize = 22.sp
             ),
             textAlign = TextAlign.Center
@@ -1174,7 +1178,7 @@ private fun AshramEmptyState(
         Text(
             text = stringResource(R.string.ashram_empty_desc),
             style = MaterialTheme.typography.bodyMedium.copy(
-                color = AshramSecondaryText,
+                color = colors.secondaryText,
                 fontSize = 14.sp,
                 lineHeight = 21.sp
             ),
@@ -1188,7 +1192,7 @@ private fun AshramEmptyState(
         Surface(
             onClick = onAddNewVisit,
             shape = RoundedCornerShape(16.dp),
-            color = AshramForestGreen,
+            color = colors.primary,
             shadowElevation = 3.dp,
             modifier = Modifier
                 .fillMaxWidth()
@@ -1204,7 +1208,7 @@ private fun AshramEmptyState(
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = colors.onPrimary,
                     modifier = Modifier.size(22.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -1213,14 +1217,14 @@ private fun AshramEmptyState(
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
-                        color = Color.White
+                        color = colors.onPrimary
                     )
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = colors.onPrimary,
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -1234,11 +1238,12 @@ private fun AshramEmptyState(
             verticalAlignment = Alignment.CenterVertically
         ) {
             FeatureHighlightItem(
+                colors = colors,
                 icon = {
                     Icon(
                         imageVector = Icons.Default.CalendarToday,
                         contentDescription = null,
-                        tint = AshramSaffronGold,
+                        tint = colors.gold,
                         modifier = Modifier.size(20.dp)
                     )
                 },
@@ -1251,15 +1256,16 @@ private fun AshramEmptyState(
                 modifier = Modifier
                     .width(1.dp)
                     .height(48.dp)
-                    .background(AshramBorderColor.copy(alpha = 0.7f))
+                    .background(colors.border.copy(alpha = 0.7f))
             )
 
             FeatureHighlightItem(
+                colors = colors,
                 icon = {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_devotional_namaskar),
                         contentDescription = null,
-                        tint = AshramSaffronGold,
+                        tint = colors.gold,
                         modifier = Modifier.size(20.dp)
                     )
                 },
@@ -1272,15 +1278,16 @@ private fun AshramEmptyState(
                 modifier = Modifier
                     .width(1.dp)
                     .height(48.dp)
-                    .background(AshramBorderColor.copy(alpha = 0.7f))
+                    .background(colors.border.copy(alpha = 0.7f))
             )
 
             FeatureHighlightItem(
+                colors = colors,
                 icon = {
                     Icon(
                         imageVector = Icons.Default.Description,
                         contentDescription = null,
-                        tint = AshramSaffronGold,
+                        tint = colors.gold,
                         modifier = Modifier.size(20.dp)
                     )
                 },
@@ -1297,6 +1304,7 @@ private fun AshramEmptyState(
  */
 @Composable
 private fun DevotionalGoldSeparator(
+    colors: AshramColors,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -1313,7 +1321,7 @@ private fun DevotionalGoldSeparator(
                 .height(1.dp)
                 .background(
                     Brush.horizontalGradient(
-                        colors = listOf(Color.Transparent, AshramSaffronGold.copy(alpha = 0.7f))
+                        colors = listOf(Color.Transparent, colors.gold.copy(alpha = 0.7f))
                     )
                 )
         )
@@ -1322,14 +1330,14 @@ private fun DevotionalGoldSeparator(
             modifier = Modifier
                 .size(5.dp)
                 .rotate(45f)
-                .background(AshramSaffronGold)
+                .background(colors.gold)
         )
         Spacer(modifier = Modifier.width(6.dp))
         Box(
             modifier = Modifier
                 .size(4.dp)
                 .clip(CircleShape)
-                .background(AshramSaffronGold)
+                .background(colors.gold)
         )
         Spacer(modifier = Modifier.width(8.dp))
 
@@ -1337,7 +1345,7 @@ private fun DevotionalGoldSeparator(
         Icon(
             painter = painterResource(id = R.drawable.ic_devotional_lotus),
             contentDescription = null,
-            tint = AshramSaffronGold,
+            tint = colors.gold,
             modifier = Modifier.size(22.dp)
         )
 
@@ -1346,14 +1354,14 @@ private fun DevotionalGoldSeparator(
             modifier = Modifier
                 .size(4.dp)
                 .clip(CircleShape)
-                .background(AshramSaffronGold)
+                .background(colors.gold)
         )
         Spacer(modifier = Modifier.width(6.dp))
         Box(
             modifier = Modifier
                 .size(5.dp)
                 .rotate(45f)
-                .background(AshramSaffronGold)
+                .background(colors.gold)
         )
         Spacer(modifier = Modifier.width(6.dp))
         // Right gradient line
@@ -1363,7 +1371,7 @@ private fun DevotionalGoldSeparator(
                 .height(1.dp)
                 .background(
                     Brush.horizontalGradient(
-                        colors = listOf(AshramSaffronGold.copy(alpha = 0.7f), Color.Transparent)
+                        colors = listOf(colors.gold.copy(alpha = 0.7f), Color.Transparent)
                     )
                 )
         )
@@ -1375,6 +1383,7 @@ private fun DevotionalGoldSeparator(
  */
 @Composable
 private fun FeatureHighlightItem(
+    colors: AshramColors,
     icon: @Composable () -> Unit,
     title: String,
     desc: String,
@@ -1387,7 +1396,7 @@ private fun FeatureHighlightItem(
     ) {
         Surface(
             shape = CircleShape,
-            color = Color(0xFFF9F1DF),
+            color = if (colors.isDark) Color(0xFF2C2417) else Color(0xFFF9F1DF),
             modifier = Modifier.size(46.dp)
         ) {
             Box(contentAlignment = Alignment.Center) {
@@ -1400,7 +1409,7 @@ private fun FeatureHighlightItem(
             style = MaterialTheme.typography.titleSmall.copy(
                 fontWeight = FontWeight.Bold,
                 fontSize = 12.sp,
-                color = AshramPrimaryText
+                color = colors.primaryText
             ),
             textAlign = TextAlign.Center
         )
@@ -1409,7 +1418,7 @@ private fun FeatureHighlightItem(
             text = desc,
             style = MaterialTheme.typography.bodySmall.copy(
                 fontSize = 10.5.sp,
-                color = AshramSecondaryText,
+                color = colors.secondaryText,
                 lineHeight = 14.sp
             ),
             textAlign = TextAlign.Center
