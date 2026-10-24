@@ -6,11 +6,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,7 +27,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,11 +34,22 @@ import com.sevadiary.app.R
 import com.sevadiary.app.core.designsystem.theme.*
 import com.sevadiary.app.feature.chanting.presentation.ChantingUiState
 import com.sevadiary.app.feature.chanting.presentation.ChantingViewModel
+import com.sevadiary.app.feature.seva.data.AshramMasterData
 import com.sevadiary.app.feature.seva.presentation.SevaUiState
 import com.sevadiary.app.feature.seva.presentation.SevaViewModel
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
+
+// Devotional Theme Constants
+private val AshramBgColor = Color(0xFFFAF8F2)
+private val AshramForestGreen = Color(0xFF174C38)
+private val AshramDarkGreen = Color(0xFF103C2D)
+private val AshramSaffronGold = Color(0xFFD99A32)
+private val AshramPrimaryText = Color(0xFF252B27)
+private val AshramSecondaryText = Color(0xFF646B65)
+private val AshramCardBg = Color(0xFFFFFFFF)
+private val AshramBorderColor = Color(0xFFE5DFD3)
 
 @Composable
 fun DashboardScreen(
@@ -46,7 +59,8 @@ fun DashboardScreen(
     onNavigateToChanting: () -> Unit,
     onNavigateToAshram: () -> Unit,
     onNavigateToReports: () -> Unit,
-    onNavigateToSettings: () -> Unit
+    onNavigateToSettings: () -> Unit,
+    onNavigateToAllFeatures: () -> Unit = onNavigateToChanting
 ) {
     // Refresh stats when dashboard is opened or resumed
     LaunchedEffect(Unit) {
@@ -64,23 +78,44 @@ fun DashboardScreen(
     val todayCount = chantingUiState.todayCount
     val target = if (chantingUiState.target > 0) chantingUiState.target else 108
     val progress = (todayCount.toFloat() / target.toFloat()).coerceIn(0f, 1f)
-    val percentage = (progress * 100).toInt()
+    val percentage = ((todayCount.toFloat() / target.toFloat()) * 100).toInt()
     val remaining = (target - todayCount).coerceAtLeast(0)
     val thisMonthJaap = chantingUiState.summary.thisMonth
 
     // Ashram visit summary values
-    val recentVisit = sevaUiState.records.firstOrNull()
+    val records = sevaUiState.records
+    val recentVisit = records.firstOrNull()
     val visitDateText = remember(recentVisit?.startDate) {
         formatVisitDisplayDate(recentVisit?.startDate)
     }
     val visitDurationText = if (recentVisit != null) {
-        stringResource(R.string.days_stay, recentVisit.durationDays)
+        if (recentVisit.durationDays == 1) "1 day stay" else "${recentVisit.durationDays} days stay"
     } else {
         stringResource(R.string.log_your_visit)
     }
+    val recentVisitLocation = remember(recentVisit) {
+        if (recentVisit == null) ""
+        else if (recentVisit.customAshramName.isNotBlank()) recentVisit.customAshramName
+        else {
+            val master = AshramMasterData.findByCode(recentVisit.ashramCode)
+            if (master != null) {
+                master.code.replace("_", " ").lowercase()
+                    .split(" ").joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
+            } else {
+                recentVisit.ashramCode.replace("_", " ")
+            }
+        }
+    }
+    val totalVisitsCount = records.size
+    val distinctAshramsCount = remember(records) {
+        records.map { it.ashramCode }.distinct().size
+    }
+    val totalSevaDays = remember(records) {
+        records.sumOf { it.durationDays }
+    }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = AshramBgColor,
         topBar = {
             DashboardTopBar(
                 devotionalName = devotionalName,
@@ -105,11 +140,11 @@ fun DashboardScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
             Spacer(modifier = Modifier.height(2.dp))
 
-            // 1. Hero Card: "Today's Naam Jaap" with target progress & devotional quote
+            // 1. Hero Card: "Today's Naam Jaap" with Full-Width Progress & Target Badge
             NaamJaapSummaryHeroCard(
                 todayCount = todayCount,
                 target = target,
@@ -120,175 +155,26 @@ fun DashboardScreen(
                 onClick = onNavigateToChanting
             )
 
-            // 2. Row with Two Compact Stat Chips: "This Month Total Jaap" & "Last Ashram Visit"
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // This Month Total Jaap
-                StatChipCard(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.this_month),
-                    subtitle = stringResource(R.string.total_jaap),
-                    value = NumberFormat.getIntegerInstance().format(thisMonthJaap),
-                    icon = {
-                        Box(
-                            modifier = Modifier
-                                .size(38.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(if (isDark) Color(0xFF143820) else Color(0xFFD7EEDB)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.DateRange,
-                                contentDescription = null,
-                                tint = if (isDark) DevotionalEmerald else Color(0xFF2E7D32),
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    },
-                    trailing = {
-                        Icon(
-                            imageVector = Icons.Default.BarChart,
-                            contentDescription = null,
-                            tint = if (isDark) DevotionalEmerald else Color(0xFF2E7D32),
-                            modifier = Modifier.size(22.dp)
-                        )
-                    },
-                    cardBgColor = if (isDark) Color(0xFF18241B) else Color(0xFFF0F7F2),
-                    cardBorderColor = if (isDark) DevotionalEmerald.copy(alpha = 0.3f) else Color(0x332E7D32),
-                    onClick = onNavigateToChanting
-                )
-
-                // Last Ashram Visit
-                StatChipCard(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.last_ashram_visit),
-                    subtitle = visitDurationText,
-                    value = visitDateText.ifBlank { stringResource(R.string.no_visits_yet) },
-                    icon = {
-                        Box(
-                            modifier = Modifier
-                                .size(38.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(if (isDark) Color(0xFF4A3414) else Color(0xFFFEE8C8)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_devotional_ashram),
-                                contentDescription = null,
-                                tint = if (isDark) RadiantGold else Color(0xFFD97706),
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    },
-                    trailing = {
-                        Icon(
-                            imageVector = Icons.Default.ChevronRight,
-                            contentDescription = null,
-                            tint = if (isDark) RadiantGold else Color(0xFFD97706),
-                            modifier = Modifier.size(20.dp)
-                        )
-                    },
-                    cardBgColor = if (isDark) Color(0xFF262016) else Color(0xFFFFF8EC),
-                    cardBorderColor = if (isDark) RadiantGold.copy(alpha = 0.3f) else Color(0x33D9822B),
-                    onClick = onNavigateToAshram
-                )
-            }
-
-            // 3. Section Header: "Explore Features" & "View All >"
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.explore_features),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontSize = 18.sp
-                    )
-                )
-
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable(onClick = onNavigateToChanting)
-                        .padding(horizontal = 4.dp, vertical = 2.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(R.string.view_all),
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontSize = 13.sp
-                        )
-                    )
-                    Spacer(modifier = Modifier.width(2.dp))
-                    Icon(
-                        imageVector = Icons.Default.ChevronRight,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            }
-
-            // 4. Feature Cards
-            // Card 1: Daily Naam Jaap
-            FeatureActionCard(
-                title = stringResource(R.string.jaap_title),
-                description = stringResource(R.string.feature_jaap_desc),
-                iconBgColor = if (isDark) Color(0xFF351F24) else Color(0xFFFFEEF1),
-                iconContent = {
-                    Image(
-                        painter = painterResource(id = R.drawable.counter_logo),
-                        contentDescription = stringResource(R.string.jaap_title),
-                        modifier = Modifier.size(36.dp)
-                    )
-                },
-                onClick = onNavigateToChanting
+            // 2. Horizontally Scrollable "Quick Insights" Section
+            QuickInsightsSection(
+                thisMonthJaap = thisMonthJaap,
+                recentVisitDate = visitDateText,
+                recentVisitDuration = visitDurationText,
+                recentVisitLocation = recentVisitLocation,
+                totalVisitsCount = totalVisitsCount,
+                distinctAshramsCount = distinctAshramsCount,
+                totalSevaDays = totalSevaDays,
+                onNavigateToChanting = onNavigateToChanting,
+                onNavigateToAshram = onNavigateToAshram,
+                onNavigateToReports = onNavigateToReports
             )
 
-            // Card 2: Satlok Ashram Visits
-            FeatureActionCard(
-                title = stringResource(R.string.ashram_diary_title),
-                description = stringResource(R.string.feature_ashram_desc),
-                iconBgColor = if (isDark) Color(0xFF38291A) else Color(0xFFFEF0DE),
-                iconContent = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_devotional_ashram),
-                        contentDescription = stringResource(R.string.ashram_diary_title),
-                        tint = if (isDark) RadiantGold else SaffronGold,
-                        modifier = Modifier.size(28.dp)
-                    )
-                },
-                onClick = onNavigateToAshram
-            )
-
-            // Card 3: Personal Reports
-            FeatureActionCard(
-                title = stringResource(R.string.reports_title),
-                description = stringResource(R.string.feature_reports_desc),
-                iconBgColor = if (isDark) Color(0xFF193220) else Color(0xFFE8F7ED),
-                iconContent = {
-                    Icon(
-                        imageVector = Icons.Default.Description,
-                        contentDescription = stringResource(R.string.reports_title),
-                        tint = if (isDark) DevotionalEmerald else SuccessGreen,
-                        modifier = Modifier.size(26.dp)
-                    )
-                },
-                onClick = onNavigateToReports
-            )
-
-            // 5. Daily Devotional Quote Card
-            DevotionalQuoteCard(
-                isDark = isDark
+            // 3. Section: "Explore Features" with functional "View All >"
+            ExploreFeaturesSection(
+                onNavigateToChanting = onNavigateToChanting,
+                onNavigateToAshram = onNavigateToAshram,
+                onNavigateToReports = onNavigateToReports,
+                onViewAllClick = onNavigateToAllFeatures
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -297,7 +183,8 @@ fun DashboardScreen(
 }
 
 /**
- * Top App Bar with status bar insets, circular avatar with gold border, devotee greeting, and quick actions.
+ * Top App Bar with status bar insets, circular avatar with gold border, devotee greeting, and profile action.
+ * Note: Notification bell is removed completely as requested.
  */
 @Composable
 private fun DashboardTopBar(
@@ -325,7 +212,7 @@ private fun DashboardTopBar(
                     .clip(CircleShape)
                     .background(Color.White)
                     .border(
-                        BorderStroke(1.5.dp, SaffronGold.copy(alpha = 0.6f)),
+                        BorderStroke(1.5.dp, AshramSaffronGold.copy(alpha = 0.7f)),
                         CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -346,7 +233,7 @@ private fun DashboardTopBar(
                 Text(
                     text = stringResource(R.string.greeting_sat_saheb),
                     style = MaterialTheme.typography.labelSmall.copy(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = AshramSecondaryText,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Normal
                     )
@@ -357,7 +244,7 @@ private fun DashboardTopBar(
                     text = displayName,
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        color = if (isDark) DevotionalEmerald else ForestGreen,
+                        color = if (isDark) DevotionalEmerald else AshramDarkGreen,
                         fontSize = 19.sp
                     ),
                     maxLines = 1,
@@ -367,8 +254,8 @@ private fun DashboardTopBar(
                 Text(
                     text = stringResource(R.string.app_tagline),
                     style = MaterialTheme.typography.bodySmall.copy(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 11.sp
+                        color = AshramSecondaryText,
+                        fontSize = 11.5.sp
                     ),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -378,58 +265,29 @@ private fun DashboardTopBar(
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        // Actions: Notification bell with unread indicator & Profile / Settings button
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            // Notifications Bell Button
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = "Notifications",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
-                // Red unread notification dot
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .align(Alignment.TopEnd)
-                        .offset(x = (-8).dp, y = 8.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFE53935))
-                )
-            }
-
-            // Profile / Settings Button
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f))
+        // Profile / Settings Button (Only profile icon kept, notification bell removed)
+        Box(
+            modifier = Modifier
+                .size(42.dp)
+                .clip(CircleShape)
+                .background(Color.White)
+                .border(BorderStroke(1.dp, AshramBorderColor), CircleShape)
                 .clickable(onClick = onNavigateToSettings),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Profile",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = "Profile",
+                tint = AshramForestGreen,
+                modifier = Modifier.size(22.dp)
+            )
         }
     }
 }
 
 /**
- * Hero Card showing Today's Naam Jaap progress and inspirational devotional quote.
+ * Redesigned Hero Card for Today's Naam Jaap.
+ * Full width layout, large counter, progress bar, completion badge, and no quote section.
  */
 @Composable
 private fun NaamJaapSummaryHeroCard(
@@ -441,177 +299,481 @@ private fun NaamJaapSummaryHeroCard(
     isDark: Boolean,
     onClick: () -> Unit
 ) {
+    val isCompleted = todayCount >= target
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(20.dp),
-        color = if (isDark) Color(0xFF14331E) else ForestGreen,
+        color = if (isDark) Color(0xFF14331E) else AshramForestGreen,
         border = BorderStroke(
             1.dp,
             if (isDark) DevotionalEmerald.copy(alpha = 0.35f) else Color(0x334DB670)
         ),
         shadowElevation = 3.dp
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 18.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(horizontal = 20.dp, vertical = 20.dp)
         ) {
-            // Left Section: Naam Jaap counts & progress
-            Column(modifier = Modifier.weight(1.25f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = stringResource(R.string.today_naam_jaap),
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            fontSize = 15.sp
-                        )
+            // Top Row: Title and Trailing Chevron Circle
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.today_naam_jaap),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        fontSize = 16.sp
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Box(
-                        modifier = Modifier
-                            .size(22.dp)
-                            .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.2f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ChevronRight,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(15.dp)
-                        )
-                    }
-                }
+                )
 
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Row(verticalAlignment = Alignment.Bottom) {
-                    Text(
-                        text = NumberFormat.getIntegerInstance().format(todayCount),
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color.White,
-                            fontSize = 28.sp
-                        )
-                    )
-                    Text(
-                        text = " / ${NumberFormat.getIntegerInstance().format(target)}",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color.White.copy(alpha = 0.75f),
-                            fontSize = 17.sp
-                        ),
-                        modifier = Modifier.padding(bottom = 3.dp, start = 4.dp)
+                Box(
+                    modifier = Modifier
+                        .size(26.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.2f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
                     )
                 }
+            }
 
-                Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-                // Progress Bar with percentage
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+            // Large Jaap Counter Display
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(
+                    text = NumberFormat.getIntegerInstance().format(todayCount),
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.White,
+                        fontSize = 36.sp
+                    )
+                )
+                Text(
+                    text = " / ${NumberFormat.getIntegerInstance().format(target)}",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White.copy(alpha = 0.75f),
+                        fontSize = 22.sp
+                    ),
+                    modifier = Modifier.padding(bottom = 4.dp, start = 6.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Full-Width Progress Bar with Percentage on Right
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(8.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(Color.White.copy(alpha = 0.22f))
                 ) {
                     Box(
                         modifier = Modifier
-                            .weight(1f)
-                            .height(7.dp)
-                            .clip(RoundedCornerShape(3.5.dp))
-                            .background(Color.White.copy(alpha = 0.22f))
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth(fraction = progress)
-                                .fillMaxHeight()
-                                .clip(RoundedCornerShape(3.5.dp))
-                                .background(Color(0xFF4ADE80))
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "$percentage%",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            fontSize = 11.sp
-                        )
+                            .fillMaxWidth(fraction = progress)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(Color(0xFF34C759))
                     )
                 }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Target Remaining Notice
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Schedule,
-                        contentDescription = null,
-                        tint = Color.White.copy(alpha = 0.75f),
-                        modifier = Modifier.size(13.dp)
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = "$percentage%",
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        fontSize = 13.sp
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = if (remaining > 0) {
-                            stringResource(
-                                R.string.remaining_to_daily_target,
-                                NumberFormat.getIntegerInstance().format(remaining)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Completion / Remaining Capsule Badge
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = Color.Black.copy(alpha = 0.25f),
+                modifier = Modifier.wrapContentWidth()
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (isCompleted) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = Color(0xFF4ADE80),
+                            modifier = Modifier.size(15.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = stringResource(R.string.jaap_target_completed_banner),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                color = Color.White,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 12.sp
                             )
-                        } else {
-                            stringResource(R.string.daily_target_completed)
-                        },
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            color = Color.White.copy(alpha = 0.8f),
-                            fontSize = 10.5.sp
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Schedule,
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = 0.85f),
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = stringResource(
+                                R.string.jaap_target_remaining_banner,
+                                NumberFormat.getIntegerInstance().format(remaining)
+                            ),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                color = Color.White.copy(alpha = 0.9f),
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 12.sp
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Horizontally Scrollable "Quick Insights" Section using LazyRow.
+ */
+@Composable
+private fun QuickInsightsSection(
+    thisMonthJaap: Int,
+    recentVisitDate: String,
+    recentVisitDuration: String,
+    recentVisitLocation: String,
+    totalVisitsCount: Int,
+    distinctAshramsCount: Int,
+    totalSevaDays: Int,
+    onNavigateToChanting: () -> Unit,
+    onNavigateToAshram: () -> Unit,
+    onNavigateToReports: () -> Unit
+) {
+    val listState = rememberLazyListState()
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        // Section Header: "Quick Insights" & "View All >"
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.quick_insights),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = AshramDarkGreen,
+                    fontSize = 18.sp
+                )
+            )
+
+            Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable(onClick = onNavigateToReports)
+                    .padding(horizontal = 4.dp, vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.view_all),
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = AshramForestGreen,
+                        fontSize = 13.sp
+                    )
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = null,
+                    tint = AshramForestGreen,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Horizontally Scrollable Cards Row
+        LazyRow(
+            state = listState,
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(horizontal = 0.dp)
+        ) {
+            // 1. This Month Total Jaap
+            item {
+                InsightCard(
+                    title = stringResource(R.string.this_month),
+                    subtitle = stringResource(R.string.total_jaap),
+                    value = NumberFormat.getIntegerInstance().format(thisMonthJaap),
+                    footerText = stringResource(R.string.trend_from_last_month),
+                    footerIcon = Icons.AutoMirrored.Filled.TrendingUp,
+                    bgColor = Color(0xFFF0F7F3),
+                    borderColor = Color(0xFFDCEAE1),
+                    iconBgColor = Color(0xFFD9EFE2),
+                    iconTint = Color(0xFF1E7E34),
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = null,
+                            tint = Color(0xFF1E7E34),
+                            modifier = Modifier.size(18.dp)
+                        )
+                    },
+                    width = 160.dp,
+                    onClick = onNavigateToChanting
+                )
+            }
+
+            // 2. Last Ashram Visit
+            item {
+                InsightCard(
+                    title = stringResource(R.string.last_ashram_visit),
+                    subtitle = recentVisitDuration,
+                    value = recentVisitDate.ifBlank { stringResource(R.string.no_visits_yet) },
+                    footerText = recentVisitLocation.ifBlank { "Satlok Ashram" },
+                    footerIcon = Icons.Default.Place,
+                    bgColor = Color(0xFFFDF7EC),
+                    borderColor = Color(0xFFF4E7CE),
+                    iconBgColor = Color(0xFFFDE8C8),
+                    iconTint = Color(0xFFD97706),
+                    icon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_devotional_ashram),
+                            contentDescription = null,
+                            tint = Color(0xFFD97706),
+                            modifier = Modifier.size(18.dp)
+                        )
+                    },
+                    width = 170.dp,
+                    onClick = onNavigateToAshram
+                )
+            }
+
+            // 3. Total Visits
+            item {
+                val ashramCountText = if (distinctAshramsCount == 1) {
+                    stringResource(R.string.distinct_ashram_single)
+                } else {
+                    stringResource(R.string.distinct_ashrams_format, distinctAshramsCount)
+                }
+                InsightCard(
+                    title = stringResource(R.string.total_visits_title),
+                    subtitle = "",
+                    value = totalVisitsCount.toString(),
+                    footerText = ashramCountText,
+                    footerIcon = null,
+                    bgColor = Color(0xFFFDF2F2),
+                    borderColor = Color(0xFFF9DCDC),
+                    iconBgColor = Color(0xFFFDDCDC),
+                    iconTint = Color(0xFFE53935),
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.LocalFireDepartment,
+                            contentDescription = null,
+                            tint = Color(0xFFE53935),
+                            modifier = Modifier.size(18.dp)
+                        )
+                    },
+                    width = 150.dp,
+                    onClick = onNavigateToAshram
+                )
+            }
+
+            // 4. Total Seva Days
+            item {
+                val sevaDaysText = if (totalSevaDays == 1) {
+                    stringResource(R.string.day_at_ashram_single)
+                } else {
+                    stringResource(R.string.days_at_ashram_format, totalSevaDays)
+                }
+                InsightCard(
+                    title = stringResource(R.string.total_seva_days_title),
+                    subtitle = "",
+                    value = totalSevaDays.toString(),
+                    footerText = "days at ashram",
+                    footerIcon = null,
+                    bgColor = Color(0xFFF0F6FA),
+                    borderColor = Color(0xFFDCE8F2),
+                    iconBgColor = Color(0xFFDCEAF6),
+                    iconTint = Color(0xFF1976D2),
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Schedule,
+                            contentDescription = null,
+                            tint = Color(0xFF1976D2),
+                            modifier = Modifier.size(18.dp)
+                        )
+                    },
+                    width = 150.dp,
+                    onClick = onNavigateToAshram
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Scroll Indicator Dots
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            repeat(4) { index ->
+                val isSelected = listState.firstVisibleItemIndex == index
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 3.dp)
+                        .size(if (isSelected) 6.dp else 4.5.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (isSelected) AshramForestGreen else AshramBorderColor
+                        )
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Reusable Insight Card for Quick Insights section.
+ */
+@Composable
+private fun InsightCard(
+    title: String,
+    subtitle: String,
+    value: String,
+    footerText: String,
+    footerIcon: androidx.compose.ui.graphics.vector.ImageVector?,
+    bgColor: Color,
+    borderColor: Color,
+    iconBgColor: Color,
+    iconTint: Color,
+    icon: @Composable () -> Unit,
+    width: androidx.compose.ui.unit.Dp,
+    onClick: () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(16.dp),
+        color = bgColor,
+        border = BorderStroke(1.dp, borderColor),
+        shadowElevation = 1.dp,
+        modifier = Modifier
+            .width(width)
+            .height(142.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(14.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Header Row: Icon + Title & Subtitle
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(iconBgColor),
+                    contentAlignment = Alignment.Center
+                ) {
+                    icon()
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = AshramPrimaryText,
+                            fontSize = 12.5.sp
                         ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+                    if (subtitle.isNotBlank()) {
+                        Text(
+                            text = subtitle,
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                color = AshramSecondaryText,
+                                fontSize = 10.5.sp
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
 
-            // Vertical subtle divider
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 12.dp)
-                    .width(1.dp)
-                    .height(95.dp)
-                    .background(Color.White.copy(alpha = 0.18f))
+            // Big Metric Value
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.ExtraBold,
+                    color = AshramPrimaryText,
+                    fontSize = 20.sp
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
 
-            // Right Section: Golden Lotus & Devotional Quote
-            Column(
-                modifier = Modifier.weight(0.75f),
-                horizontalAlignment = Alignment.CenterHorizontally
+            // Footer Trend / Detail Row
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_devotional_lotus),
-                    contentDescription = null,
-                    tint = Color(0xFFF3C76D),
-                    modifier = Modifier.size(38.dp)
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = stringResource(R.string.quote_naam_aadhar),
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        color = Color.White,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 10.5.sp,
-                        textAlign = TextAlign.Center,
-                        lineHeight = 14.sp
+                if (footerIcon != null) {
+                    Icon(
+                        imageVector = footerIcon,
+                        contentDescription = null,
+                        tint = AshramSecondaryText,
+                        modifier = Modifier.size(13.dp)
                     )
-                )
-                Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                }
                 Text(
-                    text = stringResource(R.string.quote_author_rampal_ji),
+                    text = footerText,
                     style = MaterialTheme.typography.labelSmall.copy(
-                        color = Color.White.copy(alpha = 0.75f),
-                        fontSize = 8.5.sp,
-                        textAlign = TextAlign.Center
-                    )
+                        color = AshramSecondaryText,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
@@ -619,76 +781,111 @@ private fun NaamJaapSummaryHeroCard(
 }
 
 /**
- * Compact Stat Chip for This Month and Last Ashram Visit.
+ * Explore Features section listing primary devotional tools.
  */
 @Composable
-private fun StatChipCard(
-    modifier: Modifier = Modifier,
-    title: String,
-    subtitle: String,
-    value: String,
-    icon: @Composable () -> Unit,
-    trailing: @Composable () -> Unit,
-    cardBgColor: Color,
-    cardBorderColor: Color,
-    onClick: () -> Unit
+private fun ExploreFeaturesSection(
+    onNavigateToChanting: () -> Unit,
+    onNavigateToAshram: () -> Unit,
+    onNavigateToReports: () -> Unit,
+    onViewAllClick: () -> Unit
 ) {
-    Surface(
-        modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
-        color = cardBgColor,
-        border = BorderStroke(1.dp, cardBorderColor),
-        shadowElevation = 1.dp
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        // Section Header
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 12.dp),
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            icon()
-            Spacer(modifier = Modifier.width(8.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 11.sp
-                    ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+            Text(
+                text = stringResource(R.string.explore_features),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = AshramDarkGreen,
+                    fontSize = 18.sp
                 )
+            )
+
+            Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable(onClick = onViewAllClick)
+                    .padding(horizontal = 4.dp, vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 10.sp
-                    ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = value,
-                    style = MaterialTheme.typography.titleMedium.copy(
+                    text = stringResource(R.string.view_all),
+                    style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 15.sp
-                    ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                        color = AshramForestGreen,
+                        fontSize = 13.sp
+                    )
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = null,
+                    tint = AshramForestGreen,
+                    modifier = Modifier.size(16.dp)
                 )
             }
-            trailing()
         }
+
+        // Feature 1: Daily Naam Jaap
+        FeatureActionCard(
+            title = stringResource(R.string.jaap_title),
+            description = stringResource(R.string.feature_jaap_desc),
+            iconBgColor = Color(0xFFFFEEF1),
+            iconContent = {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_devotional_jaap_mala),
+                    contentDescription = null,
+                    tint = Color(0xFFD94A6B),
+                    modifier = Modifier.size(28.dp)
+                )
+            },
+            onClick = onNavigateToChanting
+        )
+
+        // Feature 2: Satlok Ashram Visits
+        FeatureActionCard(
+            title = stringResource(R.string.ashram_diary_title),
+            description = stringResource(R.string.feature_ashram_desc),
+            iconBgColor = Color(0xFFFEF0DE),
+            iconContent = {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_devotional_ashram),
+                    contentDescription = null,
+                    tint = Color(0xFFD97706),
+                    modifier = Modifier.size(28.dp)
+                )
+            },
+            onClick = onNavigateToAshram
+        )
+
+        // Feature 3: Personal Reports
+        FeatureActionCard(
+            title = stringResource(R.string.reports_title),
+            description = stringResource(R.string.feature_reports_desc),
+            iconBgColor = Color(0xFFE8F7ED),
+            iconContent = {
+                Icon(
+                    imageVector = Icons.Default.Description,
+                    contentDescription = null,
+                    tint = Color(0xFF1E7E34),
+                    modifier = Modifier.size(26.dp)
+                )
+            },
+            onClick = onNavigateToReports
+        )
     }
 }
 
 /**
- * Redesigned Feature Card with standardized icon container, aligned text, and chevron.
+ * Standardized Feature Action Card.
  */
 @Composable
 private fun FeatureActionCard(
@@ -701,23 +898,20 @@ private fun FeatureActionCard(
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(18.dp),
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(
-            1.dp,
-            MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
-        ),
+        color = AshramCardBg,
+        border = BorderStroke(1.dp, AshramBorderColor),
         shadowElevation = 1.dp,
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+                .padding(horizontal = 16.dp, vertical = 15.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(54.dp)
+                    .size(52.dp)
                     .clip(CircleShape)
                     .background(iconBgColor),
                 contentAlignment = Alignment.Center
@@ -732,7 +926,7 @@ private fun FeatureActionCard(
                     text = title,
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = AshramPrimaryText,
                         fontSize = 16.sp
                     )
                 )
@@ -740,9 +934,9 @@ private fun FeatureActionCard(
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall.copy(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = AshramSecondaryText,
                         fontSize = 12.sp,
-                        lineHeight = 16.sp
+                        lineHeight = 16.5.sp
                     ),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
@@ -755,77 +949,14 @@ private fun FeatureActionCard(
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)),
+                    .background(Color(0xFFF4EFE6)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = AshramSecondaryText,
                     modifier = Modifier.size(18.dp)
-                )
-            }
-        }
-    }
-}
-
-/**
- * Daily Devotional Quote Banner at the bottom of the screen.
- */
-@Composable
-private fun DevotionalQuoteCard(
-    isDark: Boolean
-) {
-    Surface(
-        shape = RoundedCornerShape(18.dp),
-        color = if (isDark) Color(0xFF221F1B) else Color(0xFFFBF5E8),
-        border = BorderStroke(
-            1.dp,
-            if (isDark) RadiantGold.copy(alpha = 0.3f) else Color(0x33D9822B)
-        ),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_devotional_lotus),
-                contentDescription = null,
-                tint = if (isDark) RadiantGold else SaffronGold,
-                modifier = Modifier.size(38.dp)
-            )
-
-            Spacer(modifier = Modifier.width(14.dp))
-
-            Box(
-                modifier = Modifier
-                    .width(1.dp)
-                    .height(36.dp)
-                    .background(if (isDark) Color(0x33F2A848) else Color(0x33D9822B))
-            )
-
-            Spacer(modifier = Modifier.width(14.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.quote_life_purpose),
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        lineHeight = 16.sp,
-                        fontSize = 12.sp
-                    )
-                )
-                Spacer(modifier = Modifier.height(3.dp))
-                Text(
-                    text = stringResource(R.string.quote_author_rampal_ji),
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 10.sp
-                    )
                 )
             }
         }
@@ -846,12 +977,9 @@ private fun DashboardBottomBar(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(
-            1.dp,
-            MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
-        ),
-        shadowElevation = 4.dp
+        color = AshramCardBg,
+        border = BorderStroke(1.dp, AshramBorderColor),
+        shadowElevation = 6.dp
     ) {
         Row(
             modifier = Modifier
@@ -861,7 +989,7 @@ private fun DashboardBottomBar(
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Home (Selected)
+            // 1. Home (Selected)
             BottomNavItem(
                 label = stringResource(R.string.nav_home),
                 selected = true,
@@ -876,7 +1004,7 @@ private fun DashboardBottomBar(
                 onClick = onHomeClick
             )
 
-            // Jaap
+            // 2. Naam Jaap
             BottomNavItem(
                 label = stringResource(R.string.nav_jaap),
                 selected = false,
@@ -891,7 +1019,7 @@ private fun DashboardBottomBar(
                 onClick = onJaapClick
             )
 
-            // Visits
+            // 3. Visits
             BottomNavItem(
                 label = stringResource(R.string.nav_visits),
                 selected = false,
@@ -906,7 +1034,7 @@ private fun DashboardBottomBar(
                 onClick = onVisitsClick
             )
 
-            // Reports
+            // 4. Reports
             BottomNavItem(
                 label = stringResource(R.string.nav_reports),
                 selected = false,
@@ -921,7 +1049,7 @@ private fun DashboardBottomBar(
                 onClick = onReportsClick
             )
 
-            // Profile
+            // 5. Profile
             BottomNavItem(
                 label = stringResource(R.string.nav_profile),
                 selected = false,
@@ -946,8 +1074,8 @@ private fun BottomNavItem(
     icon: @Composable (tint: Color) -> Unit,
     onClick: () -> Unit
 ) {
-    val activeColor = MaterialTheme.colorScheme.primary
-    val inactiveColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+    val activeColor = AshramForestGreen
+    val inactiveColor = Color(0xFF8E9690)
     val color = if (selected) activeColor else inactiveColor
 
     Column(

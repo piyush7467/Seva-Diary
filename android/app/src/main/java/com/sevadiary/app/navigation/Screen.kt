@@ -20,6 +20,7 @@ sealed class Screen(val route: String) {
     object ReportPreview : Screen("report_preview/{reportType}") {
         fun createRoute(reportType: String) = "report_preview/$reportType"
     }
+    object AllFeatures : Screen("all_features")
     object Settings : Screen("settings")
     object EditProfile : Screen("edit_profile")
 }

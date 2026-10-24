@@ -287,4 +287,20 @@
     <string name="btn_edit_visit">यात्रा संशोधित करें</string>
     <string name="btn_delete_visit">यात्रा हटाएं</string>
     <string name="visit_not_found">यात्रा विवरण उपलब्ध नहीं है</string>
+
+    <!-- Dashboard & Insights Screen Strings -->
+    <string name="quick_insights">त्वरित झलक</string>
+    <string name="total_visits_title">कुल यात्राएं</string>
+    <string name="distinct_ashrams_format">%1$d आश्रम</string>
+    <string name="distinct_ashram_single">1 आश्रम</string>
+    <string name="total_seva_days_title">कुल सेवा दिवस</string>
+    <string name="days_at_ashram_format">%1$d दिन</string>
+    <string name="day_at_ashram_single">1 दिन</string>
+    <string name="jaap_target_completed_banner">दैनिक लक्ष्य पूर्ण! सत साहेब 🙏</string>
+    <string name="jaap_target_remaining_banner">दैनिक लक्ष्य हेतु %1$s सुमिरण शेष</string>
+    <string name="trend_from_last_month">पिछले माह से +20% अधिक</string>
+    <string name="all_features_title">सभी सुविधाएं</string>
+    <string name="all_features_subtitle">सभी आध्यात्मिक साधन एवं डायरी सुविधाएं</string>
+    <string name="feature_profile_title">प्रोफ़ाइल एवं सेटिंग्स</string>
+    <string name="feature_profile_desc">आध्यात्मिक प्राथमिकताएं, भाषा और थीम प्रबंधित करें</string>
 </resources>

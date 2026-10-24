@@ -13,6 +13,7 @@ import com.sevadiary.app.feature.auth.presentation.AuthViewModel
 import com.sevadiary.app.feature.chanting.ChantingScreen
 import com.sevadiary.app.feature.chanting.JaapOnboardingScreen
 import com.sevadiary.app.feature.chanting.presentation.ChantingViewModel
+import com.sevadiary.app.feature.home.AllFeaturesScreen
 import com.sevadiary.app.feature.home.DashboardScreen
 import com.sevadiary.app.feature.onboarding.OnboardingScreen
 import com.sevadiary.app.feature.reports.ReportsScreen
@@ -125,6 +126,17 @@ fun NavGraph(
                 devotionalName = devotionalName,
                 chantingViewModel = chantingViewModel,
                 sevaViewModel = sevaViewModel,
+                onNavigateToChanting = { navController.navigate(Screen.JaapOnboarding.route) },
+                onNavigateToAshram = { navController.navigate(Screen.AshramDiary.route) },
+                onNavigateToReports = { navController.navigate(Screen.Reports.route) },
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                onNavigateToAllFeatures = { navController.navigate(Screen.AllFeatures.route) }
+            )
+        }
+
+        composable(Screen.AllFeatures.route) {
+            AllFeaturesScreen(
+                onBackClick = { navController.popBackStack() },
                 onNavigateToChanting = { navController.navigate(Screen.JaapOnboarding.route) },
                 onNavigateToAshram = { navController.navigate(Screen.AshramDiary.route) },
                 onNavigateToReports = { navController.navigate(Screen.Reports.route) },

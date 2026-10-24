@@ -287,4 +287,20 @@
     <string name="btn_edit_visit">Edit Visit</string>
     <string name="btn_delete_visit">Delete Visit</string>
     <string name="visit_not_found">Visit record not found</string>
+
+    <!-- Dashboard & Insights Screen Strings -->
+    <string name="quick_insights">Quick Insights</string>
+    <string name="total_visits_title">Total Visits</string>
+    <string name="distinct_ashrams_format">%1$d Ashrams</string>
+    <string name="distinct_ashram_single">1 Ashram</string>
+    <string name="total_seva_days_title">Total Seva Days</string>
+    <string name="days_at_ashram_format">%1$d days</string>
+    <string name="day_at_ashram_single">1 day</string>
+    <string name="jaap_target_completed_banner">Daily target completed! Sat Saheb 🙏</string>
+    <string name="jaap_target_remaining_banner">%1$s remaining to reach daily target</string>
+    <string name="trend_from_last_month">+20% from last month</string>
+    <string name="all_features_title">All Features</string>
+    <string name="all_features_subtitle">Explore all devotional tools &amp; diary features</string>
+    <string name="feature_profile_title">Profile &amp; Settings</string>
+    <string name="feature_profile_desc">Manage your spiritual preferences, language &amp; theme</string>
 </resources>
