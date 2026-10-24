@@ -325,6 +325,8 @@
     <string name="delete_account_title">खाता हटाएं</string>
     <string name="badge_member">सदस्य</string>
     <string name="sat_saheb">सत साहेब</string>
+    <string name="devotee_title">भगत जी</string>
+    <string name="label_full_address">पूरा पता</string>
 
     <string name="label_full_name">पूरा नाम</string>
     <string name="label_gender">लिंग</string>

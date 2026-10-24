@@ -72,23 +72,24 @@ fun SettingsScreen(
     var showDeleteAccountDialog by remember { mutableStateOf(false) }
     var snackbarMessage by remember { mutableStateOf<String?>(null) }
 
+    val defaultDevoteeStr = stringResource(R.string.devotee_title)
     val profile = uiState.userProfile ?: remember(devotionalName) {
         UserProfileDto(
-            displayName = devotionalName.ifBlank { "Piyush Das" },
-            username = "piyush123",
-            email = "piyush@example.com",
-            phone = "+91 98765 43210",
+            displayName = devotionalName.ifBlank { defaultDevoteeStr },
+            username = "",
+            email = "",
+            phone = "",
             gender = "MALE",
             address = AddressDto(
-                state = "Haryana",
-                district = "Hisar",
-                tehsil = "Barwala",
-                cityVillage = "Hisar",
-                addressLine = "H.No. 123, XYZ Colony",
-                pinCode = "125121"
+                state = "",
+                district = "",
+                tehsil = "",
+                cityVillage = "",
+                addressLine = "",
+                pinCode = ""
             ),
-            mantraStage = "Pratham Nam",
-            mantraDetails = "Satnam, Sarnam, Sat Saheb"
+            mantraStage = "",
+            mantraDetails = ""
         )
     }
 
@@ -505,21 +506,26 @@ private fun ProfileHeroSection(
                     }
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
+                        val heroDisplayName = profile.displayName.ifBlank {
+                            profile.firstName?.takeIf { it.isNotBlank() } ?: stringResource(R.string.devotee_title)
+                        }
                         Text(
-                            text = profile.displayName.ifBlank { profile.firstName ?: "Piyush Das" },
+                            text = heroDisplayName,
                             style = MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = colors.primaryText,
                                 fontSize = 21.sp
                             )
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = genderSymbol,
-                            color = colors.primary,
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        if (profile.gender.isNotBlank()) {
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = genderSymbol,
+                                color = colors.primary,
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -529,17 +535,16 @@ private fun ProfileHeroSection(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        val displayUsername = if (profile.username.isNotBlank()) {
-                            if (profile.username.startsWith("@")) profile.username else profile.username
-                        } else "piyush123"
-
-                        Text(
-                            text = displayUsername,
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                color = colors.secondaryText,
-                                fontSize = 13.sp
+                        if (profile.username.isNotBlank()) {
+                            val displayUsername = if (profile.username.startsWith("@")) profile.username else "@${profile.username}"
+                            Text(
+                                text = displayUsername,
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    color = colors.secondaryText,
+                                    fontSize = 13.sp
+                                )
                             )
-                        )
+                        }
 
                         Surface(
                             shape = RoundedCornerShape(12.dp),
@@ -630,10 +635,11 @@ private fun PersonalInfoCard(
         colors = colors,
         onHeaderClick = onClick
     ) {
+        val defaultDevoteeStr = stringResource(R.string.devotee_title)
         val fullName = if (profile.firstName.isNullOrBlank() && profile.lastName.isNullOrBlank()) {
-            profile.displayName.ifBlank { "Piyush Das" }
+            profile.displayName.ifBlank { defaultDevoteeStr }
         } else {
-            "${profile.firstName ?: ""} ${profile.lastName ?: ""}".trim().ifBlank { profile.displayName }
+            "${profile.firstName ?: ""} ${profile.lastName ?: ""}".trim().ifBlank { profile.displayName.ifBlank { defaultDevoteeStr } }
         }
 
         val genderText = when (profile.gender.uppercase()) {
@@ -644,9 +650,28 @@ private fun PersonalInfoCard(
 
         ProfileDataRow(label = stringResource(R.string.label_full_name), value = fullName, colors = colors)
         ProfileDataRow(label = stringResource(R.string.label_gender), value = genderText, colors = colors)
-        ProfileDataRow(label = stringResource(R.string.label_phone), value = profile.phone.ifBlank { "+91 98765 43210" }, colors = colors)
-        ProfileDataRow(label = stringResource(R.string.label_email), value = profile.email.ifBlank { "piyush@example.com" }, colors = colors)
-        ProfileDataRow(label = stringResource(R.string.label_username), value = profile.username.ifBlank { "piyush123" }, colors = colors)
+        ProfileDataRow(label = stringResource(R.string.label_phone), value = profile.phone.ifBlank { "—" }, colors = colors)
+        ProfileDataRow(label = stringResource(R.string.label_email), value = profile.email.ifBlank { "—" }, colors = colors)
+        ProfileDataRow(label = stringResource(R.string.label_username), value = profile.username.ifBlank { "—" }, colors = colors)
+    }
+}
+
+/**
+ * Format address by joining present components: (if given) addressLine + village + tehsil + dist + state - pincode
+ */
+fun formatAddressString(address: AddressDto): String {
+    val parts = mutableListOf<String>()
+    if (address.addressLine.isNotBlank()) parts.add(address.addressLine.trim())
+    if (address.cityVillage.isNotBlank()) parts.add(address.cityVillage.trim())
+    if (address.tehsil.isNotBlank()) parts.add(address.tehsil.trim())
+    if (address.district.isNotBlank()) parts.add(address.district.trim())
+    if (address.state.isNotBlank()) parts.add(address.state.trim())
+
+    val base = parts.joinToString(", ")
+    return if (base.isNotBlank()) {
+        if (address.pinCode.isNotBlank()) "$base - ${address.pinCode.trim()}" else base
+    } else {
+        "—"
     }
 }
 
@@ -660,6 +685,7 @@ private fun AddressInfoCard(
     onClick: () -> Unit
 ) {
     val address = profile.address
+    val formattedAddress = remember(address) { formatAddressString(address) }
 
     ProfileSectionContainer(
         title = stringResource(R.string.address_info_title),
@@ -670,12 +696,48 @@ private fun AddressInfoCard(
         colors = colors,
         onHeaderClick = onClick
     ) {
-        ProfileDataRow(label = stringResource(R.string.label_state), value = address.state.ifBlank { "Haryana" }, colors = colors)
-        ProfileDataRow(label = stringResource(R.string.label_district), value = address.district.ifBlank { "Hisar" }, colors = colors)
-        ProfileDataRow(label = stringResource(R.string.label_tehsil), value = address.tehsil.ifBlank { "Barwala" }, colors = colors)
-        ProfileDataRow(label = stringResource(R.string.label_city_village), value = address.cityVillage.ifBlank { "Hisar" }, colors = colors)
-        ProfileDataRow(label = stringResource(R.string.label_address), value = address.addressLine.ifBlank { "H.No. 123, XYZ Colony" }, colors = colors)
-        ProfileDataRow(label = stringResource(R.string.label_pin_code), value = address.pinCode.ifBlank { "125121" }, colors = colors)
+        // Formatted Address: (if given) addressLine + village + tehsil + dist + state - pincode
+        ProfileDataRow(
+            label = stringResource(R.string.label_full_address),
+            value = formattedAddress,
+            colors = colors
+        )
+
+        // Address components (showing actual user data or "—")
+        if (address.addressLine.isNotBlank()) {
+            ProfileDataRow(
+                label = stringResource(R.string.label_address),
+                value = address.addressLine,
+                colors = colors
+            )
+        }
+        ProfileDataRow(
+            label = stringResource(R.string.label_city_village),
+            value = address.cityVillage.ifBlank { "—" },
+            colors = colors
+        )
+        ProfileDataRow(
+            label = stringResource(R.string.label_tehsil),
+            value = address.tehsil.ifBlank { "—" },
+            colors = colors
+        )
+        ProfileDataRow(
+            label = stringResource(R.string.label_district),
+            value = address.district.ifBlank { "—" },
+            colors = colors
+        )
+        ProfileDataRow(
+            label = stringResource(R.string.label_state),
+            value = address.state.ifBlank { "—" },
+            colors = colors
+        )
+        if (address.pinCode.isNotBlank()) {
+            ProfileDataRow(
+                label = stringResource(R.string.label_pin_code),
+                value = address.pinCode,
+                colors = colors
+            )
+        }
     }
 }
 
@@ -707,8 +769,16 @@ private fun MantraDetailsCard(
         colors = colors,
         onHeaderClick = onClick
     ) {
-        ProfileDataRow(label = stringResource(R.string.label_mantra_stage), value = profile.mantraStage.ifBlank { "Pratham Nam" }, colors = colors)
-        ProfileDataRow(label = stringResource(R.string.label_mantra_details), value = profile.mantraDetails.ifBlank { "Satnam, Sarnam, Sat Saheb" }, colors = colors)
+        ProfileDataRow(
+            label = stringResource(R.string.label_mantra_stage),
+            value = profile.mantraStage.ifBlank { "—" },
+            colors = colors
+        )
+        ProfileDataRow(
+            label = stringResource(R.string.label_mantra_details),
+            value = profile.mantraDetails.ifBlank { "—" },
+            colors = colors
+        )
     }
 }
 
@@ -1386,41 +1456,11 @@ private fun EditProfileDialog(
                     fontSize = 13.5.sp
                 )
 
-                // State
+                // Address Line (Optional / if given)
                 OutlinedTextField(
-                    value = state,
-                    onValueChange = { state = it },
-                    label = { Text(stringResource(R.string.label_state)) },
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colors.primary,
-                        unfocusedBorderColor = colors.border,
-                        focusedTextColor = colors.primaryText,
-                        unfocusedTextColor = colors.primaryText
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                // District
-                OutlinedTextField(
-                    value = district,
-                    onValueChange = { district = it },
-                    label = { Text(stringResource(R.string.label_district)) },
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colors.primary,
-                        unfocusedBorderColor = colors.border,
-                        focusedTextColor = colors.primaryText,
-                        unfocusedTextColor = colors.primaryText
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                // Tehsil
-                OutlinedTextField(
-                    value = tehsil,
-                    onValueChange = { tehsil = it },
-                    label = { Text(stringResource(R.string.label_tehsil)) },
+                    value = addressLine,
+                    onValueChange = { addressLine = it },
+                    label = { Text(stringResource(R.string.label_address)) },
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = colors.primary,
@@ -1446,11 +1486,41 @@ private fun EditProfileDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Address Line
+                // Tehsil
                 OutlinedTextField(
-                    value = addressLine,
-                    onValueChange = { addressLine = it },
-                    label = { Text(stringResource(R.string.label_address)) },
+                    value = tehsil,
+                    onValueChange = { tehsil = it },
+                    label = { Text(stringResource(R.string.label_tehsil)) },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colors.primary,
+                        unfocusedBorderColor = colors.border,
+                        focusedTextColor = colors.primaryText,
+                        unfocusedTextColor = colors.primaryText
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // District
+                OutlinedTextField(
+                    value = district,
+                    onValueChange = { district = it },
+                    label = { Text(stringResource(R.string.label_district)) },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colors.primary,
+                        unfocusedBorderColor = colors.border,
+                        focusedTextColor = colors.primaryText,
+                        unfocusedTextColor = colors.primaryText
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // State
+                OutlinedTextField(
+                    value = state,
+                    onValueChange = { state = it },
+                    label = { Text(stringResource(R.string.label_state)) },
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = colors.primary,

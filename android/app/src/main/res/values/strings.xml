@@ -325,6 +325,8 @@
     <string name="delete_account_title">Delete Account</string>
     <string name="badge_member">Member</string>
     <string name="sat_saheb">Sat Saheb</string>
+    <string name="devotee_title">Devotee</string>
+    <string name="label_full_address">Full Address</string>
 
     <string name="label_full_name">Full Name</string>
     <string name="label_gender">Gender</string>

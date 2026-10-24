@@ -233,7 +233,8 @@ private fun DashboardTopBar(
                     )
                 )
 
-                val displayName = devotionalName.ifBlank { "Piyush Das" }
+                val defaultName = stringResource(R.string.devotee_title)
+                val displayName = devotionalName.ifBlank { defaultName }
                 Text(
                     text = displayName,
                     style = MaterialTheme.typography.titleMedium.copy(
