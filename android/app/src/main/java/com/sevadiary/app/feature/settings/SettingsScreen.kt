@@ -887,14 +887,14 @@ private fun AccountSecurityCard(
             )
 
             // Action 5: Delete Account
-            AccountActionRow(
-                icon = Icons.Default.Delete,
-                title = stringResource(R.string.delete_account_title),
-                textColor = MaterialTheme.colorScheme.error,
-                iconTint = MaterialTheme.colorScheme.error,
-                colors = colors,
-                onClick = onDeleteAccountClick
-            )
+//            AccountActionRow(
+//                icon = Icons.Default.Delete,
+//                title = stringResource(R.string.delete_account_title),
+//                textColor = MaterialTheme.colorScheme.error,
+//                iconTint = MaterialTheme.colorScheme.error,
+//                colors = colors,
+//                onClick = onDeleteAccountClick
+//            )
         }
     }
 }

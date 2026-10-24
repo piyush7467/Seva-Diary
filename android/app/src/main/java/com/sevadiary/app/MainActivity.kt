@@ -26,6 +26,8 @@ import com.sevadiary.app.feature.reports.presentation.ReportsViewModel
 import com.sevadiary.app.feature.seva.data.SevaRepository
 import com.sevadiary.app.feature.seva.presentation.SevaViewModel
 import com.sevadiary.app.feature.settings.presentation.SettingsViewModel
+import com.sevadiary.app.feature.updater.AppUpdateDialog
+import com.sevadiary.app.feature.updater.AppUpdateViewModel
 import com.sevadiary.app.navigation.NavGraph
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -78,11 +80,20 @@ class MainActivity : ComponentActivity() {
             var isSessionValid by remember { mutableStateOf(preferencesManager.isSessionValid()) }
             val devotionalName by preferencesManager.devotionalName.collectAsState(initial = preferencesManager.getInitialDevotionalName())
 
+            val updateViewModel = remember { AppUpdateViewModel(apiService) }
+
             // If session is valid on app launch, refresh its timestamp for continuous 1-day rolling window
             LaunchedEffect(Unit) {
                 if (preferencesManager.isSessionValid()) {
                     preferencesManager.refreshSessionTimestamp()
                 }
+                val currentVersionCode = try {
+                    val pInfo = packageManager.getPackageInfo(packageName, 0)
+                    androidx.core.content.pm.PackageInfoCompat.getLongVersionCode(pInfo).toInt()
+                } catch (_: Exception) {
+                    1
+                }
+                updateViewModel.checkForUpdates(currentVersionCode)
             }
 
             val darkTheme = when (currentTheme) {
@@ -152,6 +163,9 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     )
+
+                    // In-App Auto Update Dialog (checks for new APK updates automatically)
+                    AppUpdateDialog(viewModel = updateViewModel)
                 }
             }
         }

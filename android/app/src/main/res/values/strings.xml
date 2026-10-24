@@ -358,4 +358,15 @@
     <string name="password_changed_success">Password changed successfully!</string>
     <string name="delete_account_confirm">Are you sure you want to delete your account? This action cannot be undone.</string>
     <string name="btn_save_changes">Save Changes</string>
+
+    <!-- In-App Auto Updater -->
+    <string name="app_update_available_title">New Update Available</string>
+    <string name="app_update_available_subtitle">A newer version of Seva Diary is ready with improvements.</string>
+    <string name="app_update_version_label">Version %1$s</string>
+    <string name="app_update_release_notes_label">What\'s New:</string>
+    <string name="btn_update_now">Update Now</string>
+    <string name="btn_update_later">Later</string>
+    <string name="app_update_downloading">Downloading update (%1$d%%)…</string>
+    <string name="app_update_installing">Preparing installation…</string>
+    <string name="app_update_error">Could not download update. Please check your internet connection.</string>
 </resources>

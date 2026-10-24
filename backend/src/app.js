@@ -11,6 +11,7 @@ const userRoutes = require('./modules/users/user.routes');
 const chantingRoutes = require('./modules/chanting/chanting.routes');
 const sevaRoutes = require('./modules/seva/seva.routes');
 const masterDataRoutes = require('./modules/master-data/master-data.routes');
+const appUpdateRoutes = require('./modules/app-update/app-update.routes');
 
 const app = express();
 
@@ -63,6 +64,7 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/chanting', chantingRoutes);
 app.use('/api/v1/seva', sevaRoutes);
 app.use('/api/v1/master-data', masterDataRoutes);
+app.use('/api/v1/app', appUpdateRoutes);
 
 // Error Handling
 app.use(notFoundHandler);

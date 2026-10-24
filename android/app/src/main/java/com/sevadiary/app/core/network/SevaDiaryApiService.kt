@@ -31,6 +31,10 @@ interface SevaDiaryApiService {
     @POST("api/v1/auth/change-password/verify-otp")
     suspend fun verifyChangePasswordOtp(@Body request: ChangePasswordOtpRequest): Response<ApiResponse<Map<String, String>>>
 
+    // In-App Auto-Updater
+    @GET("api/v1/app/version")
+    suspend fun getAppVersion(): Response<ApiResponse<AppUpdateDto>>
+
     // User Profile
     @GET("api/v1/users/me")
     suspend fun getProfile(): Response<ApiResponse<UserProfileDto>>

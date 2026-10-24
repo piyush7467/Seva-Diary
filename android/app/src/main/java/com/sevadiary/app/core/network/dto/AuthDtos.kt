@@ -106,3 +106,12 @@ data class PreferencesDto(
     val theme: String = "system",
     val language: String = "en"
 )
+
+data class AppUpdateDto(
+    val versionCode: Int = 1,
+    val versionName: String = "1.0.0",
+    val title: String = "New Update Available",
+    val releaseNotes: String = "",
+    val downloadUrl: String = "",
+    val isForceUpdate: Boolean = false
+)
