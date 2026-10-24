@@ -195,6 +195,7 @@
     <string name="profile_edit">प्रोफाइल संपादित करें</string>
     <string name="onboarding_reopen">ऐप गाइड एवं टूर</string>
     <string name="btn_logout">लॉगआउट</string>
+    <string name="logging_out">लॉग आउट हो रहा है…</string>
     <string name="logout_confirm">क्या आप लॉगआउट करना चाहते हैं?</string>
     <string name="version_info">सेवा डायरी संस्करण 1.0.0</string>
 

@@ -117,16 +117,20 @@ class AuthRepository(
     }
 
     suspend fun logout(): Result<Unit> {
-        return try {
-            val currentRefreshToken = tokenManager.getRefreshToken()
-            if (!currentRefreshToken.isNullOrBlank()) {
-                apiService.logout(RefreshRequest(currentRefreshToken))
+        val currentRefreshToken = tokenManager.getRefreshToken()
+        // Immediately clear local tokens so client-side authentication is cleared in 0ms
+        tokenManager.clearTokens()
+
+        // Asynchronously notify backend with a 1.5s timeout so UI is never blocked
+        if (!currentRefreshToken.isNullOrBlank()) {
+            try {
+                kotlinx.coroutines.withTimeoutOrNull(1500L) {
+                    apiService.logout(RefreshRequest(currentRefreshToken))
+                }
+            } catch (_: Exception) {
+                // Ignore network exceptions since local session is already cleared
             }
-            tokenManager.clearTokens()
-            Result.success(Unit)
-        } catch (e: Exception) {
-            tokenManager.clearTokens()
-            Result.success(Unit)
         }
+        return Result.success(Unit)
     }
 }

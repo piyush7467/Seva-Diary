@@ -211,13 +211,15 @@ object ApiClient {
         val tokenAuthenticator = TokenAuthenticator(tokenManager)
 
         val okHttpClient = OkHttpClient.Builder()
+            .connectionPool(okhttp3.ConnectionPool(5, 5, TimeUnit.MINUTES))
             .addInterceptor(failoverInterceptor)
             .addInterceptor(authInterceptor)
             .addInterceptor(loggingInterceptor)
             .authenticator(tokenAuthenticator)
-            .connectTimeout(6, TimeUnit.SECONDS)
-            .readTimeout(15, TimeUnit.SECONDS)
-            .writeTimeout(15, TimeUnit.SECONDS)
+            .connectTimeout(5, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(true)
             .build()
 
         val retrofitInstance = Retrofit.Builder()

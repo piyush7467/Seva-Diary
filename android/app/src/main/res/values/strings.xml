@@ -195,6 +195,7 @@
     <string name="profile_edit">Edit Profile</string>
     <string name="onboarding_reopen">App Guide &amp; Tour</string>
     <string name="btn_logout">Logout</string>
+    <string name="logging_out">Signing out…</string>
     <string name="logout_confirm">Are you sure you want to log out?</string>
     <string name="version_info">Seva Diary v1.0.0</string>
 

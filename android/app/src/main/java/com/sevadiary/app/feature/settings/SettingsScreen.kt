@@ -131,6 +131,17 @@ fun SettingsScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
+            // Subtle Loading Bar when refreshing profile in background
+            if (uiState.isLoading) {
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(3.dp),
+                    color = colors.gold,
+                    trackColor = colors.bannerBg
+                )
+            }
+
             // 1. Devotional Header Banner with Ashram Illustration & Avatar
             ProfileHeroSection(
                 profile = profile,
@@ -292,6 +303,51 @@ fun SettingsScreen(
             containerColor = colors.cardBg,
             shape = RoundedCornerShape(16.dp)
         )
+    }
+
+    // Fullscreen Overlay Loader: Signing Out
+    if (uiState.isLoggingOut) {
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = {},
+            properties = androidx.compose.ui.window.DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false
+            )
+        ) {
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = colors.cardBg),
+                border = BorderStroke(1.dp, colors.border)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(28.dp),
+                        color = colors.primary,
+                        strokeWidth = 3.dp
+                    )
+                    Column {
+                        Text(
+                            text = stringResource(R.string.logging_out),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                color = colors.primaryText,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                        Text(
+                            text = stringResource(R.string.sat_saheb),
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = colors.gold,
+                                fontWeight = FontWeight.Medium
+                            )
+                        )
+                    }
+                }
+            }
+        }
     }
 
     // Dialog: Delete Account Confirmation

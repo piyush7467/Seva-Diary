@@ -23,7 +23,8 @@ data class SettingsUiState(
     val isVerifyingOtp: Boolean = false,
     val otpSentSuccess: Boolean = false,
     val maskedEmail: String? = null,
-    val changePasswordSuccess: Boolean = false
+    val changePasswordSuccess: Boolean = false,
+    val isLoggingOut: Boolean = false
 )
 
 class SettingsViewModel(
@@ -165,9 +166,11 @@ class SettingsViewModel(
     }
 
     fun logout(onLoggedOut: () -> Unit) {
+        _uiState.value = _uiState.value.copy(isLoggingOut = true)
         viewModelScope.launch {
             authRepository.logout()
             preferencesManager.clearSessionPreferences()
+            _uiState.value = _uiState.value.copy(isLoggingOut = false)
             onLoggedOut()
         }
     }
