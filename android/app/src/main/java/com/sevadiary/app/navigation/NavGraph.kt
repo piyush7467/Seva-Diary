@@ -233,7 +233,15 @@ fun NavGraph(
                         popUpTo(Screen.Dashboard.route) { inclusive = true }
                     }
                 },
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStack() },
+                onNavigateToHome = {
+                    navController.navigate(Screen.Dashboard.route) {
+                        popUpTo(Screen.Dashboard.route) { inclusive = true }
+                    }
+                },
+                onNavigateToJaap = { navController.navigate(Screen.JaapOnboarding.route) },
+                onNavigateToVisits = { navController.navigate(Screen.AshramDiary.route) },
+                onNavigateToReports = { navController.navigate(Screen.Reports.route) }
             )
         }
     }

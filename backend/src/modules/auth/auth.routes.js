@@ -2,6 +2,7 @@ const express = require('express');
 const { body } = require('express-validator');
 const authController = require('./auth.controller');
 const { authLimiter, passwordResetLimiter } = require('../../common/middleware/rate-limiter.middleware');
+const { authenticate } = require('../../common/middleware/auth.middleware');
 
 const router = express.Router();
 
@@ -58,6 +59,22 @@ router.post(
     body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters.')
   ],
   authController.resetPassword
+);
+
+router.post(
+  '/change-password/request-otp',
+  authenticate,
+  authController.requestChangePasswordOtp
+);
+
+router.post(
+  '/change-password/verify-otp',
+  authenticate,
+  [
+    body('otp').trim().isLength({ min: 6, max: 6 }).withMessage('A valid 6-digit OTP is required.'),
+    body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters.')
+  ],
+  authController.verifyChangePasswordOtp
 );
 
 module.exports = router;

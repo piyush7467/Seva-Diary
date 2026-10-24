@@ -15,6 +15,7 @@ class UserController {
         success: true,
         data: {
           id: user._id.toString(),
+          userId: user._id.toString(),
           firstName: user.firstName,
           lastName: user.lastName,
           gender: user.gender,
@@ -39,6 +40,7 @@ class UserController {
       const allowedUpdates = [
         'firstName',
         'lastName',
+        'gender',
         'displayName',
         'phone',
         'address',
@@ -52,6 +54,11 @@ class UserController {
         if (req.body[key] !== undefined) {
           updates[key] = req.body[key];
         }
+      }
+
+      // If displayName not explicitly supplied but firstName is updated, sync displayName
+      if (updates.firstName && !updates.displayName) {
+        updates.displayName = `${updates.firstName} ${updates.lastName || ''}`.trim();
       }
 
       const user = await User.findByIdAndUpdate(
@@ -71,6 +78,7 @@ class UserController {
         success: true,
         data: {
           id: user._id.toString(),
+          userId: user._id.toString(),
           firstName: user.firstName,
           lastName: user.lastName,
           gender: user.gender,
@@ -79,6 +87,7 @@ class UserController {
           email: user.normalizedEmail,
           phone: user.phone,
           address: user.address,
+          mantraStage: user.mantraStage || 'Pratham Nam',
           mantraDetails: user.mantraDetails,
           preferences: user.preferences,
           updatedAt: user.updatedAt

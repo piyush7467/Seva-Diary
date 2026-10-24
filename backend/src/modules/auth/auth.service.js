@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require('uuid') || { v4: () => require('crypto').randomUUID() };
 const crypto = require('crypto');
-const { User, RefreshSession, PasswordResetToken } = require('./auth.model');
+const { User, RefreshSession, PasswordResetToken, ChangePasswordOtp } = require('./auth.model');
 const {
   hashPassword,
   verifyPassword,
@@ -309,6 +309,105 @@ class AuthService {
     );
 
     return { success: true, message: 'Password has been successfully updated. Please log in.' };
+  }
+
+  async requestChangePasswordOtp({ userId }) {
+    const user = await User.findById(userId);
+    if (!user) {
+      const error = new Error('User not found.');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    // Generate cryptographically secure 6-digit numeric OTP
+    const otpCode = crypto.randomInt(100000, 1000000).toString();
+    const otpHash = hashToken(otpCode);
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Invalidate any existing unused OTPs for this user
+    await ChangePasswordOtp.updateMany(
+      { userId: user._id, usedAt: null },
+      { $set: { usedAt: new Date() } }
+    );
+
+    await ChangePasswordOtp.create({
+      userId: user._id,
+      otpHash,
+      expiresAt
+    });
+
+    // Send transactional email via Brevo
+    await brevoService.sendChangePasswordOtpEmail({
+      toEmail: user.normalizedEmail,
+      displayName: user.displayName,
+      otpCode
+    });
+
+    const [local, domain] = user.normalizedEmail.split('@');
+    const maskedEmail = local.length > 2
+      ? `${local[0]}***${local[local.length - 1]}@${domain}`
+      : `${local[0]}***@${domain}`;
+
+    return {
+      success: true,
+      message: 'A 6-digit verification OTP has been sent to your registered email.',
+      maskedEmail
+    };
+  }
+
+  async verifyChangePasswordOtp({ userId, otp, newPassword }) {
+    if (!otp || otp.trim().length !== 6) {
+      const error = new Error('Please enter a valid 6-digit OTP.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (!newPassword || newPassword.length < 6) {
+      const error = new Error('New password must be at least 6 characters.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      const error = new Error('User not found.');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const otpHash = hashToken(otp.trim());
+    const validOtpEntry = await ChangePasswordOtp.findOne({
+      userId: user._id,
+      otpHash,
+      usedAt: null,
+      expiresAt: { $gt: new Date() }
+    });
+
+    if (!validOtpEntry) {
+      const error = new Error('Invalid or expired verification OTP. Please request a new one.');
+      error.statusCode = 400;
+      error.code = 'INVALID_OTP';
+      throw error;
+    }
+
+    // Mark OTP as used
+    validOtpEntry.usedAt = new Date();
+    await validOtpEntry.save();
+
+    // Update password
+    user.passwordHash = await hashPassword(newPassword);
+    await user.save();
+
+    // Invalidate all active refresh sessions for security
+    await RefreshSession.updateMany(
+      { userId: user._id, revokedAt: null },
+      { revokedAt: new Date() }
+    );
+
+    return {
+      success: true,
+      message: 'Your password has been changed successfully.'
+    };
   }
 }
 

@@ -303,4 +303,52 @@
     <string name="all_features_subtitle">Explore all devotional tools &amp; diary features</string>
     <string name="feature_profile_title">Profile &amp; Settings</string>
     <string name="feature_profile_desc">Manage your spiritual preferences, language &amp; theme</string>
+
+    <!-- My Profile Screen Strings -->
+    <string name="my_profile_title">My Profile</string>
+    <string name="my_profile_subtitle">Your devotional journey with Seva Diary</string>
+    <string name="profile_edit_btn">Edit Profile</string>
+    <string name="personal_info_title">Personal Information</string>
+    <string name="personal_info_subtitle">Basic details about you</string>
+    <string name="address_info_title">Address Information</string>
+    <string name="address_info_subtitle">Your current location details</string>
+    <string name="mantra_details_title">Mantra Details</string>
+    <string name="mantra_details_subtitle">Your spiritual information</string>
+    <string name="account_security_title">Account &amp; Security</string>
+    <string name="account_security_subtitle">Manage your account settings</string>
+    <string name="change_password_title">Change Password</string>
+    <string name="delete_account_title">Delete Account</string>
+    <string name="badge_member">Member</string>
+    <string name="sat_saheb">Sat Saheb</string>
+
+    <string name="label_full_name">Full Name</string>
+    <string name="label_gender">Gender</string>
+    <string name="label_phone">Phone</string>
+    <string name="label_email">Email</string>
+    <string name="label_username">Username</string>
+    <string name="label_state">State</string>
+    <string name="label_district">District</string>
+    <string name="label_tehsil">Tehsil</string>
+    <string name="label_city_village">City/Village</string>
+    <string name="label_address">Address</string>
+    <string name="label_pin_code">Pin Code</string>
+    <string name="label_mantra_stage">Mantra Stage</string>
+    <string name="label_mantra_details">Mantra / Details</string>
+
+    <!-- Change Password OTP Dialog -->
+    <string name="otp_dialog_title">Change Password</string>
+    <string name="otp_dialog_desc">A 6-digit verification code will be sent to your registered email to verify your identity.</string>
+    <string name="otp_sent_to">Verification OTP sent to: %1$s</string>
+    <string name="btn_send_otp">Send Verification OTP</string>
+    <string name="btn_resend_otp">Resend OTP</string>
+    <string name="enter_6_digit_otp">Enter 6-Digit OTP</string>
+    <string name="enter_new_password">Enter New Password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
+    <string name="btn_update_password">Update Password</string>
+    <string name="password_mismatch_error">New passwords do not match.</string>
+    <string name="password_length_error">Password must be at least 6 characters.</string>
+    <string name="otp_length_error">Please enter the 6-digit OTP.</string>
+    <string name="password_changed_success">Password changed successfully!</string>
+    <string name="delete_account_confirm">Are you sure you want to delete your account? This action cannot be undone.</string>
+    <string name="btn_save_changes">Save Changes</string>
 </resources>

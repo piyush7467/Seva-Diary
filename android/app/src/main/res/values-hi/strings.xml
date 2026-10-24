@@ -303,4 +303,52 @@
     <string name="all_features_subtitle">सभी आध्यात्मिक साधन एवं डायरी सुविधाएं</string>
     <string name="feature_profile_title">प्रोफ़ाइल एवं सेटिंग्स</string>
     <string name="feature_profile_desc">आध्यात्मिक प्राथमिकताएं, भाषा और थीम प्रबंधित करें</string>
+
+    <!-- My Profile Screen Strings -->
+    <string name="my_profile_title">मेरी प्रोफाइल</string>
+    <string name="my_profile_subtitle">सेवा डायरी के साथ आपकी भक्ति यात्रा</string>
+    <string name="profile_edit_btn">प्रोफ़ाइल संपादित करें</string>
+    <string name="personal_info_title">व्यक्तिगत जानकारी</string>
+    <string name="personal_info_subtitle">आपके बारे में बुनियादी जानकारी</string>
+    <string name="address_info_title">पते की जानकारी</string>
+    <string name="address_info_subtitle">आपके वर्तमान स्थान का विवरण</string>
+    <string name="mantra_details_title">नाम दीक्षा विवरण</string>
+    <string name="mantra_details_subtitle">आपकी आध्यात्मिक जानकारी</string>
+    <string name="account_security_title">खाता और सुरक्षा</string>
+    <string name="account_security_subtitle">अपने खाते की सेटिंग्स प्रबंधित करें</string>
+    <string name="change_password_title">पासवर्ड बदलें</string>
+    <string name="delete_account_title">खाता हटाएं</string>
+    <string name="badge_member">सदस्य</string>
+    <string name="sat_saheb">सत साहेब</string>
+
+    <string name="label_full_name">पूरा नाम</string>
+    <string name="label_gender">लिंग</string>
+    <string name="label_phone">फ़ोन</string>
+    <string name="label_email">ईमेल</string>
+    <string name="label_username">उपयोगकर्ता नाम</string>
+    <string name="label_state">राज्य</string>
+    <string name="label_district">ज़िला</string>
+    <string name="label_tehsil">तहसील</string>
+    <string name="label_city_village">शहर/गाँव</string>
+    <string name="label_address">पता</string>
+    <string name="label_pin_code">पिन कोड</string>
+    <string name="label_mantra_stage">नाम चरण</string>
+    <string name="label_mantra_details">मंत्र / विवरण</string>
+
+    <!-- Change Password OTP Dialog -->
+    <string name="otp_dialog_title">पासवर्ड बदलें</string>
+    <string name="otp_dialog_desc">आपकी पहचान सत्यापित करने के लिए आपके पंजीकृत ईमेल पर 6-अंकों का सत्यापन कोड भेजा जाएगा।</string>
+    <string name="otp_sent_to">सत्यापन ओटीपी भेजा गया: %1$s</string>
+    <string name="btn_send_otp">सत्यापन ओटीपी भेजें</string>
+    <string name="btn_resend_otp">ओटीपी पुनः भेजें</string>
+    <string name="enter_6_digit_otp">6-अंकों का ओटीपी दर्ज करें</string>
+    <string name="enter_new_password">नया पासवर्ड दर्ज करें</string>
+    <string name="confirm_new_password">नए पासवर्ड की पुष्टि करें</string>
+    <string name="btn_update_password">पासवर्ड अपडेट करें</string>
+    <string name="password_mismatch_error">नए पासवर्ड मेल नहीं खाते।</string>
+    <string name="password_length_error">पासवर्ड कम से कम 6 अक्षरों का होना चाहिए।</string>
+    <string name="otp_length_error">कृपया 6-अंकों का ओटीपी दर्ज करें।</string>
+    <string name="password_changed_success">पासवर्ड सफलतापूर्वक बदल दिया गया!</string>
+    <string name="delete_account_confirm">क्या आप वाकई अपना खाता हटाना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती।</string>
+    <string name="btn_save_changes">बदलाव सहेजें</string>
 </resources>

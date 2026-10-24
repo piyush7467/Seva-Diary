@@ -111,6 +111,44 @@ class AuthController {
       next(err);
     }
   }
+
+  async requestChangePasswordOtp(req, res, next) {
+    try {
+      const result = await authService.requestChangePasswordOtp({ userId: req.user.userId });
+      res.status(200).json({
+        success: true,
+        data: result
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async verifyChangePasswordOtp(req, res, next) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: errors.array()[0].msg }
+        });
+      }
+
+      const { otp, newPassword } = req.body;
+      const result = await authService.verifyChangePasswordOtp({
+        userId: req.user.userId,
+        otp,
+        newPassword
+      });
+
+      res.status(200).json({
+        success: true,
+        data: result
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new AuthController();

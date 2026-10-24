@@ -3,6 +3,8 @@ package com.sevadiary.app.feature.settings.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sevadiary.app.core.network.SevaDiaryApiService
+import com.sevadiary.app.core.network.dto.ChangePasswordOtpRequest
+import com.sevadiary.app.core.network.dto.UpdateProfileRequest
 import com.sevadiary.app.core.network.dto.UserProfileDto
 import com.sevadiary.app.core.preferences.PreferencesManager
 import com.sevadiary.app.feature.auth.data.AuthRepository
@@ -16,7 +18,12 @@ data class SettingsUiState(
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val isSuccess: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isRequestingOtp: Boolean = false,
+    val isVerifyingOtp: Boolean = false,
+    val otpSentSuccess: Boolean = false,
+    val maskedEmail: String? = null,
+    val changePasswordSuccess: Boolean = false
 )
 
 class SettingsViewModel(
@@ -54,6 +61,107 @@ class SettingsViewModel(
                 _uiState.value = _uiState.value.copy(isLoading = false)
             }
         }
+    }
+
+    fun updateProfile(
+        request: UpdateProfileRequest,
+        onSuccess: () -> Unit = {},
+        onError: (String) -> Unit = {}
+    ) {
+        _uiState.value = _uiState.value.copy(isSaving = true, errorMessage = null)
+        viewModelScope.launch {
+            try {
+                val response = apiService.updateProfile(request)
+                if (response.isSuccessful && response.body()?.success == true && response.body()?.data != null) {
+                    val updated = response.body()!!.data!!
+                    _uiState.value = _uiState.value.copy(
+                        userProfile = updated,
+                        isSaving = false,
+                        isSuccess = true
+                    )
+                    preferencesManager.setDevotionalName(updated.displayName)
+                    onSuccess()
+                } else {
+                    val errorMsg = response.body()?.error?.message ?: response.errorBody()?.string() ?: "Failed to update profile."
+                    _uiState.value = _uiState.value.copy(isSaving = false, errorMessage = errorMsg)
+                    onError(errorMsg)
+                }
+            } catch (e: Exception) {
+                val errorMsg = e.localizedMessage ?: "Network error. Please try again."
+                _uiState.value = _uiState.value.copy(isSaving = false, errorMessage = errorMsg)
+                onError(errorMsg)
+            }
+        }
+    }
+
+    fun requestChangePasswordOtp(
+        onSuccess: (String?) -> Unit = {},
+        onError: (String) -> Unit = {}
+    ) {
+        _uiState.value = _uiState.value.copy(isRequestingOtp = true, errorMessage = null)
+        viewModelScope.launch {
+            try {
+                val response = apiService.requestChangePasswordOtp()
+                if (response.isSuccessful && response.body()?.success == true) {
+                    val data = response.body()?.data
+                    val masked = data?.get("maskedEmail")
+                    _uiState.value = _uiState.value.copy(
+                        isRequestingOtp = false,
+                        otpSentSuccess = true,
+                        maskedEmail = masked
+                    )
+                    onSuccess(masked)
+                } else {
+                    val errorMsg = response.body()?.error?.message ?: "Failed to send verification OTP."
+                    _uiState.value = _uiState.value.copy(isRequestingOtp = false, errorMessage = errorMsg)
+                    onError(errorMsg)
+                }
+            } catch (e: Exception) {
+                val errorMsg = e.localizedMessage ?: "Failed to send verification OTP."
+                _uiState.value = _uiState.value.copy(isRequestingOtp = false, errorMessage = errorMsg)
+                onError(errorMsg)
+            }
+        }
+    }
+
+    fun verifyChangePasswordOtp(
+        otp: String,
+        newPassword: String,
+        onSuccess: () -> Unit = {},
+        onError: (String) -> Unit = {}
+    ) {
+        _uiState.value = _uiState.value.copy(isVerifyingOtp = true, errorMessage = null)
+        viewModelScope.launch {
+            try {
+                val response = apiService.verifyChangePasswordOtp(
+                    ChangePasswordOtpRequest(otp = otp.trim(), newPassword = newPassword)
+                )
+                if (response.isSuccessful && response.body()?.success == true) {
+                    _uiState.value = _uiState.value.copy(
+                        isVerifyingOtp = false,
+                        changePasswordSuccess = true
+                    )
+                    onSuccess()
+                } else {
+                    val errorMsg = response.body()?.error?.message ?: "Invalid or expired OTP."
+                    _uiState.value = _uiState.value.copy(isVerifyingOtp = false, errorMessage = errorMsg)
+                    onError(errorMsg)
+                }
+            } catch (e: Exception) {
+                val errorMsg = e.localizedMessage ?: "Failed to verify OTP."
+                _uiState.value = _uiState.value.copy(isVerifyingOtp = false, errorMessage = errorMsg)
+                onError(errorMsg)
+            }
+        }
+    }
+
+    fun resetPasswordState() {
+        _uiState.value = _uiState.value.copy(
+            otpSentSuccess = false,
+            maskedEmail = null,
+            changePasswordSuccess = false,
+            errorMessage = null
+        )
     }
 
     fun logout(onLoggedOut: () -> Unit) {

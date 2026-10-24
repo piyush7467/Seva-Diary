@@ -45,8 +45,16 @@ const PasswordResetTokenSchema = new mongoose.Schema({
   usedAt: { type: Date, default: null }
 }, { timestamps: true });
 
+const ChangePasswordOtpSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+  otpHash: { type: String, required: true },
+  expiresAt: { type: Date, required: true, index: { expires: 0 } },
+  usedAt: { type: Date, default: null }
+}, { timestamps: true });
+
 const User = mongoose.models.User || mongoose.model('User', UserSchema);
 const RefreshSession = mongoose.models.RefreshSession || mongoose.model('RefreshSession', RefreshSessionSchema);
 const PasswordResetToken = mongoose.models.PasswordResetToken || mongoose.model('PasswordResetToken', PasswordResetTokenSchema);
+const ChangePasswordOtp = mongoose.models.ChangePasswordOtp || mongoose.model('ChangePasswordOtp', ChangePasswordOtpSchema);
 
-module.exports = { User, RefreshSession, PasswordResetToken };
+module.exports = { User, RefreshSession, PasswordResetToken, ChangePasswordOtp };

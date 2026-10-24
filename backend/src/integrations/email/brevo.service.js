@@ -83,7 +83,7 @@ class BrevoEmailService {
     `;
 
     try {
-      const response = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
+      const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
       console.log(`[EMAIL] Password reset email queued for recipient successfully.`);
       return { success: true, messageId: response.body?.messageId };
     } catch (error) {
@@ -91,6 +91,59 @@ class BrevoEmailService {
       // Return safe failure without leaking API details
       throw new Error('Email delivery failed. Please try again later.');
     }
+  }
+
+  async sendChangePasswordOtpEmail({ toEmail, displayName, otpCode }) {
+    const apiKey = config.brevo.apiKey;
+    if (!apiKey) {
+      console.warn(`[EMAIL] Brevo API key is not configured in .env. OTP for ${toEmail}: ${otpCode}`);
+      return { success: true, simulated: true, otp: otpCode };
+    }
+
+    const apiInstance = this.getApiInstance();
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    sendSmtpEmail.subject = `Seva Diary — Your Password Change Verification OTP is ${otpCode}`;
+    sendSmtpEmail.sender = {
+      name: config.brevo.senderName,
+      email: config.brevo.senderEmail
+    };
+    sendSmtpEmail.to = [{ email: toEmail, name: displayName || 'Devotee' }];
+    sendSmtpEmail.htmlContent = `
+      <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 580px; margin: 0 auto; padding: 28px; border: 1px solid #E5DFD3; border-radius: 16px; background-color: #FAF8F2;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="color: #174C38; margin: 0; font-size: 24px; font-weight: bold;">Seva Diary</h2>
+          <p style="color: #D99A32; font-size: 14px; margin-top: 4px; font-weight: 600;">Sat Saheb</p>
+        </div>
+        <p style="color: #252B27; font-size: 16px; line-height: 1.5;">
+          Hello <strong>${displayName || 'Devotee'}</strong>,
+        </p>
+        <p style="color: #646B65; font-size: 14px; line-height: 1.6;">
+          You requested to change your password for your Seva Diary account. Please use the following 6-digit OTP code to verify your request:
+        </p>
+        <div style="text-align: center; margin: 28px 0;">
+          <div style="display: inline-block; background-color: #174C38; color: #FFFFFF; font-size: 32px; font-weight: bold; letter-spacing: 8px; padding: 14px 32px; border-radius: 12px; box-shadow: 0 4px 12px rgba(23, 76, 56, 0.18);">
+            ${otpCode}
+          </div>
+        </div>
+        <p style="color: #8E9690; font-size: 13px; text-align: center;">
+          This OTP code is valid for <strong>10 minutes</strong>. Never share this code with anyone.
+        </p>
+        <hr style="border: none; border-top: 1px solid #E5DFD3; margin: 24px 0;" />
+        <p style="color: #8E9690; font-size: 12px; text-align: center; margin: 0;">
+          If you did not make this request, please secure your account immediately.
+        </p>
+      </div>
+    `;
+
+    try {
+      const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
+      console.log(`[EMAIL] Change password OTP queued successfully for ${toEmail}`);
+      return { success: true, messageId: response.body?.messageId };
+    } catch (error) {
+      console.error('[EMAIL] Failed to send OTP email via Brevo:', error.message);
+      throw new Error('Email delivery failed. Please try again later.');
+    }
+  }
   }
 }
 

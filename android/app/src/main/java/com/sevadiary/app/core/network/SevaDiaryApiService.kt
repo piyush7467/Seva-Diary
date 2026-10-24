@@ -25,9 +25,18 @@ interface SevaDiaryApiService {
     @POST("api/v1/auth/reset-password")
     suspend fun resetPassword(@Body request: ResetPasswordRequest): Response<ApiResponse<Map<String, String>>>
 
+    @POST("api/v1/auth/change-password/request-otp")
+    suspend fun requestChangePasswordOtp(): Response<ApiResponse<Map<String, String>>>
+
+    @POST("api/v1/auth/change-password/verify-otp")
+    suspend fun verifyChangePasswordOtp(@Body request: ChangePasswordOtpRequest): Response<ApiResponse<Map<String, String>>>
+
     // User Profile
     @GET("api/v1/users/me")
     suspend fun getProfile(): Response<ApiResponse<UserProfileDto>>
+
+    @PATCH("api/v1/users/me")
+    suspend fun updateProfile(@Body request: UpdateProfileRequest): Response<ApiResponse<UserProfileDto>>
 
     // Chanting
     @GET("api/v1/chanting")

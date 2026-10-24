@@ -63,11 +63,35 @@ data class ResetPasswordRequest(
     val newPassword: String
 )
 
+data class UpdateProfileRequest(
+    val firstName: String? = null,
+    val lastName: String? = null,
+    val gender: String? = null,
+    val displayName: String? = null,
+    val phone: String? = null,
+    val address: AddressDto? = null,
+    val mantraStage: String? = null,
+    val mantraDetails: String? = null
+)
+
+data class ChangePasswordOtpRequest(
+    val otp: String,
+    val newPassword: String
+)
+
 data class UserProfileDto(
-    val userId: String,
-    val displayName: String,
-    val username: String,
-    val email: String,
+    val id: String? = null,
+    val userId: String? = null,
+    val firstName: String? = null,
+    val lastName: String? = null,
+    val gender: String = "MALE",
+    val displayName: String = "",
+    val username: String = "",
+    val email: String = "",
+    val phone: String = "",
+    val address: AddressDto = AddressDto(),
+    val mantraStage: String = "Pratham Nam",
+    val mantraDetails: String = "",
     val preferences: PreferencesDto? = null
 )
 
