@@ -487,127 +487,123 @@ private fun ProfileHeroSection(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Row containing Name + Gender and on right side Edit Profile Button
-            Box(
+            // Centered Name, Username, Member Badge, Sat Saheb, and Edit Profile
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
+                    .padding(horizontal = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Centered Name, Username, Member Badge, Sat Saheb
-                Column(
-                    modifier = Modifier.align(Alignment.Center),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // Display Name + Gender Icon
-                    val genderSymbol = when (profile.gender.uppercase()) {
-                        "FEMALE" -> "♀"
-                        "MALE" -> "♂"
-                        else -> "⚥"
-                    }
+                // Display Name + Gender Icon
+                val genderSymbol = when (profile.gender.uppercase()) {
+                    "FEMALE" -> "♀"
+                    "MALE" -> "♂"
+                    else -> "⚥"
+                }
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        val heroDisplayName = profile.displayName.ifBlank {
-                            profile.firstName?.takeIf { it.isNotBlank() } ?: stringResource(R.string.devotee_title)
-                        }
-                        Text(
-                            text = heroDisplayName,
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = colors.primaryText,
-                                fontSize = 21.sp
-                            )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    val heroDisplayName = profile.displayName.ifBlank {
+                        profile.firstName?.takeIf { it.isNotBlank() } ?: stringResource(R.string.devotee_title)
+                    }
+                    Text(
+                        text = heroDisplayName,
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = colors.primaryText,
+                            fontSize = 21.sp
                         )
-                        if (profile.gender.isNotBlank()) {
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = genderSymbol,
-                                color = colors.primary,
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    // Username + Member Badge
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        if (profile.username.isNotBlank()) {
-                            val displayUsername = if (profile.username.startsWith("@")) profile.username else "@${profile.username}"
-                            Text(
-                                text = displayUsername,
-                                style = MaterialTheme.typography.bodySmall.copy(
-                                    color = colors.secondaryText,
-                                    fontSize = 13.sp
-                                )
-                            )
-                        }
-
-                        Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = if (colors.isDark) Color(0xFF382914) else Color(0xFFFBEBD0)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.badge_member),
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    color = if (colors.isDark) colors.gold else Color(0xFFB57410),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 11.5.sp
-                                ),
-                                modifier = Modifier.padding(horizontal = 9.dp, vertical = 2.5.dp)
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(5.dp))
-
-                    // Sat Saheb greeting
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    )
+                    if (profile.gender.isNotBlank()) {
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "🪷",
-                            fontSize = 12.sp
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = stringResource(R.string.sat_saheb),
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                color = colors.primaryText,
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 12.5.sp
-                            )
+                            text = genderSymbol,
+                            color = colors.primary,
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
 
-                // Edit Profile Button (Aligned to the right)
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Username + Member Badge
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (profile.username.isNotBlank()) {
+                        val displayUsername = if (profile.username.startsWith("@")) profile.username else "@${profile.username}"
+                        Text(
+                            text = displayUsername,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = colors.secondaryText,
+                                fontSize = 13.sp
+                            )
+                        )
+                    }
+
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = if (colors.isDark) Color(0xFF382914) else Color(0xFFFBEBD0)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.badge_member),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                color = if (colors.isDark) colors.gold else Color(0xFFB57410),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 11.5.sp
+                            ),
+                            modifier = Modifier.padding(horizontal = 9.dp, vertical = 2.5.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(5.dp))
+
+                // Sat Saheb greeting
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "🪷",
+                        fontSize = 12.sp
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(R.string.sat_saheb),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = colors.primaryText,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 12.5.sp
+                        )
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Edit Profile Button: Centered with its own row (Never overlaps with Member badge)
                 Surface(
                     onClick = onEditClick,
                     shape = RoundedCornerShape(20.dp),
                     color = colors.cardBg,
-                    border = BorderStroke(1.dp, if (colors.isDark) colors.border else Color(0xFF174C38)),
-                    shadowElevation = 1.dp,
-                    modifier = Modifier.align(Alignment.CenterEnd)
+                    border = BorderStroke(1.dp, if (colors.isDark) colors.border else colors.primary.copy(alpha = 0.5f)),
+                    shadowElevation = 1.dp
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = null,
-                            tint = colors.primaryText,
+                            tint = colors.primary,
                             modifier = Modifier.size(14.dp)
                         )
-                        Spacer(modifier = Modifier.width(5.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = stringResource(R.string.profile_edit_btn),
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                color = colors.primaryText,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                color = colors.primary,
                                 fontWeight = FontWeight.SemiBold,
-                                fontSize = 12.sp
+                                fontSize = 12.5.sp
                             )
                         )
                     }
