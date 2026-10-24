@@ -101,6 +101,10 @@
     <!-- Forgot Password -->
     <string name="forgot_pw_title">Reset Password</string>
     <string name="forgot_pw_instruction">Enter your registered email address. We will send you a secure link to reset your password.</string>
+    <string name="forgot_pw_desc">Enter your registered email address to receive a 6-digit verification OTP code.</string>
+    <string name="forgot_pw_step2_desc">Enter the 6-digit verification code sent to your email and choose your new password.</string>
+    <string name="forgot_pw_success">Password reset successfully! You can now sign in with your new password.</string>
+    <string name="btn_send_code">Send Verification Code</string>
     <string name="btn_send_reset_link">Send Reset Link</string>
     <string name="reset_link_sent_msg">If this email is registered, a password recovery link has been sent. Please check your inbox.</string>
 

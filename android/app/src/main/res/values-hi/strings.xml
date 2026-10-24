@@ -101,6 +101,10 @@
     <!-- Forgot Password -->
     <string name="forgot_pw_title">पासवर्ड रीसेट करें</string>
     <string name="forgot_pw_instruction">अपना पंजीकृत ईमेल पता दर्ज करें। हम आपको पासवर्ड रीसेट करने के लिए एक सुरक्षित लिंक भेजेंगे।</string>
+    <string name="forgot_pw_desc">6-अंकों का सत्यापन ओटीपी कोड प्राप्त करने के लिए अपना पंजीकृत ईमेल पता दर्ज करें।</string>
+    <string name="forgot_pw_step2_desc">अपने ईमेल पर भेजा गया 6-अंकों का सत्यापन कोड और अपना नया पासवर्ड दर्ज करें।</string>
+    <string name="forgot_pw_success">पासवर्ड सफलतापूर्वक रीसेट हो गया! अब आप अपने नए पासवर्ड से साइन इन कर सकते हैं।</string>
+    <string name="btn_send_code">सत्यापन कोड भेजें</string>
     <string name="btn_send_reset_link">रीसेट लिंक भेजें</string>
     <string name="reset_link_sent_msg">यदि यह ईमेल पंजीकृत है, तो पासवर्ड रीसेट लिंक भेज दिया गया है। कृपया अपना इनबॉक्स देखें।</string>
 

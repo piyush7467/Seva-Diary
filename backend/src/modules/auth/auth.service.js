@@ -233,61 +233,102 @@ class AuthService {
 
   async forgotPassword({ email }) {
     const normalizedEmail = email?.trim().toLowerCase();
-    if (!normalizedEmail) return { success: true };
-
-    const user = await User.findOne({ normalizedEmail });
-    if (user) {
-      const rawToken = generateRandomToken(32);
-      const tokenHash = hashToken(rawToken);
-      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-
-      await PasswordResetToken.create({
-        userId: user._id,
-        tokenHash,
-        expiresAt
-      });
-
-      // Send transactional reset email via Brevo
-      try {
-        await brevoService.sendPasswordResetEmail({
-          toEmail: user.normalizedEmail,
-          displayName: user.displayName,
-          resetToken: rawToken
-        });
-      } catch (err) {
-        console.error('[AUTH] Brevo delivery failure:', err.message);
-      }
-    }
-
-    // Generic response to prevent account enumeration
-    return {
-      success: true,
-      message: 'If the email is registered, a password recovery link has been sent.'
-    };
-  }
-
-  async resetPassword({ token, newPassword }) {
-    if (!token || !newPassword || newPassword.length < 6) {
-      const error = new Error('Valid token and password (min 6 characters) are required.');
+    if (!normalizedEmail) {
+      const error = new Error('Email address is required.');
       error.statusCode = 400;
       throw error;
     }
 
-    const tokenHash = hashToken(token);
-    const resetEntry = await PasswordResetToken.findOne({
+    const user = await User.findOne({ normalizedEmail });
+    if (!user) {
+      const error = new Error('No account found with this email address.');
+      error.statusCode = 404;
+      error.code = 'USER_NOT_FOUND';
+      throw error;
+    }
+
+    // Generate 6-digit numeric OTP for mobile password reset
+    const otpCode = crypto.randomInt(100000, 1000000).toString();
+    const tokenHash = hashToken(otpCode);
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    // Invalidate previous unused tokens for this user
+    await PasswordResetToken.updateMany(
+      { userId: user._id, usedAt: null },
+      { $set: { usedAt: new Date() } }
+    );
+
+    await PasswordResetToken.create({
+      userId: user._id,
+      tokenHash,
+      expiresAt
+    });
+
+    // Send transactional reset email via Brevo
+    try {
+      await brevoService.sendPasswordResetEmail({
+        toEmail: user.normalizedEmail,
+        displayName: user.displayName,
+        resetToken: otpCode,
+        otpCode
+      });
+    } catch (err) {
+      console.error('[AUTH] Brevo delivery failure:', err.message);
+      if (err.message.includes('unrecognised IP address') || err.message.includes('IP')) {
+        console.warn(`[AUTH BREVO WARNING] To allow Brevo emails, add IP to Brevo: https://app.brevo.com/security/authorised_ips`);
+      }
+    }
+
+    const [local, domain] = user.normalizedEmail.split('@');
+    const maskedEmail = local.length > 2
+      ? `${local[0]}***${local[local.length - 1]}@${domain}`
+      : `${local[0]}***@${domain}`;
+
+    return {
+      success: true,
+      message: 'A 6-digit password reset code has been sent to your registered email.',
+      data: {
+        email: user.normalizedEmail,
+        maskedEmail
+      }
+    };
+  }
+
+  async resetPassword({ token, otp, email, newPassword }) {
+    const code = (otp || token)?.toString().trim();
+    if (!code || !newPassword || newPassword.length < 6) {
+      const error = new Error('Valid 6-digit verification code and new password (min 6 characters) are required.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    let user = null;
+    if (email) {
+      user = await User.findOne({ normalizedEmail: email.trim().toLowerCase() });
+    }
+
+    const tokenHash = hashToken(code);
+    const query = {
       tokenHash,
       usedAt: null,
       expiresAt: { $gt: new Date() }
-    });
+    };
+    if (user) {
+      query.userId = user._id;
+    }
+
+    const resetEntry = await PasswordResetToken.findOne(query).sort({ createdAt: -1 });
 
     if (!resetEntry) {
-      const error = new Error('Reset link is invalid or has expired.');
+      const error = new Error('Verification code is invalid or has expired. Please request a new one.');
       error.statusCode = 400;
       error.code = 'INVALID_RESET_TOKEN';
       throw error;
     }
 
-    const user = await User.findById(resetEntry.userId);
+    if (!user) {
+      user = await User.findById(resetEntry.userId);
+    }
     if (!user) {
       const error = new Error('User not found.');
       error.statusCode = 404;
@@ -305,7 +346,7 @@ class AuthService {
     // Invalidate all refresh sessions for this user for security
     await RefreshSession.updateMany(
       { userId: user._id, revokedAt: null },
-      { revokedAt: new Date() }
+      { $set: { revokedAt: new Date() } }
     );
 
     return { success: true, message: 'Password has been successfully updated. Please log in.' };

@@ -58,8 +58,15 @@ data class ForgotPasswordRequest(
     val email: String
 )
 
+data class ForgotPasswordResponseData(
+    val email: String? = null,
+    val maskedEmail: String? = null
+)
+
 data class ResetPasswordRequest(
-    val token: String,
+    val email: String? = null,
+    val otp: String? = null,
+    val token: String? = null,
     val newPassword: String
 )
 

@@ -73,16 +73,46 @@ class AuthRepository(
         }
     }
 
-    suspend fun forgotPassword(email: String): Result<String> {
+    suspend fun forgotPassword(email: String): Result<ForgotPasswordResponseData> {
         return try {
-            val response = apiService.forgotPassword(ForgotPasswordRequest(email))
-            if (response.isSuccessful) {
-                Result.success("Password reset link sent if email is registered.")
+            val response = apiService.forgotPassword(ForgotPasswordRequest(email.trim().lowercase()))
+            if (response.isSuccessful && response.body()?.success == true) {
+                val data = response.body()?.data ?: ForgotPasswordResponseData(email = email.trim().lowercase())
+                Result.success(data)
             } else {
-                Result.failure(Exception("Failed to send reset link."))
+                Result.failure(Exception(parseErrorMessage(response)))
             }
+        } catch (e: java.net.SocketTimeoutException) {
+            Result.failure(Exception("Connection timed out. Please verify your internet connection."))
+        } catch (e: java.net.ConnectException) {
+            Result.failure(Exception("Cannot reach server at ${com.sevadiary.app.core.network.ApiClient.baseUrl}. Please check your connection."))
         } catch (e: Exception) {
-            Result.failure(Exception(e.localizedMessage ?: "Network connection error."))
+            Result.failure(Exception(e.localizedMessage ?: "Could not connect to server. Is the backend running?"))
+        }
+    }
+
+    suspend fun resetPassword(email: String, otp: String, newPassword: String): Result<String> {
+        return try {
+            val response = apiService.resetPassword(
+                ResetPasswordRequest(
+                    email = email.trim().lowercase(),
+                    otp = otp.trim(),
+                    token = otp.trim(),
+                    newPassword = newPassword
+                )
+            )
+            if (response.isSuccessful && response.body()?.success == true) {
+                val msg = response.body()?.data?.get("message") ?: "Password has been successfully updated. Please log in."
+                Result.success(msg)
+            } else {
+                Result.failure(Exception(parseErrorMessage(response)))
+            }
+        } catch (e: java.net.SocketTimeoutException) {
+            Result.failure(Exception("Connection timed out. Please verify your internet connection."))
+        } catch (e: java.net.ConnectException) {
+            Result.failure(Exception("Cannot reach server at ${com.sevadiary.app.core.network.ApiClient.baseUrl}. Please check your connection."))
+        } catch (e: Exception) {
+            Result.failure(Exception(e.localizedMessage ?: "Could not connect to server. Is the backend running?"))
         }
     }
 

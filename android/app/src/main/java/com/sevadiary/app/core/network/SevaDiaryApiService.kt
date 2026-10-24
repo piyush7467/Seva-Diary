@@ -20,7 +20,7 @@ interface SevaDiaryApiService {
     suspend fun logout(@Body request: RefreshRequest): Response<ApiResponse<Map<String, String>>>
 
     @POST("api/v1/auth/forgot-password")
-    suspend fun forgotPassword(@Body request: ForgotPasswordRequest): Response<ApiResponse<Map<String, String>>>
+    suspend fun forgotPassword(@Body request: ForgotPasswordRequest): Response<ApiResponse<ForgotPasswordResponseData>>
 
     @POST("api/v1/auth/reset-password")
     suspend fun resetPassword(@Body request: ResetPasswordRequest): Response<ApiResponse<Map<String, String>>>

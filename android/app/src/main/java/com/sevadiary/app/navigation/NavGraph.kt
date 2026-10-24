@@ -115,6 +115,7 @@ fun NavGraph(
 
         composable(Screen.ForgotPassword.route) {
             ForgotPasswordScreen(
+                viewModel = authViewModel,
                 onNavigateBack = {
                     navController.popBackStack()
                 }

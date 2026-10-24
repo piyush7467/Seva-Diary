@@ -101,4 +101,34 @@ class AuthViewModel(
             )
         }
     }
+
+    fun requestPasswordReset(
+        email: String,
+        onSuccess: (ForgotPasswordResponseData) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            val result = authRepository.forgotPassword(email)
+            result.fold(
+                onSuccess = { onSuccess(it) },
+                onFailure = { onError(it.message ?: "Failed to send verification code.") }
+            )
+        }
+    }
+
+    fun resetPasswordWithOtp(
+        email: String,
+        otp: String,
+        newPassword: String,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            val result = authRepository.resetPassword(email, otp, newPassword)
+            result.fold(
+                onSuccess = { onSuccess(it) },
+                onFailure = { onError(it.message ?: "Failed to reset password.") }
+            )
+        }
+    }
 }

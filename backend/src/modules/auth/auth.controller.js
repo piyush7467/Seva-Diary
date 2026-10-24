@@ -101,8 +101,16 @@ class AuthController {
 
   async resetPassword(req, res, next) {
     try {
-      const { token, newPassword } = req.body;
-      const result = await authService.resetPassword({ token, newPassword });
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: errors.array()[0].msg }
+        });
+      }
+
+      const { token, otp, email, newPassword } = req.body;
+      const result = await authService.resetPassword({ token, otp, email, newPassword });
       res.status(200).json({
         success: true,
         data: result

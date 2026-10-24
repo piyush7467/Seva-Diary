@@ -55,8 +55,13 @@ router.post(
 router.post(
   '/reset-password',
   [
-    body('token').notEmpty().withMessage('Reset token is required.'),
-    body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters.')
+    body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters.'),
+    body().custom((value) => {
+      if (!value.token && !value.otp) {
+        throw new Error('Verification code (OTP) or reset token is required.');
+      }
+      return true;
+    })
   ],
   authController.resetPassword
 );
