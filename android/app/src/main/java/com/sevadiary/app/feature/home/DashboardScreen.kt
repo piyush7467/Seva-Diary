@@ -34,22 +34,14 @@ import com.sevadiary.app.R
 import com.sevadiary.app.core.designsystem.theme.*
 import com.sevadiary.app.feature.chanting.presentation.ChantingUiState
 import com.sevadiary.app.feature.chanting.presentation.ChantingViewModel
+import com.sevadiary.app.feature.seva.data.AshramColors
 import com.sevadiary.app.feature.seva.data.AshramMasterData
+import com.sevadiary.app.feature.seva.data.rememberAshramColors
 import com.sevadiary.app.feature.seva.presentation.SevaUiState
 import com.sevadiary.app.feature.seva.presentation.SevaViewModel
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
-
-// Devotional Theme Constants
-private val AshramBgColor = Color(0xFFFAF8F2)
-private val AshramForestGreen = Color(0xFF174C38)
-private val AshramDarkGreen = Color(0xFF103C2D)
-private val AshramSaffronGold = Color(0xFFD99A32)
-private val AshramPrimaryText = Color(0xFF252B27)
-private val AshramSecondaryText = Color(0xFF646B65)
-private val AshramCardBg = Color(0xFFFFFFFF)
-private val AshramBorderColor = Color(0xFFE5DFD3)
 
 @Composable
 fun DashboardScreen(
@@ -62,6 +54,9 @@ fun DashboardScreen(
     onNavigateToSettings: () -> Unit,
     onNavigateToAllFeatures: () -> Unit = onNavigateToChanting
 ) {
+    val colors = rememberAshramColors()
+    val isDark = colors.isDark
+
     // Refresh stats when dashboard is opened or resumed
     LaunchedEffect(Unit) {
         chantingViewModel?.loadData()
@@ -70,9 +65,6 @@ fun DashboardScreen(
 
     val chantingUiState = chantingViewModel?.uiState?.collectAsState()?.value ?: ChantingUiState()
     val sevaUiState = sevaViewModel?.uiState?.collectAsState()?.value ?: SevaUiState()
-
-    // Determine theme mode dynamically (dark vs light)
-    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
 
     // Naam Jaap summary values
     val todayCount = chantingUiState.todayCount
@@ -115,17 +107,17 @@ fun DashboardScreen(
     }
 
     Scaffold(
-        containerColor = AshramBgColor,
+        containerColor = colors.bg,
         topBar = {
             DashboardTopBar(
                 devotionalName = devotionalName,
-                isDark = isDark,
+                colors = colors,
                 onNavigateToSettings = onNavigateToSettings
             )
         },
         bottomBar = {
             DashboardBottomBar(
-                isDark = isDark,
+                colors = colors,
                 onHomeClick = { /* Already on Home */ },
                 onJaapClick = onNavigateToChanting,
                 onVisitsClick = onNavigateToAshram,
@@ -151,7 +143,7 @@ fun DashboardScreen(
                 progress = progress,
                 percentage = percentage,
                 remaining = remaining,
-                isDark = isDark,
+                colors = colors,
                 onClick = onNavigateToChanting
             )
 
@@ -164,6 +156,7 @@ fun DashboardScreen(
                 totalVisitsCount = totalVisitsCount,
                 distinctAshramsCount = distinctAshramsCount,
                 totalSevaDays = totalSevaDays,
+                colors = colors,
                 onNavigateToChanting = onNavigateToChanting,
                 onNavigateToAshram = onNavigateToAshram,
                 onNavigateToReports = onNavigateToReports
@@ -171,6 +164,7 @@ fun DashboardScreen(
 
             // 3. Section: "Explore Features" with functional "View All >"
             ExploreFeaturesSection(
+                colors = colors,
                 onNavigateToChanting = onNavigateToChanting,
                 onNavigateToAshram = onNavigateToAshram,
                 onNavigateToReports = onNavigateToReports,
@@ -189,7 +183,7 @@ fun DashboardScreen(
 @Composable
 private fun DashboardTopBar(
     devotionalName: String,
-    isDark: Boolean,
+    colors: AshramColors,
     onNavigateToSettings: () -> Unit
 ) {
     Row(
@@ -210,9 +204,9 @@ private fun DashboardTopBar(
                     .size(48.dp)
                     .shadow(elevation = 2.dp, shape = CircleShape)
                     .clip(CircleShape)
-                    .background(Color.White)
+                    .background(if (colors.isDark) Color(0xFF1E1C1A) else Color.White)
                     .border(
-                        BorderStroke(1.5.dp, AshramSaffronGold.copy(alpha = 0.7f)),
+                        BorderStroke(1.5.dp, colors.gold.copy(alpha = 0.7f)),
                         CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -233,7 +227,7 @@ private fun DashboardTopBar(
                 Text(
                     text = stringResource(R.string.greeting_sat_saheb),
                     style = MaterialTheme.typography.labelSmall.copy(
-                        color = AshramSecondaryText,
+                        color = colors.secondaryText,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Normal
                     )
@@ -244,7 +238,7 @@ private fun DashboardTopBar(
                     text = displayName,
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        color = if (isDark) DevotionalEmerald else AshramDarkGreen,
+                        color = colors.darkGreen,
                         fontSize = 19.sp
                     ),
                     maxLines = 1,
@@ -254,7 +248,7 @@ private fun DashboardTopBar(
                 Text(
                     text = stringResource(R.string.app_tagline),
                     style = MaterialTheme.typography.bodySmall.copy(
-                        color = AshramSecondaryText,
+                        color = colors.secondaryText,
                         fontSize = 11.5.sp
                     ),
                     maxLines = 1,
@@ -270,15 +264,15 @@ private fun DashboardTopBar(
             modifier = Modifier
                 .size(42.dp)
                 .clip(CircleShape)
-                .background(Color.White)
-                .border(BorderStroke(1.dp, AshramBorderColor), CircleShape)
+                .background(colors.cardBg)
+                .border(BorderStroke(1.dp, colors.border), CircleShape)
                 .clickable(onClick = onNavigateToSettings),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = "Profile",
-                tint = AshramForestGreen,
+                tint = colors.primary,
                 modifier = Modifier.size(22.dp)
             )
         }
@@ -296,7 +290,7 @@ private fun NaamJaapSummaryHeroCard(
     progress: Float,
     percentage: Int,
     remaining: Int,
-    isDark: Boolean,
+    colors: AshramColors,
     onClick: () -> Unit
 ) {
     val isCompleted = todayCount >= target
@@ -307,10 +301,10 @@ private fun NaamJaapSummaryHeroCard(
             .clip(RoundedCornerShape(20.dp))
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(20.dp),
-        color = if (isDark) Color(0xFF14331E) else AshramForestGreen,
+        color = if (colors.isDark) Color(0xFF14331E) else Color(0xFF174C38),
         border = BorderStroke(
             1.dp,
-            if (isDark) DevotionalEmerald.copy(alpha = 0.35f) else Color(0x334DB670)
+            if (colors.isDark) DevotionalEmerald.copy(alpha = 0.35f) else Color(0x334DB670)
         ),
         shadowElevation = 3.dp
     ) {
@@ -472,6 +466,7 @@ private fun QuickInsightsSection(
     totalVisitsCount: Int,
     distinctAshramsCount: Int,
     totalSevaDays: Int,
+    colors: AshramColors,
     onNavigateToChanting: () -> Unit,
     onNavigateToAshram: () -> Unit,
     onNavigateToReports: () -> Unit
@@ -489,7 +484,7 @@ private fun QuickInsightsSection(
                 text = stringResource(R.string.quick_insights),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    color = AshramDarkGreen,
+                    color = colors.darkGreen,
                     fontSize = 18.sp
                 )
             )
@@ -505,7 +500,7 @@ private fun QuickInsightsSection(
                     text = stringResource(R.string.view_all),
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        color = AshramForestGreen,
+                        color = colors.primary,
                         fontSize = 13.sp
                     )
                 )
@@ -513,7 +508,7 @@ private fun QuickInsightsSection(
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
                     contentDescription = null,
-                    tint = AshramForestGreen,
+                    tint = colors.primary,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -536,15 +531,16 @@ private fun QuickInsightsSection(
                     value = NumberFormat.getIntegerInstance().format(thisMonthJaap),
                     footerText = stringResource(R.string.trend_from_last_month),
                     footerIcon = Icons.AutoMirrored.Filled.TrendingUp,
-                    bgColor = Color(0xFFF0F7F3),
-                    borderColor = Color(0xFFDCEAE1),
-                    iconBgColor = Color(0xFFD9EFE2),
-                    iconTint = Color(0xFF1E7E34),
+                    bgColor = if (colors.isDark) Color(0xFF17281D) else Color(0xFFF0F7F3),
+                    borderColor = if (colors.isDark) Color(0xFF253D2E) else Color(0xFFDCEAE1),
+                    iconBgColor = if (colors.isDark) Color(0xFF1D3B26) else Color(0xFFD9EFE2),
+                    iconTint = if (colors.isDark) Color(0xFF4ADE80) else Color(0xFF1E7E34),
+                    colors = colors,
                     icon = {
                         Icon(
                             imageVector = Icons.Default.DateRange,
                             contentDescription = null,
-                            tint = Color(0xFF1E7E34),
+                            tint = if (colors.isDark) Color(0xFF4ADE80) else Color(0xFF1E7E34),
                             modifier = Modifier.size(18.dp)
                         )
                     },
@@ -561,15 +557,16 @@ private fun QuickInsightsSection(
                     value = recentVisitDate.ifBlank { stringResource(R.string.no_visits_yet) },
                     footerText = recentVisitLocation.ifBlank { "Satlok Ashram" },
                     footerIcon = Icons.Default.Place,
-                    bgColor = Color(0xFFFDF7EC),
-                    borderColor = Color(0xFFF4E7CE),
-                    iconBgColor = Color(0xFFFDE8C8),
-                    iconTint = Color(0xFFD97706),
+                    bgColor = if (colors.isDark) Color(0xFF282014) else Color(0xFFFDF7EC),
+                    borderColor = if (colors.isDark) Color(0xFF3E311D) else Color(0xFFF4E7CE),
+                    iconBgColor = if (colors.isDark) Color(0xFF382914) else Color(0xFFFDE8C8),
+                    iconTint = if (colors.isDark) colors.gold else Color(0xFFD97706),
+                    colors = colors,
                     icon = {
                         Icon(
                             painter = painterResource(R.drawable.ic_devotional_ashram),
                             contentDescription = null,
-                            tint = Color(0xFFD97706),
+                            tint = if (colors.isDark) colors.gold else Color(0xFFD97706),
                             modifier = Modifier.size(18.dp)
                         )
                     },
@@ -591,15 +588,16 @@ private fun QuickInsightsSection(
                     value = totalVisitsCount.toString(),
                     footerText = ashramCountText,
                     footerIcon = null,
-                    bgColor = Color(0xFFFDF2F2),
-                    borderColor = Color(0xFFF9DCDC),
-                    iconBgColor = Color(0xFFFDDCDC),
-                    iconTint = Color(0xFFE53935),
+                    bgColor = if (colors.isDark) Color(0xFF2A1717) else Color(0xFFFDF2F2),
+                    borderColor = if (colors.isDark) Color(0xFF422121) else Color(0xFFF9DCDC),
+                    iconBgColor = if (colors.isDark) Color(0xFF3A1919) else Color(0xFFFDDCDC),
+                    iconTint = if (colors.isDark) Color(0xFFFF8A80) else Color(0xFFE53935),
+                    colors = colors,
                     icon = {
                         Icon(
                             imageVector = Icons.Default.LocalFireDepartment,
                             contentDescription = null,
-                            tint = Color(0xFFE53935),
+                            tint = if (colors.isDark) Color(0xFFFF8A80) else Color(0xFFE53935),
                             modifier = Modifier.size(18.dp)
                         )
                     },
@@ -621,15 +619,16 @@ private fun QuickInsightsSection(
                     value = totalSevaDays.toString(),
                     footerText = "days at ashram",
                     footerIcon = null,
-                    bgColor = Color(0xFFF0F6FA),
-                    borderColor = Color(0xFFDCE8F2),
-                    iconBgColor = Color(0xFFDCEAF6),
-                    iconTint = Color(0xFF1976D2),
+                    bgColor = if (colors.isDark) Color(0xFF14222E) else Color(0xFFF0F6FA),
+                    borderColor = if (colors.isDark) Color(0xFF1E3447) else Color(0xFFDCE8F2),
+                    iconBgColor = if (colors.isDark) Color(0xFF162B3D) else Color(0xFFDCEAF6),
+                    iconTint = if (colors.isDark) Color(0xFF64B5F6) else Color(0xFF1976D2),
+                    colors = colors,
                     icon = {
                         Icon(
                             imageVector = Icons.Default.Schedule,
                             contentDescription = null,
-                            tint = Color(0xFF1976D2),
+                            tint = if (colors.isDark) Color(0xFF64B5F6) else Color(0xFF1976D2),
                             modifier = Modifier.size(18.dp)
                         )
                     },
@@ -655,7 +654,7 @@ private fun QuickInsightsSection(
                         .size(if (isSelected) 6.dp else 4.5.dp)
                         .clip(CircleShape)
                         .background(
-                            if (isSelected) AshramForestGreen else AshramBorderColor
+                            if (isSelected) colors.primary else colors.border
                         )
                 )
             }
@@ -677,6 +676,7 @@ private fun InsightCard(
     borderColor: Color,
     iconBgColor: Color,
     iconTint: Color,
+    colors: AshramColors,
     icon: @Composable () -> Unit,
     width: androidx.compose.ui.unit.Dp,
     onClick: () -> Unit
@@ -719,7 +719,7 @@ private fun InsightCard(
                         text = title,
                         style = MaterialTheme.typography.labelMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            color = AshramPrimaryText,
+                            color = colors.primaryText,
                             fontSize = 12.5.sp
                         ),
                         maxLines = 1,
@@ -729,7 +729,7 @@ private fun InsightCard(
                         Text(
                             text = subtitle,
                             style = MaterialTheme.typography.labelSmall.copy(
-                                color = AshramSecondaryText,
+                                color = colors.secondaryText,
                                 fontSize = 10.5.sp
                             ),
                             maxLines = 1,
@@ -744,7 +744,7 @@ private fun InsightCard(
                 text = value,
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.ExtraBold,
-                    color = AshramPrimaryText,
+                    color = colors.primaryText,
                     fontSize = 20.sp
                 ),
                 maxLines = 1,
@@ -760,7 +760,7 @@ private fun InsightCard(
                     Icon(
                         imageVector = footerIcon,
                         contentDescription = null,
-                        tint = AshramSecondaryText,
+                        tint = colors.secondaryText,
                         modifier = Modifier.size(13.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -768,7 +768,7 @@ private fun InsightCard(
                 Text(
                     text = footerText,
                     style = MaterialTheme.typography.labelSmall.copy(
-                        color = AshramSecondaryText,
+                        color = colors.secondaryText,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium
                     ),
@@ -785,6 +785,7 @@ private fun InsightCard(
  */
 @Composable
 private fun ExploreFeaturesSection(
+    colors: AshramColors,
     onNavigateToChanting: () -> Unit,
     onNavigateToAshram: () -> Unit,
     onNavigateToReports: () -> Unit,
@@ -804,7 +805,7 @@ private fun ExploreFeaturesSection(
                 text = stringResource(R.string.explore_features),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    color = AshramDarkGreen,
+                    color = colors.darkGreen,
                     fontSize = 18.sp
                 )
             )
@@ -820,7 +821,7 @@ private fun ExploreFeaturesSection(
                     text = stringResource(R.string.view_all),
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        color = AshramForestGreen,
+                        color = colors.primary,
                         fontSize = 13.sp
                     )
                 )
@@ -828,7 +829,7 @@ private fun ExploreFeaturesSection(
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
                     contentDescription = null,
-                    tint = AshramForestGreen,
+                    tint = colors.primary,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -838,12 +839,13 @@ private fun ExploreFeaturesSection(
         FeatureActionCard(
             title = stringResource(R.string.jaap_title),
             description = stringResource(R.string.feature_jaap_desc),
-            iconBgColor = Color(0xFFFFEEF1),
+            colors = colors,
+            iconBgColor = if (colors.isDark) Color(0xFF351F24) else Color(0xFFFFEEF1),
             iconContent = {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_devotional_jaap_mala),
                     contentDescription = null,
-                    tint = Color(0xFFD94A6B),
+                    tint = if (colors.isDark) Color(0xFFF28B9F) else Color(0xFFD94A6B),
                     modifier = Modifier.size(28.dp)
                 )
             },
@@ -854,12 +856,13 @@ private fun ExploreFeaturesSection(
         FeatureActionCard(
             title = stringResource(R.string.ashram_diary_title),
             description = stringResource(R.string.feature_ashram_desc),
-            iconBgColor = Color(0xFFFEF0DE),
+            colors = colors,
+            iconBgColor = if (colors.isDark) Color(0xFF38291A) else Color(0xFFFEF0DE),
             iconContent = {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_devotional_ashram),
                     contentDescription = null,
-                    tint = Color(0xFFD97706),
+                    tint = colors.gold,
                     modifier = Modifier.size(28.dp)
                 )
             },
@@ -870,12 +873,13 @@ private fun ExploreFeaturesSection(
         FeatureActionCard(
             title = stringResource(R.string.reports_title),
             description = stringResource(R.string.feature_reports_desc),
-            iconBgColor = Color(0xFFE8F7ED),
+            colors = colors,
+            iconBgColor = if (colors.isDark) Color(0xFF193220) else Color(0xFFE8F7ED),
             iconContent = {
                 Icon(
                     imageVector = Icons.Default.Description,
                     contentDescription = null,
-                    tint = Color(0xFF1E7E34),
+                    tint = colors.primary,
                     modifier = Modifier.size(26.dp)
                 )
             },
@@ -891,6 +895,7 @@ private fun ExploreFeaturesSection(
 private fun FeatureActionCard(
     title: String,
     description: String,
+    colors: AshramColors,
     iconBgColor: Color,
     iconContent: @Composable () -> Unit,
     onClick: () -> Unit
@@ -898,8 +903,8 @@ private fun FeatureActionCard(
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(18.dp),
-        color = AshramCardBg,
-        border = BorderStroke(1.dp, AshramBorderColor),
+        color = colors.cardBg,
+        border = BorderStroke(1.dp, colors.border),
         shadowElevation = 1.dp,
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -926,7 +931,7 @@ private fun FeatureActionCard(
                     text = title,
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        color = AshramPrimaryText,
+                        color = colors.primaryText,
                         fontSize = 16.sp
                     )
                 )
@@ -934,7 +939,7 @@ private fun FeatureActionCard(
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall.copy(
-                        color = AshramSecondaryText,
+                        color = colors.secondaryText,
                         fontSize = 12.sp,
                         lineHeight = 16.5.sp
                     ),
@@ -949,13 +954,13 @@ private fun FeatureActionCard(
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFF4EFE6)),
+                    .background(if (colors.isDark) Color(0xFF262320) else Color(0xFFF4EFE6)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
                     contentDescription = null,
-                    tint = AshramSecondaryText,
+                    tint = colors.secondaryText,
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -968,7 +973,7 @@ private fun FeatureActionCard(
  */
 @Composable
 private fun DashboardBottomBar(
-    isDark: Boolean,
+    colors: AshramColors,
     onHomeClick: () -> Unit,
     onJaapClick: () -> Unit,
     onVisitsClick: () -> Unit,
@@ -977,8 +982,8 @@ private fun DashboardBottomBar(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = AshramCardBg,
-        border = BorderStroke(1.dp, AshramBorderColor),
+        color = colors.cardBg,
+        border = BorderStroke(1.dp, colors.border),
         shadowElevation = 6.dp
     ) {
         Row(
@@ -993,6 +998,7 @@ private fun DashboardBottomBar(
             BottomNavItem(
                 label = stringResource(R.string.nav_home),
                 selected = true,
+                colors = colors,
                 icon = { tint ->
                     Icon(
                         imageVector = Icons.Default.Home,
@@ -1008,6 +1014,7 @@ private fun DashboardBottomBar(
             BottomNavItem(
                 label = stringResource(R.string.nav_jaap),
                 selected = false,
+                colors = colors,
                 icon = { tint ->
                     Icon(
                         painter = painterResource(R.drawable.ic_devotional_jaap_mala),
@@ -1023,6 +1030,7 @@ private fun DashboardBottomBar(
             BottomNavItem(
                 label = stringResource(R.string.nav_visits),
                 selected = false,
+                colors = colors,
                 icon = { tint ->
                     Icon(
                         painter = painterResource(R.drawable.ic_devotional_ashram),
@@ -1038,6 +1046,7 @@ private fun DashboardBottomBar(
             BottomNavItem(
                 label = stringResource(R.string.nav_reports),
                 selected = false,
+                colors = colors,
                 icon = { tint ->
                     Icon(
                         imageVector = Icons.Default.Description,
@@ -1053,6 +1062,7 @@ private fun DashboardBottomBar(
             BottomNavItem(
                 label = stringResource(R.string.nav_profile),
                 selected = false,
+                colors = colors,
                 icon = { tint ->
                     Icon(
                         imageVector = Icons.Default.Person,
@@ -1071,11 +1081,12 @@ private fun DashboardBottomBar(
 private fun BottomNavItem(
     label: String,
     selected: Boolean,
+    colors: AshramColors,
     icon: @Composable (tint: Color) -> Unit,
     onClick: () -> Unit
 ) {
-    val activeColor = AshramForestGreen
-    val inactiveColor = Color(0xFF8E9690)
+    val activeColor = colors.primary
+    val inactiveColor = if (colors.isDark) Color(0xFF8E8880) else Color(0xFF8E9690)
     val color = if (selected) activeColor else inactiveColor
 
     Column(
